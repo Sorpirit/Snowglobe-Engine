@@ -1,0 +1,2 @@
+Checks: 'clang-diagnostic-*,clang-analyzer-*,cppcoreguidelines-*,modernize-*,performance-*,readability-*,misc-*,google-*,llvm-*'
+WarningsAsErrors: true
