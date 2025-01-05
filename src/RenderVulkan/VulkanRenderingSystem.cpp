@@ -32,4 +32,9 @@ namespace Snowglobe::RenderVulkan
     {
         _mainWindow = std::make_unique<Render::GLFW::WindowGLFW>(params);
     }
-}
+    
+    void VulkanRenderingSystem::InitializeRenderScene()
+    {
+    }
+    
+    } // namespace Snowglobe::RenderVulkan

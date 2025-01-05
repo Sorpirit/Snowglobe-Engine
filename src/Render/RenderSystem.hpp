@@ -17,6 +17,7 @@ namespace Snowglobe::Render
         virtual void Update() override = 0;
 
         virtual void InitializeWindow(const WindowParams& params) = 0;
+        virtual void InitializeRenderScene() = 0;
 
         Window* GetMainWindow() const { return _mainWindow.get(); }
     };

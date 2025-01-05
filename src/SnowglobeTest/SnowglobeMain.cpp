@@ -1,10 +1,12 @@
 #include <iostream>
 #include <functional>
+#include <string>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <SnowFileSystem.hpp>
 #include <SnowEngine.hpp>
 #include <Window.hpp>
 #include <RenderSystem.hpp>
@@ -23,7 +25,9 @@ int main()
     Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, 0, 0, true, false, true, true, false, 0.0, 0.0, "" };
 
     auto engine = Snowglobe::SnowEngine::SnowEngine::GetInstance();
-    
+    auto fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
+
+    fileSystem->AddMount("C:/Users/danvu/sources/snowglobe/src/RenderOpenGL/Shaders");
     engine->Setup(profile);
     
     // Get render proxy
@@ -35,6 +39,7 @@ int main()
     }
 
     renderSystem->InitializeWindow(windowParams);
+    renderSystem->InitializeRenderScene();
 
     auto mainWindow = renderSystem->GetMainWindow();
 

@@ -13,6 +13,7 @@ public:
 
     virtual void Update() override;
     virtual void InitializeWindow(const Render::WindowParams& params) override;
+    virtual void InitializeRenderScene() override;
 };
 
 } // namespace Snowglobe::RenderVulkan
