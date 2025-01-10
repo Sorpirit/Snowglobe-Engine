@@ -8,8 +8,11 @@
 #include <ShaderCompiler.hpp>
 
 #include <SnowFileSystem.hpp>
-#include "PositionColorVertex.hpp"
+#include "PositionVertex.hpp"
 #include "Mesh.hpp"
+#include "RenderEntity.hpp"
+#include "SimpleShapeMaterial.hpp"
+#include "SceneParameters.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -18,7 +21,7 @@ namespace Snowglobe::RenderOpenGL
     public:
         std::unique_ptr<ShaderCompiler> _shaderCompiler;
 
-        OpenGLRenderSystem(/* args */);
+        OpenGLRenderSystem();
         virtual ~OpenGLRenderSystem() override;
 
         virtual void Update() override;
@@ -26,7 +29,12 @@ namespace Snowglobe::RenderOpenGL
         virtual void InitializeRenderScene() override;
 
     private:
-        std::unique_ptr<Mesh<PositionColorVertex>> _mesh;
+        SceneParameters _sceneParameters;
+
+        std::unique_ptr<Mesh<PositionVertex>> _mesh;
+        RenderEntity _entity;
+        SimpleShapeMaterial _material;
+        
         unsigned int _shaderProgram;
     };    
 } // namespace Snowglobe::RenderOpenGL

@@ -1,0 +1,156 @@
+#pragma once
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+namespace Snowglobe::Render
+{
+    enum CameraMode
+    {
+        Orthographic,
+        Perspective
+    };
+
+    class Camera
+    {
+    public:
+        Camera() = default;
+        Camera(const Camera&) = delete;
+        Camera& operator=(const Camera&) = delete;
+        Camera(Camera&&) = delete;
+        Camera& operator=(Camera&&) = delete;
+
+        Camera(CameraMode mode, float fov, float aspectRatio, float near, float far, float orthographicSize = 1)
+            : _mode(mode), _fov(fov), _aspectRatio(aspectRatio), _orthographicSize(orthographicSize), _near(near), _far(far),
+            _projectionMatrix(GenerateProjectionMatrix())
+        { 
+        }
+
+        void SetPosition(const glm::vec3& position) 
+        { 
+            _position = position; 
+            _viewDirty = true;
+        }
+        void SetRotation(const glm::vec3& rotation) 
+        {   
+            _rotation = rotation;
+            _viewDirty = true;
+        }
+
+        const glm::vec3& GetPosition() const { return _position; }
+        const glm::vec3& GetRotation() const { return _rotation; }
+
+        const glm::mat4 GetViewMatrix() const
+        {
+            return _viewMatrix;
+        }
+
+        const glm::mat4 GetProjectionMatrix() const
+        {
+            return _projectionMatrix;
+        }
+
+        const glm::mat4 GetViewProjectionMatrix() const
+        {
+            return _projectionMatrix * GetViewMatrix();
+        }
+
+        void SetMode(CameraMode mode)
+        {
+            _mode = mode;
+            _projDirty = true;
+        }
+
+        void SetFov(float fov)
+        {
+            _fov = fov;
+            _projDirty = true;
+        }
+
+        void SetAspectRatio(float aspectRatio)
+        {
+            _aspectRatio = aspectRatio;
+            _projDirty = true;
+        }
+
+        void SetOrthographicSize(float orthographicSize)
+        {
+            _orthographicSize = orthographicSize;
+            _projDirty = true;
+        }
+
+        void SetNear(float near)
+        {
+            _near = near;
+            _projDirty = true;
+        }
+
+        void SetFar(float far)
+        {
+            _far = far;
+            _projDirty = true;
+        }
+
+        void Update()
+        {
+            RecalculateMatrices();
+        }
+
+    private:
+        bool _viewDirty = true;
+        glm::mat4 _viewMatrix = glm::mat4(1.0f);
+        glm::vec3 _position = glm::vec3(0.0f);
+        glm::vec3 _rotation = glm::vec3(0.0f);
+
+        bool _projDirty = true;
+        glm::mat4 _projectionMatrix = glm::mat4(1.0f);
+        CameraMode _mode = CameraMode::Perspective;
+        float _fov = 45.0f;
+        float _aspectRatio = 1.0f;
+        float _orthographicSize = 1.0f;
+        float _near = 0.1f;
+        float _far = 100.0f;
+
+        void RecalculateMatrices()
+        {
+            if(_viewDirty)
+            {
+                _viewMatrix = GenerateViewMatrix();
+                _viewDirty = false;
+            }
+
+            if(_projDirty)
+            {
+                _projectionMatrix = GenerateProjectionMatrix();
+                _projDirty = false;
+            }
+        }
+
+        glm::mat4 GenerateViewMatrix()
+        {
+            glm::mat4 viewMatrix = glm::mat4(1.0f);
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+            viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+            viewMatrix = glm::translate(viewMatrix, _position);
+
+            return viewMatrix;
+        }
+
+        glm::mat4 GenerateProjectionMatrix()
+        {
+            if(_mode == CameraMode::Orthographic)
+            {
+                float horizontal = (_orthographicSize * _aspectRatio) / 2;
+                float vertical = _orthographicSize / 2;
+
+                return glm::ortho(-horizontal, horizontal, -vertical, vertical, _near, _far);
+            }
+            else
+            {
+                return glm::perspective(glm::radians(_fov), _aspectRatio, _near, _far);
+            }
+        }
+    };
+} // namespace Snowglobe::Render

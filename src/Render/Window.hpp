@@ -3,6 +3,8 @@
 #include <string>
 #include <functional>
 
+#include "InputReader.hpp"
+
 namespace Snowglobe::Render
 {
     /// @brief Parameters for creating a window.
@@ -40,6 +42,8 @@ namespace Snowglobe::Render
         virtual void PollEvents() = 0;
         virtual void Close() = 0;
         virtual bool IsOpen() { return _isOpen; }
+
+        virtual SnowCore::InputReader& GetInput() = 0;
     protected:
         bool _isOpen = true;
     };

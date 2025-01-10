@@ -9,11 +9,12 @@
 #include <SnowFileSystem.hpp>
 #include <SnowEngine.hpp>
 #include <Window.hpp>
+#include <InputReader.hpp>
 #include <RenderSystem.hpp>
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+const unsigned int SCR_WIDTH = 1280;
+const unsigned int SCR_HEIGHT = 720;
 
 int main()
 {
@@ -28,7 +29,7 @@ int main()
     auto fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
 
     fileSystem->AddMount("C:/Users/danvu/sources/snowglobe/src/RenderOpenGL/Shaders");
-    engine->Setup(profile);
+    engine->Setup(profile, windowParams);
     
     // Get render proxy
     Snowglobe::Render::RenderSystem* renderSystem = nullptr; 
@@ -38,16 +39,20 @@ int main()
         return -1;
     }
 
-    renderSystem->InitializeWindow(windowParams);
-    renderSystem->InitializeRenderScene();
-
     auto mainWindow = renderSystem->GetMainWindow();
 
-    // Add shapes
-    // Run update while running
     while(mainWindow->IsOpen())
     {
+        mainWindow->PollEvents();
+
+        if(mainWindow->GetInput().IsKeyPressed(Snowglobe::SnowCore::Key::Escape))
+        {
+            std::cout << "Escape pressed" << std::endl;
+            mainWindow->Close();
+        }
+
         engine->Update();
+        mainWindow->Present();
     }
     
     

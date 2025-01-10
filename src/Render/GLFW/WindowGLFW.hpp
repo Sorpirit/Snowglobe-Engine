@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Window.hpp"
+#include "InputGLFW.hpp"
 
 namespace Snowglobe::Render::GLFW
 {
@@ -23,13 +24,19 @@ namespace Snowglobe::Render::GLFW
         virtual void PollEvents() override;
         virtual void Close() override;
         virtual bool IsOpen() override;
+        virtual SnowCore::InputReader& GetInput() override { return _input; }
+
+        GLFWwindow* GetWindow() const { return _window; }
+        InputGLFW& GetInputGLFW() { return _input; }
     private:
         WindowParams _params;
         GLFWwindow* _window;
+        InputGLFW _input;
         std::function<void(int, int)> _resizeCallback;
         std::function<void()> _closeCallback;
 
         void WindowResizeCallback(GLFWwindow* windowImpl, int width, int height);
+
         static void WindowResizeCallbackStatic(GLFWwindow* window, int width, int height);
     };
     

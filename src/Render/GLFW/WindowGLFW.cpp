@@ -21,8 +21,10 @@ namespace Snowglobe::Render::GLFW
         _window = glfwCreateWindow(params.width, params.height, params.title.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(_window, this);
         glfwMakeContextCurrent(_window);
-        glfwSetWindowUserPointer ( _window, reinterpret_cast<void *>(this) );
+    
         glfwSetFramebufferSizeCallback(_window, WindowResizeCallbackStatic);
+
+        _input.Init(_window);
     }
     
     WindowGLFW::~WindowGLFW()
@@ -52,6 +54,7 @@ namespace Snowglobe::Render::GLFW
 
     void WindowGLFW::PollEvents()
     {
+        _input.Update();
         glfwPollEvents();
     }
 

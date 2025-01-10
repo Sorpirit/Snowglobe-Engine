@@ -2,10 +2,12 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <typeindex>
 #include <typeinfo>
 #include "EngineProfile.hpp"
 #include "ISnowSystem.hpp"
+#include "Window.hpp"
 
 namespace Snowglobe::SnowEngine
 {
@@ -17,11 +19,12 @@ namespace Snowglobe::SnowEngine
 
         std::string _applicationName;
         std::unordered_map<std::type_index, SnowCore::ISnowSystem*> _systems;
+        std::unordered_set<SnowCore::ISnowFrameSystem*> _frameSystems;
     public:
         
         ~SnowEngine();
 
-        void Setup(const SnowCore::EngineProfile& profile);
+        void Setup(const SnowCore::EngineProfile& profile, const Snowglobe::Render::WindowParams& windowParams);
         void Update();
 
         template <typename T>
@@ -35,6 +38,12 @@ namespace Snowglobe::SnowEngine
             }
 
             _systems[typeid(T)] = ptr;
+
+            SnowCore::ISnowFrameSystem* frameSystem = dynamic_cast<SnowCore::ISnowFrameSystem*>(ptr);
+            if(frameSystem)
+            {
+                _frameSystems.insert(frameSystem);
+            }
 
             return true;
         }

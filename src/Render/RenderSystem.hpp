@@ -4,6 +4,7 @@
 
 #include <ISnowSystem.hpp>
 #include <Window.hpp>
+#include <Camera.hpp>
 
 namespace Snowglobe::Render
 {
@@ -11,6 +12,9 @@ namespace Snowglobe::Render
     {
     protected:
         std::unique_ptr<Window> _mainWindow;
+
+        Camera _camera;
+        
     public:
         virtual ~RenderSystem() override {}
 
@@ -20,6 +24,7 @@ namespace Snowglobe::Render
         virtual void InitializeRenderScene() = 0;
 
         Window* GetMainWindow() const { return _mainWindow.get(); }
+        Camera& GetCamera() { return _camera; }
     };
     
 } // namespace Snowglobe::Render
