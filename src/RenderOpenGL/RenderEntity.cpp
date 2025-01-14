@@ -10,14 +10,8 @@ namespace Snowglobe::RenderOpenGL
 
 void RenderEntity::Bind(uint32_t pipelineId)
 {
-    if(_lastPipelineId != pipelineId)
-    {
-        _cachedUniformLocationModelMatrix = glGetUniformLocation(pipelineId, "rentity.model");
-        _lastPipelineId = pipelineId;
-    }
-
-    glm::mat4 modelMatrix = GetModelMatrix();
-    glUniformMatrix4fv(_cachedUniformLocationModelMatrix, 1, GL_FALSE, &modelMatrix[0][0]);
+    auto uniformSetter = _uniformLocations.GetSetter(pipelineId);
+    uniformSetter.Set("rentity.model", GetModelMatrix());
 }
 
 glm::mat4 RenderEntity::GetModelMatrix()

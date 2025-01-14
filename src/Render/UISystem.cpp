@@ -1,5 +1,7 @@
 #include "UISystem.hpp"
 
+#include "RenderSystem.hpp"
+
 namespace Snowglobe::Render
 {
     UIPanel::~UIPanel()

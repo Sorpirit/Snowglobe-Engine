@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include "CachedUniformLocations.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -33,8 +34,7 @@ namespace Snowglobe::RenderOpenGL
         glm::vec3 _scale = glm::vec3(1.0f);
         glm::mat4 _modelMatrix = glm::mat4(1.0f);
 
-        uint32_t _lastPipelineId = UINT_MAX;
-        uint32_t _cachedUniformLocationModelMatrix = UINT_MAX;
+        CachedUniformLocations<1> _uniformLocations;
 
         glm::mat4 GetModelMatrix();
     };

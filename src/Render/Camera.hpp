@@ -21,8 +21,8 @@ namespace Snowglobe::Render
         Camera(Camera&&) = delete;
         Camera& operator=(Camera&&) = delete;
 
-        Camera(CameraMode mode, float fov, float aspectRatio, float near, float far, float orthographicSize = 1)
-            : _mode(mode), _fov(fov), _aspectRatio(aspectRatio), _orthographicSize(orthographicSize), _near(near), _far(far),
+        Camera(CameraMode mode, float fov, uint32_t width, uint32_t height, float near, float far, float orthographicSize = 1)
+            : _mode(mode), _fov(fov), _width(width), _height(height), _aspectRatio(static_cast<float>(_width) / static_cast<float>(_height)), _orthographicSize(orthographicSize), _near(near), _far(far),
             _projectionMatrix(GenerateProjectionMatrix())
         { 
         }
@@ -68,9 +68,15 @@ namespace Snowglobe::Render
             _projDirty = true;
         }
 
-        void SetAspectRatio(float aspectRatio)
+        void SetWidth(uint32_t width)
         {
-            _aspectRatio = aspectRatio;
+            _width = width;
+            _projDirty = true;
+        }
+
+        void SetHeight(uint32_t height)
+        {
+            _height = height;
             _projDirty = true;
         }
 
@@ -91,10 +97,31 @@ namespace Snowglobe::Render
             _far = far;
             _projDirty = true;
         }
-
+        
         void Update()
         {
             RecalculateMatrices();
+        }
+
+        glm::vec3 ScreenToWorld(const glm::vec2& screenPosition) const
+        {
+            glm::vec4 viewport = glm::vec4(0.0f, 0.0f, static_cast<float>(_width), static_cast<float>(_height));
+            glm::vec3 screenPosition3D = glm::vec3(screenPosition, 0.0f);
+
+            glm::vec3 worldPosition = glm::unProject(screenPosition3D, _viewMatrix, _projectionMatrix, viewport);
+
+            return worldPosition;
+        }
+
+        glm::vec2 WorldToScreen(const glm::vec3& worldPosition) const
+        {
+            glm::vec4 viewport = glm::vec4(0.0f, 0.0f, static_cast<float>(_width), static_cast<float>(_height));
+
+            glm::vec3 screenPosition = glm::project(worldPosition, _viewMatrix, _projectionMatrix, viewport);
+
+            screenPosition.y = _height - screenPosition.y;
+            
+            return glm::vec2(screenPosition);
         }
 
     private:
@@ -107,6 +134,8 @@ namespace Snowglobe::Render
         glm::mat4 _projectionMatrix = glm::mat4(1.0f);
         CameraMode _mode = CameraMode::Perspective;
         float _fov = 45.0f;
+        uint32_t _width = 0;
+        uint32_t _height = 0;
         float _aspectRatio = 1.0f;
         float _orthographicSize = 1.0f;
         float _near = 0.1f;
@@ -140,6 +169,8 @@ namespace Snowglobe::Render
 
         glm::mat4 GenerateProjectionMatrix()
         {
+            _aspectRatio = static_cast<float>(_width) / static_cast<float>(_height);
+
             if(_mode == CameraMode::Orthographic)
             {
                 float horizontal = (_orthographicSize * _aspectRatio) / 2;

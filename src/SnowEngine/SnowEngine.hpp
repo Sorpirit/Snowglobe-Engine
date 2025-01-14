@@ -1,5 +1,6 @@
 #pragma once
 
+#include <list>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -8,24 +9,26 @@
 #include "EngineProfile.hpp"
 #include "ISnowSystem.hpp"
 #include "Window.hpp"
+#include "SnowEntity.hpp"
 
 namespace Snowglobe::SnowEngine
 {
     
     class SnowEngine
     {
-    private:
-        SnowEngine() = default;
-
-        std::string _applicationName;
-        std::unordered_map<std::type_index, SnowCore::ISnowSystem*> _systems;
-        std::unordered_set<SnowCore::ISnowFrameSystem*> _frameSystems;
     public:
+        static SnowEngine& GetInstance()
+        {
+            static SnowEngine instance;
+            return instance;
+        }
         
         ~SnowEngine();
 
         void Setup(const SnowCore::EngineProfile& profile, const Snowglobe::Render::WindowParams& windowParams);
-        void Update();
+
+        void StartFrame() const;
+        void Update() const;
 
         template <typename T>
         bool TryAddSystem(T* ptr)
@@ -64,11 +67,32 @@ namespace Snowglobe::SnowEngine
             return false;
         }
 
-        static SnowEngine* GetInstance()
+        SnowEntity& CreateEntity() 
         {
-            static SnowEngine _instance;
-            return &_instance;
+            _entities.emplace_back(_nextEntityID);
+            _nextEntityID++;
+            return _entities.back();
         }
+
+        void DestroyEntity(SnowEntity& entity)
+        {
+            auto it = std::find(_entities.begin(), _entities.end(), entity);
+            if(it != _entities.end())
+            {
+                it->Destroy();
+                _entities.erase(it);
+            }
+        }
+
+    private:
+        SnowEngine() = default;
+
+        std::string _applicationName;
+        std::unordered_map<std::type_index, SnowCore::ISnowSystem*> _systems;
+        std::unordered_set<SnowCore::ISnowFrameSystem*> _frameSystems;
+
+        uint32_t _nextEntityID = 0;
+        std::list<SnowEntity> _entities;
     };
 }
 

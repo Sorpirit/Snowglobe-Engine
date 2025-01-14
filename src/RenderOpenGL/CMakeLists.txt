@@ -1,7 +1,4 @@
-file(GLOB RENDER_OPENGL_SOURCE *.cpp)
-file(GLOB RENDER_OPENGL_HEADER *.hpp)
-
-add_library(RenderOpenGL ${RENDER_OPENGL_SOURCE} ${RENDER_OPENGL_HEADER} Imgui/ImguiSystem.cpp Imgui/ImguiSystem.hpp)
+add_library(RenderOpenGL)
 add_library(Snowglobe::RenderOpenGL ALIAS RenderOpenGL)
 
 target_include_directories(RenderOpenGL
@@ -21,3 +18,15 @@ target_link_libraries(RenderOpenGL
     Snowglobe::SnowCore
     Snowglobe::Render
 )
+
+file(GLOB RENDER_OPENGL_SOURCE *.cpp)
+file(GLOB RENDER_OPENGL_HEADER *.hpp)
+
+target_sources(RenderOpenGL
+    PRIVATE
+    ${RENDER_OPENGL_SOURCE}
+    ${RENDER_OPENGL_HEADER}
+)
+
+add_subdirectory(Imgui)
+add_subdirectory(Materials)

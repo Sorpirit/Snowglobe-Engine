@@ -31,11 +31,11 @@ namespace Snowglobe::SnowCore
         SnowFileHandle CrateFileHandle(const std::string& path);
         char* ReadTextFile(const SnowFileHandle& handle);
 
-    private:
-        SnowFileSystem();
-        
         std::filesystem::path ResolvePath(const std::filesystem::path& path);
         std::filesystem::path ResolvePath(const SnowFileHandle& path);
+
+    private:
+        SnowFileSystem();
 
         std::unordered_set<std::filesystem::path> _mounts;
     };

@@ -17,5 +17,5 @@ target_link_libraries(SnowEngine
     Snowglobe::SnowCore
     Snowglobe::Render
     Snowglobe::RenderOpenGL
-    Snowglobe::RenderVulkan
+    imgui
 )

@@ -10,19 +10,30 @@
 #include <memory>
 #include <vector>
 
+#include "EngineTime.hpp"
+
+#include "PositionVertexLayoutDescriptor.hpp"
+#include "BasicShapeFactory.hpp"
+#include "Materials/BasicShapeMaterialImpl.hpp"
+
+#include  "BaseRenderPass.hpp"
+
 namespace Snowglobe::RenderOpenGL
 {
-    OpenGLRenderSystem::OpenGLRenderSystem() : 
+    OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
+
+    OpenGLRenderSystem::OpenGLRenderSystem() :
         _shaderCompiler(std::make_unique<ShaderCompiler>())
     {
         _requiersUpdate = true;
+        _instance = this;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,6);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
-    
+
     OpenGLRenderSystem::~OpenGLRenderSystem()
     {
         glfwTerminate();
@@ -30,18 +41,27 @@ namespace Snowglobe::RenderOpenGL
 
     void OpenGLRenderSystem::Update()
     {
+        SnowCore::EngineTime::GetInstance()->RenderTick();
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         _camera.Update();
 
-        glUseProgram(_shaderProgram);
-        _mesh->Bind();
-        _entity.Bind(_shaderProgram);
-        _material.Bind(_shaderProgram);
-        _sceneParameters.Bind(_camera, _shaderProgram);
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
-        _mesh->Unbind();
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        for(auto& _mesh : _meshes)
+        {
+            RenderPassSignature signature(_mesh);
+            auto renderPass = _renderPasses.find(signature);
+            if(renderPass == _renderPasses.end())
+            {
+                std::cout << "Render pass not found" << std::endl;
+                continue;
+            }
+
+            renderPass->second->Execute(_mesh);
+        }
     }
 
     void OpenGLRenderSystem::InitializeWindow(const Render::WindowParams& params)
@@ -50,11 +70,19 @@ namespace Snowglobe::RenderOpenGL
 
         //_camera = Render::Camera(Render::CameraMode::Orthographic, 45.0f, 1.0f, 0.1f, 100.0f);
         _camera.SetFov(45.0f);
-        _camera.SetAspectRatio(static_cast<float>(params.width) / static_cast<float>(params.height));
+        _camera.SetWidth(params.width);
+        _camera.SetHeight(params.height);
         _camera.SetOrthographicSize(5);
         _camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
         _camera.SetMode(Render::CameraMode::Orthographic);
 
+        _mainWindow->SetResizeCallback([this](int width, int height)
+        {
+            glViewport(0, 0, width, height);
+            _camera.SetWidth(width);
+            _camera.SetHeight(height);
+        });
+        
         if (!gladLoadGL(glfwGetProcAddress))
         {
             std::cout << "Failed to initialize GLAD" << std::endl;
@@ -63,33 +91,62 @@ namespace Snowglobe::RenderOpenGL
     
     void OpenGLRenderSystem::InitializeRenderScene()
     {
-        // auto vertecies = std::make_unique<std::vector<PositionColorVertex>>(std::initializer_list<PositionColorVertex>{
-        //     {glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)},
-        //     {glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f)},
-        //     {glm::vec3(0.0f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)}
-        // });
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionVertex), PositionVertexLayoutDescriptor::GetInstance()});
+        RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
 
-        auto vertecies = std::make_unique<std::vector<PositionVertex>>(std::initializer_list<PositionVertex>{
-            {glm::vec3(0.5f, -0.5f, 0.0f)},
-            {glm::vec3(-0.5f, -0.5f, 0.0f)},
-            {glm::vec3(0.0f, 0.5f, 0.0f)}
-        });
-
-        auto indices = std::make_unique<std::vector<unsigned int>>(std::initializer_list<unsigned int>{
-            0, 1, 2
-        });
-        auto mesh = Mesh<PositionVertex>::Create(*PositionVertexDescriptor::GetInstance(), std::move(vertecies), std::move(indices));
-        _mesh = std::unique_ptr<Mesh<PositionVertex>>(mesh);
-
-        _entity.SetPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-        _entity.SetScale(glm::vec3(1.0f, 1.0f, 1.0f) * 3.0f);
-
-        _material.SetColor(glm::vec3(1.0f, 0.0f, 0.0f));
-
-        auto vertexShader = _shaderCompiler->GetOrCompileShader(SnowCore::SnowFileHandle("color.vert"));
-        auto fragmentShader = _shaderCompiler->GetOrCompileShader(SnowCore::SnowFileHandle("color.frag"));
-        PipelineSetupParams params = { vertexShader, fragmentShader };
-        _shaderProgram = _shaderCompiler->GetOrCratePipeline(params);
+        auto renderPass = std::make_unique<BaseRenderPass>();
+        _renderPasses.insert({renderPass->GetSignature(), std::move(renderPass)});
     }
-    
+
+    Render::MeshProxy* OpenGLRenderSystem::CreateMeshProxy(const Render::VertexBufferPtr& vertexBuffer,
+        const std::string& debugName)
+    {
+        _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, debugName);
+        _nextMeshId = { _nextMeshId.id + 1 };
+        return &_meshes.back();
+    }
+
+    Render::MeshProxy *OpenGLRenderSystem::CreateMeshProxy(const Render::VertexBufferPtr &vertexBuffer,
+                                                           const Render::IndexBufferPtr &indexBuffer,
+                                                           const std::string& debugName)
+    {
+        _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, (const IndexBufferPtrOpenGL&) indexBuffer, debugName);
+        _nextMeshId = { _nextMeshId.id + 1 };
+        return &_meshes.back();
+    }
+
+    Render::IndexBufferPtr* OpenGLRenderSystem::AllocateIndexBufferPtr(const std::vector<uint32_t>& indices,
+        const std::string& debugName)
+    {
+        _indexBuffers.emplace_back(indices, debugName);
+        return &_indexBuffers.back();
+    }
+
+    Render::VertexBufferPtr* OpenGLRenderSystem::AllocateVertexBufferPtrImpl(std::type_index vertexType,
+                                                                             size_t vertexCount, const void* bufferPtr, const std::string& debugName)
+    {
+        auto vertexDesc = _vertexLayoutDescriptors.find(vertexType);
+        if(vertexDesc == _vertexLayoutDescriptors.end())
+        {
+            std::cout << "Vertex type not supported" << std::endl;
+            return nullptr;
+        }
+        
+        uint32_t stride = vertexDesc->second->GetStride();
+        _vertexBuffers.emplace_back(vertexDesc->second, vertexCount, bufferPtr, debugName);
+        return &_vertexBuffers.back();
+    }
+
+    Render::MaterialBase* OpenGLRenderSystem::CreateMaterialInstanceImpl(std::type_index materialType,const std::string &debugName)
+    {
+        auto materialManager = _materialManages.find(materialType);
+        if(materialManager == _materialManages.end())
+        {
+            std::cout << "Material type not supported" << std::endl;
+            return nullptr;
+        }
+
+        return materialManager->second->CreateMaterial(debugName);
+    }
+
     } // namespace Snowglobe::RenderOpenGL

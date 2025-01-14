@@ -36,5 +36,19 @@ namespace Snowglobe::RenderVulkan
     void VulkanRenderingSystem::InitializeRenderScene()
     {
     }
-    
-    } // namespace Snowglobe::RenderVulkan
+
+    Render::MeshProxy* VulkanRenderingSystem::CreateMeshProxy(const Render::RenderID& vertexSet, std::string debugName)
+    {
+        return nullptr;
+    }
+
+    Render::RenderID VulkanRenderingSystem::AllocateVertexSet(const Render::IVertexSet& vertexSet)
+    {
+        return Render::RenderID{0};
+    }
+
+    void VulkanRenderingSystem::FreeVertexSet(const Render::RenderID& vertexSet)
+    {
+        return;
+    }
+} // namespace Snowglobe::RenderVulkan

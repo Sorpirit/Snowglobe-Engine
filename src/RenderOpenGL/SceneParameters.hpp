@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include "Camera.hpp"
+#include "CachedUniformLocations.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -11,8 +12,7 @@ namespace Snowglobe::RenderOpenGL
         void Bind(const Render::Camera& camera, uint32_t pipelineId);
         
     private:
-        uint32_t _lastPipelineId = UINT_MAX;
-        uint32_t _cachedUniformLocationViewProjection = UINT_MAX;
+        CachedUniformLocations<1> _uniformLocations;
     };
     
 } // namespace Snowglobe::RenderOpenGL
