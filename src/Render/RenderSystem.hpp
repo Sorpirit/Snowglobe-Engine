@@ -13,8 +13,11 @@
 #include "RenderProxy.hpp"
 #include "MeshProxy.hpp"
 
+#include "FileTexture.hpp"
+
 #include "VertexBufferPtr.hpp"
 #include "IndexBufferPtr.hpp"
+#include "Texture2DPtr.hpp"
 #include "MaterialBase.hpp"
 #include "UISystem.hpp"
 
@@ -37,6 +40,8 @@ namespace Snowglobe::Render
         }
 
         virtual IndexBufferPtr* AllocateIndexBufferPtr(const std::vector<uint32_t>& indices, const std::string& debugName = "IndexBuffer") = 0;
+
+        virtual Texture2DPtr CreateTexture2D(const SnowCore::FileTexture& texture, const Texture2DDescriptor& desc, const std::string& debugName = "Texture2D") = 0;
 
         virtual MeshProxy* CreateMeshProxy(const VertexBufferPtr& vertexBuffer, const std::string& = "MeshProxy[Vertex]") = 0;
         virtual MeshProxy* CreateMeshProxy(const VertexBufferPtr& vertexBuffer, const IndexBufferPtr& indexBuffer, const std::string& = "MeshProxy[Vertex,Index]") = 0;

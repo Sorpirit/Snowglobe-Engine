@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <fstream>
 
+#include "FileTexture.hpp"
 
 namespace Snowglobe::SnowCore
 {
@@ -30,6 +31,7 @@ namespace Snowglobe::SnowCore
 
         SnowFileHandle CrateFileHandle(const std::string& path);
         char* ReadTextFile(const SnowFileHandle& handle);
+        FileTexture* LoadTexture(const SnowFileHandle& handle);
 
         std::filesystem::path ResolvePath(const std::filesystem::path& path);
         std::filesystem::path ResolvePath(const SnowFileHandle& path);

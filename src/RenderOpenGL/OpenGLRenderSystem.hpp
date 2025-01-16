@@ -28,6 +28,14 @@
 
 #include "RenderPass.hpp"
 
+#include "SnowFileSystem.hpp"
+#include "FileTexture.hpp"
+
+#include "Texture2DPtr.hpp"
+#include "Texture.hpp"
+
+#include "TemplateRenderPass.hpp"
+
 namespace Snowglobe::RenderOpenGL
 {
     class OpenGLRenderSystem : public Render::RenderSystem
@@ -49,6 +57,9 @@ namespace Snowglobe::RenderOpenGL
 
         ShaderCompiler* GetShaderCompiler() const { return _shaderCompiler.get(); }
         const Render::Camera& GetCamera() const { return _camera; }
+
+        Render::Texture2DPtr CreateTexture2D(const SnowCore::FileTexture& texture, const Render::Texture2DDescriptor& desc, const std::string& debugName = "Texture2D") override;
+
 
     protected:
         Render::VertexBufferPtr* AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount, const void* bufferPtr, const std::string& debugName) override;
@@ -74,6 +85,13 @@ namespace Snowglobe::RenderOpenGL
         void RegisterMaterialManager()
         {
             _materialManages.insert({typeid(MaterialData), Materials::TemplateMaterialManager<MaterialImpl, MaterialData>::GetInstance()});
+        }
+
+        template <typename MaterialImpl, typename InstanceVertexLayoutDescriptor>
+        void RegisterTemplateRenderPass(const SnowCore::SnowFileHandle& vertexShader, const SnowCore::SnowFileHandle& fragmentShader)
+        {
+            auto pass = std::make_unique<TemplateRenderPass<MaterialImpl, InstanceVertexLayoutDescriptor>>(vertexShader, fragmentShader);
+            _renderPasses.insert({pass->GetSignature(), std::move(pass)});
         }
     };    
 

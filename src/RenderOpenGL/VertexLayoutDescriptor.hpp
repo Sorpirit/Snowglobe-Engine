@@ -20,5 +20,14 @@ namespace Snowglobe::RenderOpenGL
             std::type_index _vertexType;
             
     };
+
+    template <typename T>
+    class TemplateVertexLayoutDescriptor : public VertexLayoutDescriptor
+    {
+        public:
+            TemplateVertexLayoutDescriptor() : VertexLayoutDescriptor(typeid(T)) {}
+
+            uint32_t GetStride() const override { return sizeof(T); }
+    };
     
 } // namespace Snowglobe::RenderOpenGL

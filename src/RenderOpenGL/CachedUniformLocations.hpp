@@ -5,6 +5,10 @@
 #include "string"
 #include "glm/glm.hpp"
 
+#include "Texture.hpp"
+#include "Texture2DPtr.hpp"
+#include "TextureManager.hpp"
+
 #include "glad/gl.h"
 
 namespace Snowglobe::RenderOpenGL
@@ -83,6 +87,14 @@ namespace Snowglobe::RenderOpenGL
             glUniformMatrix4fv(NextLocation(variable), 1, GL_FALSE, &value[0][0]);
         }
 
+        void Set(const std::string& variable, const Render::Texture2DPtr& texture)
+        {
+            TextureManager::GetInstance().GetTexture(texture).Bind();
+            glActiveTexture(GL_TEXTURE0 + _textureCounter);
+            glUniform1i(NextLocation(variable), _textureCounter);
+            _textureCounter++;
+        }
+
         void SetArray(const std::string& variable, const glm::vec2* value, size_t count)
         {
             glUniform2fv(NextLocation(variable), count, &value[0][0]);
@@ -112,6 +124,7 @@ namespace Snowglobe::RenderOpenGL
         uint32_t _pipelineId;
         bool _recache;
         uint32_t _counter = 0;
+        uint32_t _textureCounter = 0;
         CachedUniformLocations<N>& _cache;
 
         uint32_t NextLocation(const std::string& variable)

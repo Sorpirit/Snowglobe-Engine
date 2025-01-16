@@ -12,11 +12,14 @@
 
 #include "EngineTime.hpp"
 
-#include "PositionVertexLayoutDescriptor.hpp"
-#include "BasicShapeFactory.hpp"
-#include "Materials/BasicShapeMaterialImpl.hpp"
+#include "CommonVertexLayoutDescriptor.hpp"
 
-#include  "BaseRenderPass.hpp"
+#include "BasicShapeFactory.hpp"
+
+#include "Materials/BasicShapeMaterialImpl.hpp"
+#include "Materials/TextureShapeMaterialImpl.hpp"
+
+#include "TextureManager.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -48,7 +51,7 @@ namespace Snowglobe::RenderOpenGL
 
         _camera.Update();
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         for(auto& _mesh : _meshes)
         {
@@ -92,10 +95,17 @@ namespace Snowglobe::RenderOpenGL
     void OpenGLRenderSystem::InitializeRenderScene()
     {
         _vertexLayoutDescriptors.insert({typeid(Render::PositionVertex), PositionVertexLayoutDescriptor::GetInstance()});
-        RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionUVVertex), PositionUVVertexLayoutDescriptor::GetInstance()});
 
-        auto renderPass = std::make_unique<BaseRenderPass>();
-        _renderPasses.insert({renderPass->GetSignature(), std::move(renderPass)});
+        RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
+        RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
+
+        RegisterTemplateRenderPass<Materials::BasicShapeMaterialImpl, PositionVertexLayoutDescriptor>(
+            SnowCore::SnowFileHandle("color.vert"), SnowCore::SnowFileHandle("color.frag"));
+
+        RegisterTemplateRenderPass<Materials::TextureShapeMaterialImpl, PositionUVVertexLayoutDescriptor>(
+            SnowCore::SnowFileHandle("texture.vert"), SnowCore::SnowFileHandle("texture.frag"));
+
     }
 
     Render::MeshProxy* OpenGLRenderSystem::CreateMeshProxy(const Render::VertexBufferPtr& vertexBuffer,
@@ -122,8 +132,16 @@ namespace Snowglobe::RenderOpenGL
         return &_indexBuffers.back();
     }
 
-    Render::VertexBufferPtr* OpenGLRenderSystem::AllocateVertexBufferPtrImpl(std::type_index vertexType,
-                                                                             size_t vertexCount, const void* bufferPtr, const std::string& debugName)
+    Render::Texture2DPtr OpenGLRenderSystem::CreateTexture2D(const SnowCore::FileTexture &texture,
+                                                             const Render::Texture2DDescriptor &desc,
+                                                             const std::string &debugName)
+    {
+        return TextureManager::GetInstance().CreateTexture2D(texture, desc, debugName);
+    }
+
+    Render::VertexBufferPtr *OpenGLRenderSystem::AllocateVertexBufferPtrImpl(std::type_index vertexType,
+                                                                             size_t vertexCount, const void *bufferPtr,
+                                                                             const std::string &debugName)
     {
         auto vertexDesc = _vertexLayoutDescriptors.find(vertexType);
         if(vertexDesc == _vertexLayoutDescriptors.end())
@@ -132,7 +150,6 @@ namespace Snowglobe::RenderOpenGL
             return nullptr;
         }
         
-        uint32_t stride = vertexDesc->second->GetStride();
         _vertexBuffers.emplace_back(vertexDesc->second, vertexCount, bufferPtr, debugName);
         return &_vertexBuffers.back();
     }

@@ -17,14 +17,9 @@ namespace Snowglobe::Render
         Disk
     };
 
-    struct PositionVertex
-    {
-        glm::vec3 position;
-    };
-
     struct BasicShapeMaterial
     {
-        glm::vec3 color;
+        glm::vec3 color = glm::vec3(1.0f);
     };
 
     class BasicShapeFactory

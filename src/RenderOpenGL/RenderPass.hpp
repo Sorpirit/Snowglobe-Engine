@@ -34,13 +34,6 @@ namespace Snowglobe::RenderOpenGL
         RenderPassSignature _signature;
     };
 
-    template <class MaterialType, class VertexType>
-    class TemplateRenderPass : public RenderPass
-    {
-    public:
-        TemplateRenderPass() : RenderPass({ typeid(MaterialType), typeid(VertexType) }) {}
-    };
-    
 } // namespace Snowglobe::RenderOpenGL
 
 template<> struct std::hash<Snowglobe::RenderOpenGL::RenderPassSignature> {

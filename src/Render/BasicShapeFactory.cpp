@@ -1,4 +1,5 @@
 #include "BasicShapeFactory.hpp"
+#include "CommonVertexLayouts.hpp"
 
 namespace Snowglobe::Render
 {

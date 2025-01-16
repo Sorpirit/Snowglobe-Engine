@@ -14,4 +14,5 @@ target_include_directories(SnowCore
 target_link_libraries(SnowCore
     PRIVATE
     glm
+    stb
 )

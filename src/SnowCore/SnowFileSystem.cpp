@@ -65,6 +65,11 @@ char* SnowFileSystem::ReadTextFile(const SnowFileHandle& handle)
     return buffer;
 }
 
+FileTexture* SnowFileSystem::LoadTexture(const SnowFileHandle &handle)
+{
+    return new FileTexture(ResolvePath(handle));
+}
+
 std::filesystem::path SnowFileSystem::ResolvePath(const std::filesystem::path& path)
 {
     for (const auto& mount : _mounts)
