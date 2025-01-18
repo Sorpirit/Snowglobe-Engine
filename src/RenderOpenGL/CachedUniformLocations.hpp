@@ -26,6 +26,7 @@ namespace Snowglobe::RenderOpenGL
         UniformLocationSetter<N> GetSetter(uint32_t pipelineId)
         {
             bool recache = _lastPipelineId != pipelineId;
+            _lastPipelineId = pipelineId;
             return UniformLocationSetter<N>(pipelineId, recache, *this);
         }
 

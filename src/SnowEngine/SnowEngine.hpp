@@ -74,6 +74,13 @@ namespace Snowglobe::SnowEngine
             return _entities.back();
         }
 
+        SnowEntity* CreateEntityPtr() 
+        {
+            _entities.emplace_back(_nextEntityID);
+            _nextEntityID++;
+            return &_entities.back();
+        }
+
         void DestroyEntity(SnowEntity& entity)
         {
             auto it = std::find(_entities.begin(), _entities.end(), entity);

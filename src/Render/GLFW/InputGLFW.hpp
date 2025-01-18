@@ -13,25 +13,28 @@ namespace Snowglobe::Render::GLFW
         void Init(GLFWwindow* window);
         void Update();
 
-        virtual SnowCore::KeyStatus GetKeyStatus(uint32_t key) override { return _keys[key]; }
-        virtual bool IsKeyUp(uint32_t key) override { return _keys[key] == SnowCore::KeyStatus::Up; }
-        virtual bool IsKeyPressed(uint32_t key) override { return _keys[key] == SnowCore::KeyStatus::Pressed; }
-        virtual bool IsKeyReleased(uint32_t key) override { return _keys[key] == SnowCore::KeyStatus::Released; }
-        virtual bool IsKeyHeld(uint32_t key) override { return _keys[key] == SnowCore::KeyStatus::Held; }
+        SnowCore::KeyStatus GetKeyStatus(uint32_t key) const override { return _keys[key]; }
+        bool IsKeyUp(uint32_t key) const override { return _keys[key] == SnowCore::KeyStatus::Up; }
+        bool IsKeyPressed(uint32_t key) const override { return _keys[key] == SnowCore::KeyStatus::Pressed; }
+        bool IsKeyReleased(uint32_t key) const override { return _keys[key] == SnowCore::KeyStatus::Released; }
+        bool IsKeyHeld(uint32_t key) const override { return _keys[key] == SnowCore::KeyStatus::Held; }
 
-        virtual SnowCore::KeyStatus GetCursorButtonStatus(uint32_t button) override { return _mouseButtons[button]; }
-        virtual bool IsCursorButtonUp(uint32_t button) override { return _mouseButtons[button] == SnowCore::KeyStatus::Up; }
-        virtual bool IsCursorButtonPressed(uint32_t button) override { return _mouseButtons[button] == SnowCore::KeyStatus::Pressed; }
-        virtual bool IsCursorButtonReleased(uint32_t button) override { return _mouseButtons[button] == SnowCore::KeyStatus::Released; }
-        virtual bool IsCursorButtonHeld(uint32_t button) override { return _mouseButtons[button] == SnowCore::KeyStatus::Held; }
-        virtual glm::vec2 GetCursorScreenPosition() override { return _cursorPosition; }
-        virtual glm::vec2 GetCursorScreenDelta() override { return _cursorPositionDelta; }
-        virtual float GetScroll() override { return _scroll; }
-        virtual float GetScrollDelta() override { return _scrollDelta; }
+        SnowCore::KeyStatus GetCursorButtonStatus(uint32_t button) const override { return _mouseButtons[button]; }
+        bool IsCursorButtonUp(uint32_t button) const override { return _mouseButtons[button] == SnowCore::KeyStatus::Up; }
+        bool IsCursorButtonPressed(uint32_t button) const override { return _mouseButtons[button] == SnowCore::KeyStatus::Pressed; }
+        bool IsCursorButtonReleased(uint32_t button) const override { return _mouseButtons[button] == SnowCore::KeyStatus::Released; }
+        bool IsCursorButtonHeld(uint32_t button) const override { return _mouseButtons[button] == SnowCore::KeyStatus::Held; }
+        glm::vec2 GetCursorScreenPosition() const override { return _cursorPosition; }
+        glm::vec2 GetCursorScreenDelta() const override { return _cursorPositionDelta; }
+        float GetScroll() const override { return _scroll; }
+        float GetScrollDelta() const override { return _scrollDelta; }
 
-        virtual void SetCursorScreenPosition(glm::vec2 pos) override;
+        void SetCursorScreenPosition(glm::vec2 pos) override;
+
+        void SetCursorMode(SnowCore::CursorMode mode) override;
 
     private:
+        GLFWwindow* _window;
         SnowCore::KeyStatus _keys[GLFW_KEY_LAST + 1];
         SnowCore::KeyStatus _mouseButtons[GLFW_MOUSE_BUTTON_LAST + 1];
         glm::vec2 _cursorPosition;
@@ -48,6 +51,7 @@ namespace Snowglobe::Render::GLFW
         static void CursorPositionCallbackStatic(GLFWwindow* window, double xpos, double ypos);
         static void CursorButtonCallbackStatic(GLFWwindow* window, int button, int action, int mods);
         static void CursorScrollCallbackStatic(GLFWwindow* window, double xoffset, double yoffset);
+
+        static int GetGLFWCursorMode(SnowCore::CursorMode mode);
     };
-    
 } // namespace Snowglobe::Render::GLFW

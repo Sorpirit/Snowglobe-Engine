@@ -1,4 +1,7 @@
-add_executable(SnowglobeTest SnowglobeMain.cpp)
+file(GLOB SNOW_TEST_SOURCE *.cpp)
+file(GLOB SNOW_TEST_HEADER *.hpp)
+
+add_executable(SnowglobeTest ${SNOW_TEST_SOURCE} ${SNOW_TEST_HEADER})
 
 target_include_directories(SnowglobeTest
     PRIVATE

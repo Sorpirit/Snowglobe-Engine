@@ -45,51 +45,59 @@ namespace Snowglobe::SnowEngine
                 if (bodyPhysics == collisionBodyPhysics)
                     continue;
                 
-                CollisionData data = PhysicsEngine2DSystem::Overlap(colliderA, colliderB);
+                CollisionData data = Overlap(colliderA, colliderB);
 
                 if (!data.isColliding)
                     continue;
-
-                // bodyPhysics->SetVelocity(glm::vec2(0.0f));
-                // collisionBodyPhysics->SetVelocity(glm::vec2(0.0f));
                 
                 glm::vec2 bodyVelocity = bodyPhysics != nullptr ? bodyPhysics->GetVelocity() : glm::vec2(0.0f);
                 glm::vec2 collisionBodyVelocity = collisionBodyPhysics != nullptr ? collisionBodyPhysics->GetVelocity() : glm::vec2(0.0f);
                 
                 float bodyMass = bodyPhysics != nullptr ? bodyPhysics->GetMass() : 0.0f;
+                float bodyMassInv = bodyMass > 0.0f ? 1.0f / bodyMass : 0.0f;
                 float collisionBodyMass = collisionBodyPhysics != nullptr ? collisionBodyPhysics->GetMass() : 0.0f;
+                float collisionBodyMassInv = collisionBodyMass > 0.0f ? 1.0f / collisionBodyMass : 0.0f;
                 
                 glm::vec2 relativeVelocity = collisionBodyVelocity - bodyVelocity;
                 float velocityAlongNormal = glm::dot(relativeVelocity, data.normal);
                 if (velocityAlongNormal > 0)
                     continue;
                 
-                float e = 0.5f;
+                float e = 1;
                 float energy = -(1 + e) * velocityAlongNormal;
-                energy /= 1 / bodyMass + 1 / collisionBodyMass;
+                energy /= bodyMassInv + collisionBodyMassInv;
                 
                 glm::vec2 impulse = energy * data.normal;
-                bodyPhysics->SetVelocity(bodyVelocity - impulse / bodyMass);
-                collisionBodyPhysics->SetVelocity(collisionBodyVelocity + impulse / collisionBodyMass);
+                if (bodyPhysics != nullptr)
+                    bodyPhysics->SetVelocity(bodyVelocity - impulse / bodyMass);
+
+                if (collisionBodyPhysics != nullptr)
+                    collisionBodyPhysics->SetVelocity(collisionBodyVelocity + impulse / collisionBodyMass);
             }
 
-            glm::vec2 velocity = bodyPhysics->GetVelocity();
-            if (position.x <= _worldBoundaryMin.x || position.x >= _worldBoundaryMax.x)
+            if (bodyPhysics != nullptr)
             {
-                velocity.x = -velocity.x;
+                glm::vec2 velocity = bodyPhysics->GetVelocity();
+                if (position.x <= _worldBoundaryMin.x || position.x >= _worldBoundaryMax.x)
+                {
+                    velocity.x = -velocity.x;
+                }
+            
+                if (position.y <= _worldBoundaryMin.y || position.y >= _worldBoundaryMax.y)
+                {
+                    velocity.y = -velocity.y;
+                }
+            
+                bodyPhysics->SetVelocity(velocity);
             }
-
-            if (position.y <= _worldBoundaryMin.y || position.y >= _worldBoundaryMax.y)
-            {
-                velocity.y = -velocity.y;
-            }
-
-            bodyPhysics->SetVelocity(velocity);
+            
         }
-        
-        for(auto& component : _phyiscsComponents)
+
+        for (int i = 0; i < _phyiscsComponents.size(); ++i)
         {
+            Physics2DComponent* component = _phyiscsComponents[i].get();
             component->PhysicsTick(physicsDeltaTime);
+            
         }
     }
 
@@ -106,7 +114,7 @@ namespace Snowglobe::SnowEngine
         return physicsComponent.get();
     }
 
-    ColliderComponent& PhysicsEngine2DSystem::AttachCollisionComponent(SnowEntity& entity,
+    ColliderComponent* PhysicsEngine2DSystem::AttachCollisionComponent(SnowEntity& entity,
         CollisionShapeType shapeType)
     {
         Physics2DComponent* physicsComponent = nullptr;
@@ -117,7 +125,7 @@ namespace Snowglobe::SnowEngine
             physicsComponent->SetColisionComponent(collisionComponent.get());
 
         entity.AddComponent(collisionComponent.get());
-        return *collisionComponent;
+        return collisionComponent.get();
     }
 
     void PhysicsEngine2DSystem::RemovePhysicsComponent(Physics2DComponent* component)

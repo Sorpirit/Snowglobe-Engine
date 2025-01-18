@@ -74,6 +74,25 @@ namespace Snowglobe::Render
         virtual void Text(const char* fmt, ...) = 0;
         
         virtual bool Checkbox(const std::string& label, bool* value) = 0;
+
+        virtual bool Input(const std::string& label, char* textBuff, size_t size, int flags = 0) = 0;
+        virtual bool Input(const std::string& label, float* value, float step, float stepFast, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::vec2* value, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::vec3* value, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::vec4* value, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Input(const std::string& label, int* value, int step, int stepFast, int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::ivec2* value, int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::ivec3* value, int flags = 0) = 0;
+        virtual bool Input(const std::string& label, glm::ivec4* value, int flags = 0) = 0;
+
+        virtual bool Drag(const std::string& label, float* value, float speed = 0, float min = 0, float max = 0, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::vec2* value, float speed = 0, float min = 0, float max = 0, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::vec3* value, float speed = 0, float min = 0, float max = 0, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::vec4* value, float speed = 0, float min = 0, float max = 0, const std::string& format = "%.3f", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, int* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::ivec2* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::ivec3* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) = 0;
+        virtual bool Drag(const std::string& label, glm::ivec4* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) = 0;
         
         virtual void Slider(const std::string& label, float* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
         virtual void Slider(const std::string& label, glm::vec2* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
@@ -91,7 +110,10 @@ namespace Snowglobe::Render
         virtual void Combo(const std::string& label, int* current, const std::string items[], int itemsCount, int flags = 0) = 0;
         virtual void Combo(const std::string& label, int* current, const std::vector<std::string>& items, int flags = 0) = 0;
 
-        virtual void InputText(const std::string& label, char* textBuff, size_t size, int flags = 0) = 0;
+        virtual void SameLine() = 0;
+        virtual void ToolTip(const std::string& text) = 0;
+
+        virtual bool Button(const std::string& label) = 0;
         
         virtual void AddWorldText(const glm::vec3& position, const std::string& text, const glm::vec3& color = {1.0f, 1.0f, 0.0f}, int alignment = 0) = 0;
         virtual void SetDefaultFont(SnowCore::SnowFileHandle fontFileHandle) = 0;

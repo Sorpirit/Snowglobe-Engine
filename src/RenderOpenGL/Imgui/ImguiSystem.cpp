@@ -44,9 +44,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-
-        ImGui::ShowDemoWindow(); // Show demo window! :)
-
+        
         if (_drawWorldText)
         {
             static ImGuiWindowFlags flags = 
@@ -96,24 +94,6 @@ namespace Snowglobe::RenderOpenGL::Imgui
             
             _worldTexts.clear();
         }
-
-        if (ImGui::Begin("Property Editor"))
-        {
-            ImGui::Text("Hello, world!");
-            
-            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
-            static int item_current = 0;
-            ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
-            
-            ImGui::Checkbox("Draw World Text", &_drawWorldText);
-            static char str0[128] = "Hello, world!";
-            ImGui::InputText("input text", str0, IM_ARRAYSIZE(str0));
-            static float f1 = 0.123f, f2 = 0.0f;
-            ImGui::SliderFloat("slider float", &f1, 0.0f, 1.0f, "ratio = %.3f");
-            static float col1[3] = { 1.0f, 0.0f, 0.2f };
-            ImGui::ColorEdit3("color 1", col1);
-            ImGui::End();
-        }
         
     }
 
@@ -156,7 +136,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     bool ImguiSystem::Checkbox(const std::string& label, bool* value)
     {
-        ImGui::Checkbox(label.c_str(), value);
+        return ImGui::Checkbox(label.c_str(), value);
     }
 
     void ImguiSystem::Slider(const std::string& label, float* value, float min, float max, const std::string& format,
@@ -259,9 +239,114 @@ namespace Snowglobe::RenderOpenGL::Imgui
         }
     }
 
-    void ImguiSystem::InputText(const std::string& label, char* textBuff, size_t size, int flags)
+    void ImguiSystem::SameLine()
     {
-        ImGui::InputText(label.c_str(), textBuff, size, flags);
+        ImGui::SameLine();
+    }
+
+    void ImguiSystem::ToolTip(const std::string& text)
+    {
+        ImGui::SetItemTooltip(text.c_str());
+    }
+
+    bool ImguiSystem::Button(const std::string& label)
+    {
+        return ImGui::Button(label.c_str());
+    }
+
+    bool ImguiSystem::Input(const std::string& label, char* textBuff, size_t size, int flags)
+    {
+        return ImGui::InputText(label.c_str(), textBuff, size, flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, float* value, float step, float stepFast,
+        const std::string& format, int flags)
+    {
+        return ImGui::InputFloat(label.c_str(), value, step, stepFast, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::vec2* value, const std::string& format, int flags)
+    {
+        return ImGui::InputFloat2(label.c_str(), &value->x, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::vec3* value, const std::string& format, int flags)
+    {
+        return ImGui::InputFloat3(label.c_str(), &value->x, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::vec4* value, const std::string& format, int flags)
+    {
+        ImGui::InputFloat4(label.c_str(), &value->x, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, int* value, int step, int stepFast,
+        int flags)
+    {
+        return ImGui::InputInt(label.c_str(), value, step, stepFast, flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::ivec2* value, int flags)
+    {
+        return ImGui::InputInt2(label.c_str(), &value->x, flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::ivec3* value, int flags)
+    {
+        return ImGui::InputInt3(label.c_str(), &value->x, flags);
+    }
+
+    bool ImguiSystem::Input(const std::string& label, glm::ivec4* value, int flags)
+    {
+        return ImGui::InputInt3(label.c_str(), &value->x, flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, float* value, float speed, float min, float max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragFloat(label.c_str(), value, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::vec2* value, float speed, float min, float max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragFloat2(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::vec3* value, float speed, float min, float max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragFloat3(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::vec4* value, float speed, float min, float max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragFloat4(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, int* value, float speed, int min, int max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragInt(label.c_str(), value, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::ivec2* value, float speed, int min, int max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragInt2(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::ivec3* value, float speed, int min, int max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragInt3(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
+    }
+
+    bool ImguiSystem::Drag(const std::string& label, glm::ivec4* value, float speed, int min, int max,
+        const std::string& format, int flags)
+    {
+        return ImGui::DragInt4(label.c_str(), &value->x, speed, min, max, format.c_str(), flags);
     }
 } // namespace Snowglobe::Render
 

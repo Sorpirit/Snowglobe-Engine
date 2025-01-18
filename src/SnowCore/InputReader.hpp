@@ -155,30 +155,36 @@ namespace Snowglobe::SnowCore
         CursorButtonMiddle = CursorButton3
     };
 
+    enum CursorMode : uint8_t
+    {
+        CursorModeNormal = 0,
+        CursorModeHidden = 1,
+        CursorModeDisabled = 2
+    };
+
     class InputReader
     {
-    private:
-        /* data */
     public:
 
-        virtual KeyStatus GetKeyStatus(uint32_t key) = 0;
-        virtual bool IsKeyUp(uint32_t key) = 0;
-        virtual bool IsKeyPressed(uint32_t key) = 0;
-        virtual bool IsKeyReleased(uint32_t key) = 0;
-        virtual bool IsKeyHeld(uint32_t key) = 0;
+        virtual KeyStatus GetKeyStatus(uint32_t key) const = 0;
+        virtual bool IsKeyUp(uint32_t key) const = 0;
+        virtual bool IsKeyPressed(uint32_t key) const = 0;
+        virtual bool IsKeyReleased(uint32_t key) const = 0;
+        virtual bool IsKeyHeld(uint32_t key) const = 0;
 
 
-        virtual KeyStatus GetCursorButtonStatus(uint32_t button) = 0;
-        virtual bool IsCursorButtonUp(uint32_t button) = 0;
-        virtual bool IsCursorButtonPressed(uint32_t button) = 0;
-        virtual bool IsCursorButtonReleased(uint32_t button) = 0;
-        virtual bool IsCursorButtonHeld(uint32_t button) = 0;
-        virtual glm::vec2 GetCursorScreenPosition() = 0;
-        virtual glm::vec2 GetCursorScreenDelta() = 0;
-        virtual float GetScroll() = 0;
-        virtual float GetScrollDelta() = 0;
+        virtual KeyStatus GetCursorButtonStatus(uint32_t button) const = 0;
+        virtual bool IsCursorButtonUp(uint32_t button) const = 0;
+        virtual bool IsCursorButtonPressed(uint32_t button) const = 0;
+        virtual bool IsCursorButtonReleased(uint32_t button) const = 0;
+        virtual bool IsCursorButtonHeld(uint32_t button) const = 0;
+        virtual glm::vec2 GetCursorScreenPosition() const = 0; 
+        virtual glm::vec2 GetCursorScreenDelta() const = 0;
+        virtual float GetScroll() const = 0;
+        virtual float GetScrollDelta() const = 0;
 
         virtual void SetCursorScreenPosition(glm::vec2 pos) = 0;
+        virtual void SetCursorMode(CursorMode mode) = 0;
     };
     
 }

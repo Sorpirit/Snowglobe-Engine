@@ -25,6 +25,8 @@
 #include "CommonVertexLayouts.hpp"
 #include "MaterialsData/TextureColorMaterialData.hpp"
 
+#include "CommonTests.hpp"
+
 // settings
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
@@ -58,7 +60,14 @@ int main()
     }
 
     auto mainWindow = renderSystem->GetMainWindow();
-    auto uiSystem = renderSystem->GetUISystem();
+
+    // BaseShapeFactoryTests test(engine, *fileSystem);
+    // UITest test(engine, *fileSystem);
+    // TextureTests test(engine, *fileSystem);
+    // Phyiscs2DTests test(engine, *fileSystem);
+    CameraTests test(engine, *fileSystem);
+    
+    test.Init();
     
     while(mainWindow->IsOpen())
     {
@@ -71,7 +80,7 @@ int main()
             mainWindow->Close();
         }
 
-
+        test.Run();
         
         engine.Update();
         mainWindow->Present();

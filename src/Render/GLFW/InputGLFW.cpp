@@ -47,9 +47,25 @@ namespace Snowglobe::Render::GLFW
 
         instance->GetInputGLFW().CursorScrollCallback(window, xoffset, yoffset);
     }
-    
+
+    int InputGLFW::GetGLFWCursorMode(SnowCore::CursorMode mode)
+    {
+        switch (mode)
+        {
+        case SnowCore::CursorMode::CursorModeNormal:
+            return GLFW_CURSOR_NORMAL;
+        case SnowCore::CursorMode::CursorModeHidden:
+            return GLFW_CURSOR_HIDDEN;
+        case SnowCore::CursorMode::CursorModeDisabled:
+            return GLFW_CURSOR_DISABLED;
+        default:
+            return GLFW_CURSOR_NORMAL;
+        }
+    }
+
     void InputGLFW::Init(GLFWwindow *window)
     {
+        _window = window;
         glfwSetKeyCallback(window, KeyCallbackStatic);
         glfwSetCursorPosCallback(window, CursorPositionCallbackStatic);
         glfwSetMouseButtonCallback(window, CursorButtonCallbackStatic);
@@ -88,7 +104,7 @@ namespace Snowglobe::Render::GLFW
 
     void InputGLFW::SetCursorScreenPosition(glm::vec2 pos)
     {
-        //glfwSetCursorPos(_window, pos.x, pos.y);
+        glfwSetCursorPos(_window, pos.x, pos.y);
     }
 
     void InputGLFW::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -128,4 +144,9 @@ namespace Snowglobe::Render::GLFW
         _scroll = yoffset;
     }
 
-    } // namespace Snowglobe::Render::GLFW
+    void InputGLFW::SetCursorMode(SnowCore::CursorMode mode)
+    {
+        glfwSetInputMode(_window, GLFW_CURSOR, GetGLFWCursorMode(mode));
+    }
+
+} // namespace Snowglobe::Render::GLFW

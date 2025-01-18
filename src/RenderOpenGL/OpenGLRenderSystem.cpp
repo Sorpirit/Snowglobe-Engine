@@ -47,14 +47,16 @@ namespace Snowglobe::RenderOpenGL
         SnowCore::EngineTime::GetInstance()->RenderTick();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         _camera.Update();
-
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+        
         for(auto& _mesh : _meshes)
         {
+            if (_mesh.GetMaterial() == nullptr || _mesh.GetVertexBuffer() == nullptr)
+                continue;
+            
             RenderPassSignature signature(_mesh);
             auto renderPass = _renderPasses.find(signature);
             if(renderPass == _renderPasses.end())

@@ -102,7 +102,7 @@ namespace Snowglobe::SnowEngine
         void Update() override;
 
         Physics2DComponent* AttachPhysicsComponent(SnowEntity& entity);
-        ColliderComponent& AttachCollisionComponent(SnowEntity& entity, CollisionShapeType shapeType);
+        ColliderComponent* AttachCollisionComponent(SnowEntity& entity, CollisionShapeType shapeType);
 
         void RemovePhysicsComponent(Physics2DComponent* component);
         void RemoveCollisionComponent(ColliderComponent* component);
