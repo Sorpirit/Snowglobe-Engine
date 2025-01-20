@@ -19,10 +19,10 @@ namespace Snowglobe::SnowCore
     public:
         ~SnowFileSystem();
 
-        static SnowFileSystem* GetInstance()
+        static SnowFileSystem& GetInstance()
         {
             static SnowFileSystem _instance;
-            return &_instance;
+            return _instance;
         }
 
         void AddMount(const char* path);

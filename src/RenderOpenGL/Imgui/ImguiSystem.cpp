@@ -16,7 +16,7 @@
 
 namespace Snowglobe::RenderOpenGL::Imgui
 {
-    ImguiSystem::ImguiSystem(Render::Window *window)
+    ImguiSystem::ImguiSystem(Render::Window *window, SnowCore::ECS::EntityManagerBase& entityManager) : Render::UISystem(entityManager)
     {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -39,7 +39,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImGui::DestroyContext();
     }
 
-    void ImguiSystem::EarlyUpdate()
+    void ImguiSystem::UpdateEarly()
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -120,7 +120,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
     void ImguiSystem::SetDefaultFont(SnowCore::SnowFileHandle fontFileHandle)
     {
         ImGuiIO& io = ImGui::GetIO();
-        auto path = SnowCore::SnowFileSystem::GetInstance()->ResolvePath(fontFileHandle);
+        auto path = SnowCore::SnowFileSystem::GetInstance().ResolvePath(fontFileHandle);
         _defaultFont = io.Fonts->AddFontFromFileTTF(path.string().c_str(), 16.0f);
     }
 

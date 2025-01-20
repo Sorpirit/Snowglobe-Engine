@@ -6,7 +6,8 @@
 #include <typeinfo>
 #include <vector>
 
-#include <ISnowSystem.hpp>
+#include <ECS/ISystem.hpp>
+
 #include <Window.hpp>
 #include <Camera.hpp>
 
@@ -23,10 +24,10 @@
 
 namespace Snowglobe::Render
 {
-    class RenderSystem : public SnowCore::ISnowSystem
+    class RenderSystem : public SnowCore::ECS::ISystem
     {
     public:
-        ~RenderSystem() override {}
+        RenderSystem(SnowCore::ECS::EntityManagerBase& entityManager) : ISystem(entityManager) {}
 
         void Update() override = 0;
 

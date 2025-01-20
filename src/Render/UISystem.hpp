@@ -2,13 +2,12 @@
 
 #include <memory>
 #include <vector>
-
-#include <ISnowSystem.hpp>
 #include <string>
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
-#include "SnowFileSystem.hpp"
+#include <ECS/ISystem.hpp>
+#include <SnowFileSystem.hpp>
 
 namespace Snowglobe::Render
 {
@@ -60,12 +59,10 @@ namespace Snowglobe::Render
         AlwaysClamp     = ClampOnInput | ClampZeroRange
     };
 
-    class UISystem : public SnowCore::ISnowSystem
+    class UISystem : public SnowCore::ECS::ISystem
     {
     public:
-        virtual ~UISystem() override {}
-
-        virtual void Update() override = 0;
+        UISystem(SnowCore::ECS::EntityManagerBase& entityManager) : ISystem(entityManager)  {}
 
         virtual UIPanel OpenUIPanel(const std::string& title) = 0;
         virtual void Close(UIPanel* panel) = 0;

@@ -16,3 +16,5 @@ target_link_libraries(SnowCore
     glm
     stb
 )
+
+add_subdirectory(ECS)

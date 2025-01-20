@@ -7,6 +7,8 @@
 
 #include "EngineTime.hpp"
 
+#include "ECS/Entity.hpp"
+
 #include "PhysicsEngine2DSystem.hpp"
 #include "BasicShapeFactory.hpp"
 #include "CommonVertexLayouts.hpp"
@@ -89,24 +91,24 @@ public:
     void Run() override;
 
 private:
-    
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
-    Snowglobe::SnowEngine::PhysicsEngine2DSystem* _physicsEngine = nullptr;
-    
-    std::shared_ptr<Snowglobe::SnowEngine::MeshComponent> _ballLMeshC = nullptr;
-    std::shared_ptr<Snowglobe::SnowEngine::MeshComponent> _ballRMeshC = nullptr;
-    std::shared_ptr<Snowglobe::SnowEngine::MeshComponent> _planeLMeshC = nullptr;
-    std::shared_ptr<Snowglobe::SnowEngine::MeshComponent> _planeRMeshC = nullptr;
-    std::shared_ptr<Snowglobe::SnowEngine::MeshComponent> _grounWallMeshC = nullptr;
 };
 
 class CameraTests : public RuntimeTest
 {
 public:
     CameraTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem),
-        _cubes({_engine.CreateEntityPtr(), _engine.CreateEntityPtr(), _engine.CreateEntityPtr(), _engine.CreateEntityPtr(), _engine.CreateEntityPtr()}), _spectator(_renderSystem->GetCamera(), _window->GetInput()) {}
+        Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
+            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
+    {
+        auto manager = _engine.GetEntityManager();
+        _cubes.emplace_back(manager->CreateEntity());
+        _cubes.emplace_back(manager->CreateEntity());
+        _cubes.emplace_back(manager->CreateEntity());
+        _cubes.emplace_back(manager->CreateEntity());
+        _cubes.emplace_back(manager->CreateEntity());
+    }
+    
     void Init() override;
     void Run() override;
 private:
@@ -115,7 +117,7 @@ private:
 
     Snowglobe::SnowEngine::SpectatorCamera _spectator;
 
-    std::vector<Snowglobe::SnowEngine::SnowEntity*> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::SnowCore::ECS::Entity>> _cubes;
     std::vector<std::shared_ptr<Snowglobe::SnowEngine::MeshComponent>>_cubeMeshC;
 
     void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);

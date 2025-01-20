@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 
 #include "SnowEngine.hpp"
 #include "RenderSystem.hpp"
@@ -6,33 +7,28 @@
 //#include "VulkanRenderingSystem.hpp"
 #include "Imgui/ImguiSystem.hpp"
 #include "PhysicsEngine2DSystem.hpp"
+#include "RenderEngineSyncSystem.hpp"
 #include "EngineTime.hpp"
 
 namespace Snowglobe::SnowEngine
 {
     SnowEngine::~SnowEngine()
     {
-        //todo: delete data from systems
-        // for(auto& entity : _entities)
-        // {
-        //     entity.Destroy();
-        // }
-        // _entities.clear();
-
-        for(auto& system : _systems)
-        {
-            delete system.second;
-        }
         _systems.clear();
     }
 
-    void SnowEngine::Setup(const SnowCore::EngineProfile& profile, const Snowglobe::Render::WindowParams& windowParams)
+    void SnowEngine::Setup(
+        const SnowCore::EngineProfile& profile,
+        const Render::WindowParams& windowParams,
+        const std::shared_ptr<SnowCore::ECS::EntityManagerBase>& entityManager)
     {
-        bool success = false;
+        _entityManager = std::move(entityManager);
+
+        bool success = true;
         switch (profile.preferredRenderEngine)
         {
         case SnowCore::EngineRenderEngine::OpenGL:
-            success = TryAddSystem<Render::RenderSystem>(new RenderOpenGL::OpenGLRenderSystem());
+            _systems[typeid(Render::RenderSystem)] = std::make_shared<RenderOpenGL::OpenGLRenderSystem>(*_entityManager.get());
             break;
         case SnowCore::EngineRenderEngine::Vulkan:
             //todo disable vulkan until implemented
@@ -60,51 +56,50 @@ namespace Snowglobe::SnowEngine
         }
 
         renderSystem->InitializeWindow(windowParams);
-
-        if(!TryAddSystem<RenderOpenGL::Imgui::ImguiSystem>(new RenderOpenGL::Imgui::ImguiSystem(renderSystem->GetMainWindow())))
-        {
-            std::cout << "Failed to add Imgui system" << std::endl;
-        }
         
-        RenderOpenGL::Imgui::ImguiSystem* imguiSystem = nullptr;
-        if(!QuerySystem<RenderOpenGL::Imgui::ImguiSystem>(imguiSystem))
+        _systems[typeid(Render::UISystem)] = std::make_shared<RenderOpenGL::Imgui::ImguiSystem>(renderSystem->GetMainWindow(), *_entityManager);
+        
+        Render::UISystem* uiSystem = nullptr;
+        if(!QuerySystem<Render::UISystem>(uiSystem))
         {
             std::cout << "Failed to get Imgui system" << std::endl;
             return;
         }
+        renderSystem->SetUISystem(uiSystem);
 
-        if(!TryAddSystem(new PhysicsEngine2DSystem()))
-        {
-            std::cout << "Failed to add Imgui system" << std::endl;
-        }
+        _systems[typeid(PhysicsEngine2DSystem)] = std::make_shared<PhysicsEngine2DSystem>(*_entityManager);
+        _systems[typeid(RenderEngineSyncSystem)] = std::make_shared<RenderEngineSyncSystem>(*_entityManager);
         
-        renderSystem->SetUISystem(imguiSystem);
         renderSystem->InitializeRenderScene();
     }
 
-    void SnowEngine::StartFrame() const
-    {
-        for(auto& system : _frameSystems)
-        {
-            system->EarlyUpdate();
-        }
-    }
-
-    void SnowEngine::Update() const
+    void SnowEngine::Run()
     {
         SnowCore::EngineTime::GetInstance()->EngineTick();
-
-        for (auto& entity : _entities)
+        for(const auto& [type, system] : _systems)
         {
-            entity.Update();
+            if(system->IsActive())
+                system->UpdateEarly();
+        }
+
+        for (auto& updateFunction : _updateCallbacks)
+        {
+            updateFunction();
         }
         
-        for(auto& system : _systems)
+        for(const auto& [type, system] : _systems)
         {
-            if(system.second->RequiersUpdate())
-                system.second->Update();
+            if(system->IsActive())
+                system->Update();
         }
+        
+        for(const auto& [type, system] : _systems)
+        {
+            if(system->IsActive())
+                system->UpdateLate();
+        }
+
+        _entityManager->Update();
     }
 
-    
 } // namespace Snowglobe::SnowEngine

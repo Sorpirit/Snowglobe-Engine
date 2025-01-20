@@ -7,6 +7,8 @@
 #include <typeinfo>
 #include <unordered_map>
 
+#include <ECS/ISystem.hpp>
+
 #include <RenderSystem.hpp>
 #include <Window.hpp>
 
@@ -41,8 +43,8 @@ namespace Snowglobe::RenderOpenGL
     class OpenGLRenderSystem : public Render::RenderSystem
     {
     public:
-        OpenGLRenderSystem();
-        ~OpenGLRenderSystem() override;
+        OpenGLRenderSystem(SnowCore::ECS::EntityManagerBase& entityManager);
+        ~OpenGLRenderSystem();
 
         static OpenGLRenderSystem* GetInstance() { return _instance; }
 

@@ -18,13 +18,13 @@ namespace Snowglobe::RenderOpenGL::Imgui
         int alignment;
     };
     
-    class ImguiSystem : public Render::UISystem, public SnowCore::ISnowFrameSystem
+    class ImguiSystem : public Render::UISystem
     {
     public:
-        ImguiSystem(Render::Window* window);
-        ~ImguiSystem() override;
+        ImguiSystem(Render::Window* window, SnowCore::ECS::EntityManagerBase& entityManager);
+        ~ImguiSystem();
 
-        void EarlyUpdate() override;
+        void UpdateEarly() override;
         void Update() override;
 
         Render::UIPanel OpenUIPanel(const std::string& title) override;

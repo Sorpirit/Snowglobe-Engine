@@ -1,26 +1,20 @@
 #pragma once
 
-#include "SnowEntity.hpp"
+#include "ECS/Component.hpp"
+
 #include <MeshProxy.hpp>
 
 namespace Snowglobe::SnowEngine
 {
-    class MeshComponent : public SnowEntityComponent
+    class MeshComponent : public SnowCore::ECS::Component
     {
     public:
-        MeshComponent(Render::MeshProxy& meshProxy) : _meshProxy(meshProxy) { _needsUpdate = true; }
+        MeshComponent() = default; 
+        MeshComponent(Render::MeshProxy* meshProxy) : _meshProxy(meshProxy) {}
 
-        void Update() override
-        {
-            // if (!_entity->IsTransformDirty())
-            //     return;
-
-            _meshProxy.SetPosition(_entity->GetPosition());
-            _meshProxy.SetRotation(_entity->GetRotation());
-            _meshProxy.SetScale(_entity->GetScale());
-        }
+        Render::MeshProxy* GetMeshProxy() { return _meshProxy; }
     private:
-        Render::MeshProxy& _meshProxy;
+        Render::MeshProxy* _meshProxy = nullptr;
 
     };
 } // namespace Snowglobe::SnowEngine

@@ -138,11 +138,6 @@ void TextureTests::Run()
 
 void Phyiscs2DTests::Init()
 {
-    if (_engine.QuerySystem(_physicsEngine))
-    {
-        std::cout << "Failed to get physics engine" << std::endl;
-    }
-
     auto materialL = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialL.Properties()->color = glm::vec3(1.0f, 0.0f, 0.0f);
     auto materialR = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
@@ -150,58 +145,46 @@ void Phyiscs2DTests::Init()
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialG.Properties()->color = glm::vec3(0.1f, 1.0f, 0.1f);
 
+    auto manager = _engine.GetEntityManager();
 
-    Snowglobe::SnowEngine::SnowEntity& ballL = _engine.CreateEntity();
+    auto ballL = manager->CreateEntity();
     auto ballLMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(0.0f), glm::vec3(1.0f));
+    ballL->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(-3.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    ballL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(1.0f, 0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
+    ballL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
+    ballL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballLMesh);
     ballLMesh->SetMaterial(materialL.GetMaterialBase());
-    _ballLMeshC = std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*ballLMesh);
-    ballL.AddComponent(_ballLMeshC.get());
-    _physicsEngine->AttachCollisionComponent(ballL, Snowglobe::SnowEngine::CollisionShapeType::Circle);
-    auto ballLP = _physicsEngine->AttachPhysicsComponent(ballL);
 
-    Snowglobe::SnowEngine::SnowEntity& ballR = _engine.CreateEntity();
+    auto ballR = manager->CreateEntity();
     auto ballRMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(0.0f), glm::vec3(1.0f));
+    ballR->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(4.0f, 0.5f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    ballR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-1.0f, -0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
+    ballR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
+    ballR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballRMesh);
     ballRMesh->SetMaterial(materialR.GetMaterialBase());
-    _ballRMeshC = std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*ballRMesh);
-    ballR.AddComponent(_ballRMeshC.get());
-    _physicsEngine->AttachCollisionComponent(ballR, Snowglobe::SnowEngine::CollisionShapeType::Circle);
-    auto ballRP = _physicsEngine->AttachPhysicsComponent(ballR);
 
-    Snowglobe::SnowEngine::SnowEntity& planeL = _engine.CreateEntity();
+    auto planeL = manager->CreateEntity();
     auto planeLMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    planeL->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(-4.0f, -0.5f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    planeL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
+    planeL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    planeL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeLMesh);
     planeLMesh->SetMaterial(materialL.GetMaterialBase());
-    _planeLMeshC = std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*planeLMesh);
-    planeL.AddComponent(_planeLMeshC.get());
-    _physicsEngine->AttachCollisionComponent(planeL, Snowglobe::SnowEngine::CollisionShapeType::AABB);
-    auto planeLP = _physicsEngine->AttachPhysicsComponent(planeL);
 
-    Snowglobe::SnowEngine::SnowEntity& planeR = _engine.CreateEntity();
+    auto planeR = manager->CreateEntity();
     auto planeRMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    planeR->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(3.0f, -1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    planeR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
+    planeR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    planeR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeRMesh);
     planeRMesh->SetMaterial(materialR.GetMaterialBase());
-    _planeRMeshC = std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*planeRMesh);
-    planeR.AddComponent(_planeRMeshC.get());
-    _physicsEngine->AttachCollisionComponent(planeR, Snowglobe::SnowEngine::CollisionShapeType::AABB);
-    auto planeRP = _physicsEngine->AttachPhysicsComponent(planeR);
 
-    Snowglobe::SnowEngine::SnowEntity& groundWall = _engine.CreateEntity();
+    auto groundWall = manager->CreateEntity();
     auto groundWallMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    groundWall->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f), glm::vec3(4.0f, 0.5f, 1.0f));
+    groundWall->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    groundWall->AddComponent<Snowglobe::SnowEngine::MeshComponent>(groundWallMesh);
     groundWallMesh->SetMaterial(materialG.GetMaterialBase());
-    _grounWallMeshC = std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*groundWallMesh);
-    groundWall.AddComponent(_grounWallMeshC.get());
-    _physicsEngine->AttachCollisionComponent(groundWall, Snowglobe::SnowEngine::CollisionShapeType::AABB);
-
-    ballL.SetPosition(glm::vec3(-3.0f, 1.0f, 0.0f));
-    planeL.SetPosition(glm::vec3(-4.0f, -0.5f, 0.0f));
-    ballR.SetPosition(glm::vec3(4.0f, 0.5f, 0.0f));
-    planeR.SetPosition(glm::vec3(3.0f,  -1.0f, 0.0f));
-    
-    groundWall.SetPosition(glm::vec3(0.0f, -2.0f, 0.0f));
-    groundWall.SetScale(glm::vec3(4.0f, 0.5f, 1.0f));
-
-    ballLP->SetVelocity(glm::vec2(1.0f, 0.2f));
-    planeLP->SetVelocity(glm::vec2(2.0f, 0.0f));
-    ballRP->SetVelocity(glm::vec2(-1.0f, -0.2f));
-    planeRP->SetVelocity(glm::vec2(-2.0f, 0.0f));
 }
 
 void Phyiscs2DTests::Run()
@@ -237,21 +220,41 @@ void CameraTests::Init()
     {
         auto mesh = _renderSystem->CreateMeshProxy(*vertexBuffer, "CubeMesh");
         mesh->SetMaterial(textureMaterial.GetMaterialBase());
-        _cubeMeshC.push_back(std::make_shared<Snowglobe::SnowEngine::MeshComponent>(*mesh));
-        _cubes[i]->AddComponent(_cubeMeshC[i].get());
+        _cubes[i]->AddComponent<Snowglobe::SnowCore::TransformComponent>();
+        _cubes[i]->AddComponent<Snowglobe::SnowEngine::MeshComponent>(mesh);
+        
     }
 
-    _cubes[0]->SetPosition(glm::vec3(3, 1, -1));
-    _cubes[1]->SetPosition(glm::vec3(-2, 0, -6));
-    _cubes[2]->SetPosition(glm::vec3(0, -1, -4));
-    _cubes[3]->SetPosition(glm::vec3(-2, -2, -2));
-    _cubes[4]->SetPosition(glm::vec3(3, -3, -5));
+    Snowglobe::SnowCore::TransformComponent* transform = nullptr;
+    if (_cubes[0]->QueryComponent(transform))
+    {
+        transform->Position = glm::vec3(3, 1, -1);
+        transform->Rotation = glm::vec3(14, 0, 25);
+    }
 
-    _cubes[0]->SetRotation(glm::vec3(14, 0, 25));
-    _cubes[1]->SetRotation(glm::vec3(72, 0, 34));
-    _cubes[2]->SetRotation(glm::vec3(25, 0, 52));
-    _cubes[3]->SetRotation(glm::vec3(50, 0, 39));
-    _cubes[4]->SetRotation(glm::vec3(87, 0, 23));
+    if (_cubes[1]->QueryComponent(transform))
+    {
+        transform->Position = glm::vec3(-2, 0, -6);
+        transform->Rotation = glm::vec3(72, 0, 34);
+    }
+
+    if (_cubes[2]->QueryComponent(transform))
+    {
+        transform->Position = glm::vec3(0, -1, -4);
+        transform->Rotation = glm::vec3(25, 0, 52);
+    }
+
+    if (_cubes[3]->QueryComponent(transform))
+    {
+        transform->Position = glm::vec3(-2, -2, -2);
+        transform->Rotation = glm::vec3(50, 0, 39);
+    }
+
+    if (_cubes[4]->QueryComponent(transform))
+    {
+        transform->Position = glm::vec3(3, -3, -5);
+        transform->Rotation = glm::vec3(87, 0, 23);
+    }
     
     _renderSystem->GetCamera().SetMode(Snowglobe::Render::CameraMode::Perspective);
     _isOrthographic = false;
@@ -267,16 +270,13 @@ void CameraTests::Run()
         _renderSystem->GetCamera().SetMode(_isOrthographic ? Snowglobe::Render::CameraMode::Orthographic : Snowglobe::Render::CameraMode::Perspective);
     }
 
-    float timeDelta = Snowglobe::SnowCore::EngineTime::GetDeltaEngineFrameTime();
-    for (int i = 0; i < _cubes.size(); ++i)
-    {
-        auto cubeRotation = _cubes[i]->GetRotation();
-        cubeRotation.y += 45.0f * timeDelta;
-        _cubes[i]->SetRotation(cubeRotation);
-    }
-
-    
-    
+    // float timeDelta = Snowglobe::SnowCore::EngineTime::GetDeltaEngineFrameTime();
+    // for (int i = 0; i < _cubes.size(); ++i)
+    // {
+    //     auto cubeRotation = _cubes[i]->GetRotation();
+    //     cubeRotation.y += 45.0f * timeDelta;
+    //     _cubes[i]->SetRotation(cubeRotation);
+    // }
 }
 
 void CameraTests::AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform)

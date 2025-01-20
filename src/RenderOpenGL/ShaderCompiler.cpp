@@ -19,7 +19,7 @@ ShaderCompiler::~ShaderCompiler()
 
 unsigned int ShaderCompiler::GetOrCompileShader(const SnowCore::SnowFileHandle& shader)
 {
-    auto shaderSource = SnowCore::SnowFileSystem::GetInstance()->ReadTextFile(shader);
+    auto shaderSource = SnowCore::SnowFileSystem::GetInstance().ReadTextFile(shader);
     if(shaderSource == nullptr)
     {
         return UINT_MAX;

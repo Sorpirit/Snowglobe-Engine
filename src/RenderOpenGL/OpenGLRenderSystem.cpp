@@ -25,10 +25,9 @@ namespace Snowglobe::RenderOpenGL
 {
     OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
 
-    OpenGLRenderSystem::OpenGLRenderSystem() :
-        _shaderCompiler(std::make_unique<ShaderCompiler>())
+    OpenGLRenderSystem::OpenGLRenderSystem(SnowCore::ECS::EntityManagerBase& entityManager) :
+        RenderSystem(entityManager), _shaderCompiler(std::make_unique<ShaderCompiler>())
     {
-        _requiersUpdate = true;
         _instance = this;
 
         glfwInit();

@@ -14,18 +14,28 @@
 #include <InputReader.hpp>
 #include <RenderSystem.hpp>
 
-#include "BasicShapeFactory.hpp"
+#include "CommonTests.hpp"
 
-#include "EngineTime.hpp"
-#include "UISystem.hpp"
+#include "ECS/Component.hpp"
+#include "ECS/Entity.hpp"
+#include "ECS/EntityManager.hpp"
 
-#include "PhysicsEngine2DSystem.hpp"
+#include "TransformComponent.hpp"
+#include "Physics2DComponent.hpp"
+#include "Collider2DComponent.hpp"
 #include "MeshComponent.hpp"
 
-#include "CommonVertexLayouts.hpp"
-#include "MaterialsData/TextureColorMaterialData.hpp"
+typedef Snowglobe::SnowCore::ECS::MapEntityData
+<
+Snowglobe::SnowCore::TransformComponent,
+Snowglobe::SnowEngine::Physics2DComponent,
+Snowglobe::SnowEngine::Collider2DComponent,
+Snowglobe::SnowEngine::MeshComponent
+> SampleMapEntityData;
 
-#include "CommonTests.hpp"
+
+
+typedef Snowglobe::SnowCore::ECS::EntityManager<SampleMapEntityData> SampleEntityManager;
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -36,13 +46,14 @@ int main()
     Snowglobe::SnowCore::EngineProfile profile = { "Snowglobe", Snowglobe::SnowCore::EngineRenderEngine::OpenGL };
     Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, 0, 0, true, false, true, true, false, 0.0, 0.0, "" };
 
-    Snowglobe::SnowEngine::SnowEngine& engine = Snowglobe::SnowEngine::SnowEngine::GetInstance();
-    auto fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
+    auto& engine = Snowglobe::SnowEngine::SnowEngine::GetInstance();
+    auto& fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
+    auto manager = std::make_shared<SampleEntityManager>();
 
-    fileSystem->AddMount("C:/Users/danvu/sources/snowglobe/src/RenderOpenGL/Shaders");
-    fileSystem->AddMount("C:/Users/danvu/sources/snowglobe/src/SnowglobeTest");
+    fileSystem.AddMount("C:/Users/danvu/sources/snowglobe/src/RenderOpenGL/Shaders");
+    fileSystem.AddMount("C:/Users/danvu/sources/snowglobe/src/SnowglobeTest");
     
-    engine.Setup(profile, windowParams);
+    engine.Setup(profile, windowParams, manager);
     
     // Get render proxy
     Snowglobe::Render::RenderSystem* renderSystem = nullptr; 
@@ -52,28 +63,18 @@ int main()
         return -1;
     }
 
-    Snowglobe::SnowEngine::PhysicsEngine2DSystem* physicsEngine = nullptr;
-    if(!engine.QuerySystem(physicsEngine))
-    {
-        std::cout << "Failed to get render system" << std::endl;
-        return -1;
-    }
-
     auto mainWindow = renderSystem->GetMainWindow();
 
-    // BaseShapeFactoryTests test(engine, *fileSystem);
-    // UITest test(engine, *fileSystem);
-    // TextureTests test(engine, *fileSystem);
-    // Phyiscs2DTests test(engine, *fileSystem);
-    CameraTests test(engine, *fileSystem);
+    // BaseShapeFactoryTests test(engine, fileSystem);
+    // UITest test(engine, fileSystem);
+    // TextureTests test(engine, fileSystem);
+    Phyiscs2DTests test(engine, fileSystem);
+    // CameraTests test(engine, fileSystem);
     
     test.Init();
     
-    while(mainWindow->IsOpen())
+    auto updateFunc = [&]()
     {
-        mainWindow->PollEvents();
-        engine.StartFrame();
-
         if(mainWindow->GetInput().IsKeyPressed(Snowglobe::SnowCore::Key::Escape))
         {
             std::cout << "Escape pressed" << std::endl;
@@ -81,13 +82,15 @@ int main()
         }
 
         test.Run();
-        
-        engine.Update();
+    };
+
+    engine.RegisterUpdateCallback(updateFunc);
+    while(mainWindow->IsOpen())
+    {
+        mainWindow->PollEvents();
+        engine.Run();
         mainWindow->Present();
     }
     
-    
-    
-
     return 0;
 }
