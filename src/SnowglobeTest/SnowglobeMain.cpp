@@ -72,8 +72,9 @@ int main()
     // BaseShapeFactoryTests test(engine, fileSystem);
     // UITest test(engine, fileSystem);
     // TextureTests test(engine, fileSystem);
-    Phyiscs2DTests test(engine, fileSystem);
+    // Phyiscs2DTests test(engine, fileSystem);
     // CameraTests test(engine, fileSystem);
+    Assigment1Tests test(engine, fileSystem);
     
     test.Init();
     

@@ -65,6 +65,16 @@ char* SnowFileSystem::ReadTextFile(const SnowFileHandle& handle)
     return buffer;
 }
 
+void SnowFileSystem::ReadTextFile(const SnowFileHandle& handle, std::function<void(std::ifstream&)> read)
+{
+    auto resolvedPath = ResolvePath(handle);
+    if(!std::filesystem::exists(resolvedPath))
+        return;
+
+    std::ifstream file(resolvedPath, std::ios::in);
+    read(file);
+}
+
 FileTexture* SnowFileSystem::LoadTexture(const SnowFileHandle &handle)
 {
     return new FileTexture(ResolvePath(handle));

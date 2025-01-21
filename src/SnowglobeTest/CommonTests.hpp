@@ -122,3 +122,29 @@ private:
 
     void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
 };
+
+
+class Assigment1Tests : public RuntimeTest
+{
+public:
+    Assigment1Tests(
+        Snowglobe::SnowEngine::SnowEngine& engine, 
+        Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem) {}
+    void Init() override;
+    void Run() override;
+
+    
+    
+private:
+    Snowglobe::Render::BasicShapeFactory _shapeFactory;
+
+    struct ObjectDescriptor
+    {
+        std::string Name;
+        glm::vec3 Position;
+        glm::vec2 Velocity;
+        float Scale;
+        glm::vec3 Color;
+        std::string Shape;
+    };
+};
