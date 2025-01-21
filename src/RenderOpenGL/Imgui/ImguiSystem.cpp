@@ -97,7 +97,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         
     }
 
-    void ImguiSystem::Update()
+    void ImguiSystem::UpdateLate()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

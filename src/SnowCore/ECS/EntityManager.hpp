@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <string>
 
 #include "Entity.hpp"
 
@@ -41,7 +42,7 @@ public:
     {
         auto entityData = std::make_shared<TEntityData>();
         EntityData* entityDataPtr = entityData.get();
-        auto entity = std::make_shared<Entity>( *entityDataPtr, _nextId++, tag);
+        auto entity = std::make_shared<Entity>( *entityDataPtr, _nextId++, tag, "Entity_" + std::to_string(_nextId));
         _toAdd.push_back({entity, entityData});
         return entity;
     }

@@ -12,6 +12,8 @@ namespace Snowglobe::Render
     class MaterialInstance
     {
     public:
+        //todo remove default constructor
+        MaterialInstance() : _materialBase(nullptr), _materialData(nullptr) {}
         MaterialInstance(MaterialBase* materialBase) 
             : _materialBase(materialBase), _materialData(static_cast<T*>(materialBase->GetMaterialDataPtr()))
         {

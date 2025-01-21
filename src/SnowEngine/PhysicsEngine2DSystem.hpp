@@ -135,12 +135,16 @@ namespace Snowglobe::SnowEngine
 
         if (xOverlap && yOverlap)
         {
-            glm::vec2 centerA = (minA + maxA) / 2.0f;
-            glm::vec2 centerB = (minB + maxB) / 2.0f;
-            
-            glm::vec2 dist = centerB - centerA;
-            glm::vec2 overlap = glm::vec2(std::abs(dist.x), std::abs(dist.y)); // todo: check if this is correct
-            return CollisionData{true, glm::normalize(dist), std::min(overlap.x, overlap.y)};
+            float overlapX = std::min(maxA.x, maxB.x) - std::max(minA.x, minB.x);
+            float overlapY = std::min(maxA.y, maxB.y) - std::max(minA.y, minB.y);
+            if (overlapX < overlapY)
+            {
+                return CollisionData{true, glm::vec2((minA.x < minB.x) ? 1.0f : -1.0f, 0.0f), overlapX};
+            }
+            else
+            {
+                return CollisionData{true, glm::vec2(0.0f, (minA.y < minB.y) ? 1.0f : -1.0f), overlapY};
+            }
         }
         
         return CollisionData{xOverlap && yOverlap, glm::vec2(0.0f), 0.0f};

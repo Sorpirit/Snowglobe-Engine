@@ -23,6 +23,7 @@
 #include "TransformComponent.hpp"
 #include "Physics2DComponent.hpp"
 #include "Collider2DComponent.hpp"
+#include "ComponentEditor.hpp"
 #include "MeshComponent.hpp"
 
 typedef Snowglobe::SnowCore::ECS::MapEntityData
@@ -30,7 +31,10 @@ typedef Snowglobe::SnowCore::ECS::MapEntityData
 Snowglobe::SnowCore::TransformComponent,
 Snowglobe::SnowEngine::Physics2DComponent,
 Snowglobe::SnowEngine::Collider2DComponent,
-Snowglobe::SnowEngine::MeshComponent
+Snowglobe::SnowEngine::MeshComponent,
+Snowglobe::SnowEngine::BaseComponentMaterial,
+Snowglobe::SnowEngine::DebugComponent
+
 > SampleMapEntityData;
 
 

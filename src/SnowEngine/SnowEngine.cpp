@@ -8,6 +8,8 @@
 #include "Imgui/ImguiSystem.hpp"
 #include "PhysicsEngine2DSystem.hpp"
 #include "RenderEngineSyncSystem.hpp"
+#include "ComponentEditorSystem.hpp"
+#include "ComponentEditor.hpp"
 #include "EngineTime.hpp"
 
 namespace Snowglobe::SnowEngine
@@ -69,6 +71,15 @@ namespace Snowglobe::SnowEngine
 
         _systems[typeid(PhysicsEngine2DSystem)] = std::make_shared<PhysicsEngine2DSystem>(*_entityManager);
         _systems[typeid(RenderEngineSyncSystem)] = std::make_shared<RenderEngineSyncSystem>(*_entityManager);
+
+        auto componentEditorSystem = std::make_shared<ComponentEditorSystem>(*_entityManager, *uiSystem);
+        _systems[typeid(ComponentEditorSystem)] = componentEditorSystem;
+
+        componentEditorSystem->RegisterVisualiser<DebugComponent, DebugComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<SnowCore::TransformComponent, TransformComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<Physics2DComponent, Physics2DComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<Collider2DComponent, Collider2DComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<BaseComponentMaterial, BaseComponentMaterialEditor>();
         
         renderSystem->InitializeRenderScene();
     }

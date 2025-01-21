@@ -7,6 +7,7 @@
 #include <BasicShapeFactory.hpp>
 
 #include "CommonVertexLayouts.hpp"
+#include "ComponentEditor.hpp"
 #include "MeshComponent.hpp"
 #include "MaterialsData/TextureColorMaterialData.hpp"
 
@@ -149,42 +150,88 @@ void Phyiscs2DTests::Init()
 
     auto ballL = manager->CreateEntity();
     auto ballLMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(0.0f), glm::vec3(1.0f));
+    ballL->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
     ballL->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(-3.0f, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     ballL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(1.0f, 0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
     ballL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
     ballL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballLMesh);
+    ballL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialL.GetMaterialBase());
     ballLMesh->SetMaterial(materialL.GetMaterialBase());
 
     auto ballR = manager->CreateEntity();
     auto ballRMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(0.0f), glm::vec3(1.0f));
+    ballR->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
     ballR->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(4.0f, 0.5f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     ballR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-1.0f, -0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
     ballR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
     ballR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballRMesh);
+    ballR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialR.GetMaterialBase());
     ballRMesh->SetMaterial(materialR.GetMaterialBase());
 
     auto planeL = manager->CreateEntity();
     auto planeLMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    planeL->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
     planeL->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(-4.0f, -0.5f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
-    planeL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
+    planeL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
     planeL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     planeL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeLMesh);
+    planeL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialL.GetMaterialBase());
     planeLMesh->SetMaterial(materialL.GetMaterialBase());
 
     auto planeR = manager->CreateEntity();
     auto planeRMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    planeR->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
     planeR->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(3.0f, -1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     planeR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
     planeR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     planeR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeRMesh);
+    planeR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialR.GetMaterialBase());
     planeRMesh->SetMaterial(materialR.GetMaterialBase());
 
     auto groundWall = manager->CreateEntity();
     auto groundWallMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    groundWall->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
     groundWall->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f), glm::vec3(4.0f, 0.5f, 1.0f));
     groundWall->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     groundWall->AddComponent<Snowglobe::SnowEngine::MeshComponent>(groundWallMesh);
+    groundWall->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialG.GetMaterialBase());
     groundWallMesh->SetMaterial(materialG.GetMaterialBase());
+
+    auto wallBottom = manager->CreateEntity();
+    auto wallBottomMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    wallBottom->SetName("wallBottom");
+    wallBottom->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
+    wallBottom->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f, -2.5f, 0.0f), glm::vec3(0.0f), glm::vec3(8.5f, 0.5f, 1.0f));
+    wallBottom->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    wallBottom->AddComponent<Snowglobe::SnowEngine::MeshComponent>(wallBottomMesh);
+    wallBottomMesh->SetMaterial(materialG.GetMaterialBase());
+
+    auto wallTop = manager->CreateEntity();
+    auto wallTopMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    wallTop->SetName("wallTop");
+    wallTop->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
+    wallTop->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f, 2.5f, 0.0f), glm::vec3(0.0f), glm::vec3(8.5f, 0.5f, 1.0f));
+    wallTop->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    wallTop->AddComponent<Snowglobe::SnowEngine::MeshComponent>(wallTopMesh);
+    wallTopMesh->SetMaterial(materialG.GetMaterialBase());
+    
+    auto wallRight = manager->CreateEntity();
+    auto wallRightMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    wallRight->SetName("wallRight");
+    wallRight->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
+    wallRight->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(4.5f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.5f, 5.0f, 1.0f));
+    wallRight->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    wallRight->AddComponent<Snowglobe::SnowEngine::MeshComponent>(wallRightMesh);
+    wallRightMesh->SetMaterial(materialG.GetMaterialBase());
+
+    auto wallLeft = manager->CreateEntity();
+    auto wallLeftMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
+    wallLeft->SetName("wallLeft");
+    wallLeft->AddComponent<Snowglobe::SnowEngine::DebugComponent>();
+    wallLeft->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(-4.5f, 0.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.5f, 5.0f, 1.0f));
+    wallLeft->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
+    wallLeft->AddComponent<Snowglobe::SnowEngine::MeshComponent>(wallLeftMesh);
+    wallLeftMesh->SetMaterial(materialG.GetMaterialBase());
 }
 
 void Phyiscs2DTests::Run()

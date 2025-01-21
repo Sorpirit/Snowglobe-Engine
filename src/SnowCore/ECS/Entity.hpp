@@ -1,11 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <any>
-#include <tuple>
 #include <vector>
-#include <unordered_map>
-#include <typeindex>
 #include <type_traits>
 
 #include "Component.hpp"
@@ -17,7 +13,7 @@ namespace Snowglobe::SnowCore::ECS
 class Entity
 {
 public:
-    Entity(EntityData& data, uint32_t id, uint32_t tag) : _tag(tag), _id(id), _components(data) {}
+    Entity(EntityData& data, uint32_t id, uint32_t tag, const std::string& name) : _tag(tag), _id(id), _components(data), _name(name) {}
 
     template <class TComponent, typename... TArgs>
     bool AddComponent(TArgs&&... args)
@@ -34,9 +30,6 @@ public:
         if(_isActive)
             component.OnActivate();
         
-        // if(componentPtr)
-        //     *componentPtr = &component;
-            
         return true;
     }
 
@@ -145,11 +138,16 @@ public:
         });
     }
 
+    void SetName(const std::string& name) { _name = name; }
+    const std::string& GetName() const { return _name; }
+
 private:
     bool _isActive = true;
     bool _isDestroyed = false;
     uint32_t _tag = 0;
     uint32_t _id = 0;
+
+    std::string _name = "Entity";
     
     EntityData& _components;
 };

@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <any>
+#include <cassert>
 #include <tuple>
 #include <vector>
 #include <unordered_map>
