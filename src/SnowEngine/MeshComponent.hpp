@@ -25,12 +25,13 @@ class BaseComponentMaterial : public SnowCore::ECS::Component
     
 public:
     BaseComponentMaterial() = default;
-    BaseComponentMaterial(Render::MaterialBase* material) : _material(material) {}
+    BaseComponentMaterial(Render::MeshProxy* proxy, Render::MaterialBase* material) : _material(material), _proxy(proxy) {}
 
     Render::BasicShapeMaterial* GetMaterial() const { return _material.Properties(); }
-
+    Render::MeshProxy* GetProxy() const { return _proxy; }
 private:
     Render::MaterialInstance<Render::BasicShapeMaterial> _material;
+    Render::MeshProxy* _proxy;
 
 };
 

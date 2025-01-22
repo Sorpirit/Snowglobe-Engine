@@ -54,8 +54,31 @@ int main()
     auto& fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
     auto manager = std::make_shared<SampleEntityManager>();
 
-    fileSystem.AddMount("C:/Users/danvu/sources/snowglobe/src/RenderOpenGL/Shaders");
-    fileSystem.AddMount("C:/Users/danvu/sources/snowglobe/src/SnowglobeTest");
+    //Resolve project path
+    auto project_path = std::filesystem::current_path();
+    bool foundProjectPath = false;
+    while (project_path.has_parent_path())
+    {
+        if (project_path.has_filename() && project_path.filename() == "snowglobe")
+        {
+            foundProjectPath = true;
+            break;
+        }
+        project_path = project_path.parent_path();
+    }
+
+    // If we didn't find the project path, just use the current path
+    if (!foundProjectPath)
+    {
+        project_path = std::filesystem::current_path();
+    }
+    
+    fileSystem.AddMount(project_path / "src/RenderOpenGL/Shaders");
+    fileSystem.AddMount(project_path / "src/SnowglobeTest/Assets");
+
+    auto sceneConfig = Assigment1Tests::LoadScene(fileSystem, Snowglobe::SnowCore::SnowFileHandle("scene.txt"));
+    windowParams.width = sceneConfig.WindowWidth;
+    windowParams.height = sceneConfig.WindowHeight;
     
     engine.Setup(profile, windowParams, manager);
     
@@ -74,7 +97,7 @@ int main()
     // TextureTests test(engine, fileSystem);
     // Phyiscs2DTests test(engine, fileSystem);
     // CameraTests test(engine, fileSystem);
-    Assigment1Tests test(engine, fileSystem);
+    Assigment1Tests test(engine, fileSystem, sceneConfig);
     
     test.Init();
     

@@ -51,12 +51,12 @@ namespace Snowglobe::RenderOpenGL
 
         _camera.Update();
         
-        for(auto& _mesh : _meshes)
+        for(auto& mesh : _meshes)
         {
-            if (_mesh.GetMaterial() == nullptr || _mesh.GetVertexBuffer() == nullptr)
+            if (mesh.GetMaterial() == nullptr || mesh.GetVertexBuffer() == nullptr || !mesh.IsVisible())
                 continue;
             
-            RenderPassSignature signature(_mesh);
+            RenderPassSignature signature(mesh);
             auto renderPass = _renderPasses.find(signature);
             if(renderPass == _renderPasses.end())
             {
@@ -64,7 +64,7 @@ namespace Snowglobe::RenderOpenGL
                 continue;
             }
 
-            renderPass->second->Execute(_mesh);
+            renderPass->second->Execute(mesh);
         }
     }
 

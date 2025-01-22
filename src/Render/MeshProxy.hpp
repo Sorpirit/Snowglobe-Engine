@@ -12,6 +12,12 @@ public:
     MeshProxy(const RenderID& id) : RenderProxy(id) {}
 
     virtual void SetMaterial(MaterialBase& materialId) = 0;
+
+    void SetVisible(bool isVisible) { _isVisible = isVisible; }
+    bool IsVisible() const { return _isVisible; }
+    
+protected:
+    bool _isVisible = true;
 };
 
 

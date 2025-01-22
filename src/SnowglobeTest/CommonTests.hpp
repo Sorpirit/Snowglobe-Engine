@@ -127,24 +127,35 @@ private:
 class Assigment1Tests : public RuntimeTest
 {
 public:
+    struct ObjectDescriptor
+    {
+        std::string Shape;
+        std::string Name;
+        glm::vec3 Position;
+        glm::vec3 Scale;
+        glm::vec2 Velocity;
+        glm::vec3 Color;
+        
+    };
+
+    struct SceneDescriptor
+    {
+        int WindowWidth;
+        int WindowHeight;
+        std::string Font;
+        std::vector<ObjectDescriptor> Objects;
+    };
+
     Assigment1Tests(
         Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem) {}
+        Snowglobe::SnowCore::SnowFileSystem& fileSystem,
+        SceneDescriptor& descriptor) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
     void Init() override;
     void Run() override;
-
     
+    static SceneDescriptor LoadScene(Snowglobe::SnowCore::SnowFileSystem& fileSystem, const Snowglobe::SnowCore::SnowFileHandle& sceneFile);
     
 private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
-
-    struct ObjectDescriptor
-    {
-        std::string Name;
-        glm::vec3 Position;
-        glm::vec2 Velocity;
-        float Scale;
-        glm::vec3 Color;
-        std::string Shape;
-    };
+    SceneDescriptor& _descriptor;
 };

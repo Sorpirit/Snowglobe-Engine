@@ -156,7 +156,7 @@ void Phyiscs2DTests::Init()
     ballL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(1.0f, 0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
     ballL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
     ballL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballLMesh);
-    ballL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialL.GetMaterialBase());
+    ballL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(ballLMesh, &materialL.GetMaterialBase());
     ballLMesh->SetMaterial(materialL.GetMaterialBase());
 
     auto ballR = manager->CreateEntity();
@@ -166,7 +166,7 @@ void Phyiscs2DTests::Init()
     ballR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-1.0f, -0.2f), 0.0f, 1.0f, 0.0f, 1.0f);
     ballR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
     ballR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballRMesh);
-    ballR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialR.GetMaterialBase());
+    ballR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(ballRMesh, &materialR.GetMaterialBase());
     ballRMesh->SetMaterial(materialR.GetMaterialBase());
 
     auto planeL = manager->CreateEntity();
@@ -176,7 +176,7 @@ void Phyiscs2DTests::Init()
     planeL->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
     planeL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     planeL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeLMesh);
-    planeL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialL.GetMaterialBase());
+    planeL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(planeLMesh, &materialL.GetMaterialBase());
     planeLMesh->SetMaterial(materialL.GetMaterialBase());
 
     auto planeR = manager->CreateEntity();
@@ -186,7 +186,7 @@ void Phyiscs2DTests::Init()
     planeR->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(glm::vec2(-2.0f, 0.0f), 0.0f, 1.0f, 0.0f, 1.0f);
     planeR->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     planeR->AddComponent<Snowglobe::SnowEngine::MeshComponent>(planeRMesh);
-    planeR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialR.GetMaterialBase());
+    planeR->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(planeRMesh, &materialR.GetMaterialBase());
     planeRMesh->SetMaterial(materialR.GetMaterialBase());
 
     auto groundWall = manager->CreateEntity();
@@ -195,7 +195,7 @@ void Phyiscs2DTests::Init()
     groundWall->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f, -2.0f, 0.0f), glm::vec3(0.0f), glm::vec3(4.0f, 0.5f, 1.0f));
     groundWall->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::AABB);
     groundWall->AddComponent<Snowglobe::SnowEngine::MeshComponent>(groundWallMesh);
-    groundWall->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialG.GetMaterialBase());
+    groundWall->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(groundWallMesh, &materialG.GetMaterialBase());
     groundWallMesh->SetMaterial(materialG.GetMaterialBase());
 
     auto wallBottom = manager->CreateEntity();
@@ -346,35 +346,14 @@ void CameraTests::AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vert
 
 void Assigment1Tests::Init()
 {
-    std::vector<ObjectDescriptor> descriptors;
-    _fileSystem.ReadTextFile(Snowglobe::SnowCore::SnowFileHandle("scene.txt"), [&](std::ifstream& stream)
-    {
-        std::string line;
-        while (std::getline(stream, line))
-        {
-            if (line.empty())
-                continue;
-
-            std::istringstream iss(line);
-            std::string name;
-            glm::vec3 position;
-            glm::vec2 velocity;
-            float scale;
-            glm::vec3 color;
-            std::string shape;
-
-            iss >> name >> position.x >> position.y >> position.z >> velocity.x >> velocity.y >> scale >> color.x >> color.y >> color.z >> shape;
-
-            descriptors.push_back({name, position, velocity, scale, color, shape});
-        } 
-    });
-
+    _uiSystem->SetDefaultFont(Snowglobe::SnowCore::SnowFileHandle(_descriptor.Font));
+    
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialG.Properties()->color = glm::vec3(0.4f, 0.7f, 0.4f);
 
     auto manager = _engine.GetEntityManager();
 
-    for (auto& desc : descriptors)
+    for (auto& desc : _descriptor.Objects)
     {
         auto entity = manager->CreateEntity();
         auto shape = desc.Shape == "Circle" ? Snowglobe::Render::BasicShape::Disk : Snowglobe::Render::BasicShape::Plane;
@@ -389,7 +368,7 @@ void Assigment1Tests::Init()
         entity->AddComponent<Snowglobe::SnowEngine::Physics2DComponent>(desc.Velocity, 0.0f, 1.0f, 0.0f, 1.0f);
         entity->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(collisionShape);
         entity->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballLMesh);
-        entity->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(&materialL.GetMaterialBase());
+        entity->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(ballLMesh, &materialL.GetMaterialBase());
         ballLMesh->SetMaterial(materialL.GetMaterialBase());
     }
 
@@ -433,4 +412,53 @@ void Assigment1Tests::Init()
 
 void Assigment1Tests::Run()
 {
+}
+
+Assigment1Tests::SceneDescriptor Assigment1Tests::LoadScene(Snowglobe::SnowCore::SnowFileSystem& fileSystem,const Snowglobe::SnowCore::SnowFileHandle& sceneFile)
+{
+    SceneDescriptor descriptor;
+    fileSystem.ReadTextFile(sceneFile, [&](std::ifstream& stream)
+    {
+        std::string line;
+        if (stream >> line)
+        {
+            stream >> descriptor.WindowWidth >> descriptor.WindowHeight >> descriptor.Font;
+        }
+        
+        while (std::getline(stream, line))
+        {
+            if (line.empty())
+                continue;
+            
+            std::istringstream iss(line);
+            std::string shape;
+            std::string name;
+            glm::vec3 position(0.0f);
+            glm::vec3 scale(1.0f);
+            glm::vec2 velocity(0.0f);
+            glm::vec3 color;
+            
+
+            iss >> shape >> name >> position.x >> position.y >> velocity.x >> velocity.y >> color.x >> color.y >> color.z;
+
+            if (shape == "Circle")
+            {
+                iss >> scale.x;
+                scale.y = scale.x;
+            }
+            else if (shape == "Rect")
+            {
+                iss >> scale.x >> scale.y;
+            }
+            else
+            {
+                std::cerr << "Unknown shape: " << shape << std::endl;
+                continue;
+            }
+
+            descriptor.Objects.push_back({shape, name, position, scale, velocity, color});
+        } 
+    });
+
+    return descriptor;
 }

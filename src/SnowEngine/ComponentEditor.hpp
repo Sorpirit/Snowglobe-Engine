@@ -83,6 +83,12 @@ public:
     {
         _uiSystem.Text("BaseComponentMaterial");
         auto material = component->GetMaterial();
+        auto proxy = component->GetProxy();
+        bool drawMesh = proxy->IsVisible();
+        if (_uiSystem.Checkbox("DrawMesh: ", &drawMesh))
+        {
+            proxy->SetVisible(drawMesh);
+        }
         _uiSystem.Color("Color: ", &material->color);
     }
 };
