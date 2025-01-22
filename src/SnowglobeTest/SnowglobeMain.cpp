@@ -57,7 +57,7 @@ int main()
     //Resolve project path
     auto project_path = std::filesystem::current_path();
     bool foundProjectPath = false;
-    while (project_path.has_parent_path())
+    while (project_path.has_parent_path() && project_path != project_path.root_path())
     {
         if (project_path.has_filename() && project_path.filename() == "snowglobe")
         {
@@ -66,7 +66,7 @@ int main()
         }
         project_path = project_path.parent_path();
     }
-
+    
     // If we didn't find the project path, just use the current path
     if (!foundProjectPath)
     {
