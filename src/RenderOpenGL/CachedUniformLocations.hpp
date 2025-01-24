@@ -90,8 +90,9 @@ namespace Snowglobe::RenderOpenGL
 
         void Set(const std::string& variable, const Render::Texture2DPtr& texture)
         {
-            TextureManager::GetInstance().GetTexture(texture).Bind();
             glActiveTexture(GL_TEXTURE0 + _textureCounter);
+            TextureManager::GetInstance().GetTexture(texture).Bind();
+            // glActiveTexture()
             glUniform1i(NextLocation(variable), _textureCounter);
             _textureCounter++;
         }

@@ -34,6 +34,10 @@ namespace Snowglobe::Render
         Texture2DPtr() : id(0) {}
         Texture2DPtr(uint32_t id) : id(id) {}
 
+        
+        static Texture2DPtr WhiteRBG () { return { 0 }; }
+        static Texture2DPtr WhiteRBGA () { return { 1 }; }
+        
         bool operator==(const Texture2DPtr& other) const { return id == other.id; }
         bool operator!=(const Texture2DPtr& other) const { return id != other.id; }
 

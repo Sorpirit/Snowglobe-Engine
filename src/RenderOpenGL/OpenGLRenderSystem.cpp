@@ -18,8 +18,10 @@
 
 #include "Materials/BasicShapeMaterialImpl.hpp"
 #include "Materials/TextureShapeMaterialImpl.hpp"
+#include "Materials/TextureLitMaterialImpl.hpp"
 
 #include "TextureManager.hpp"
+#include "TransformComponent.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -50,6 +52,17 @@ namespace Snowglobe::RenderOpenGL
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         _camera.Update();
+
+        auto lights = _entityManager.GetEntitiesByTag(LIGHT_TAG);
+        SnowCore::TransformComponent* transform = nullptr;
+        LightComponent* light = nullptr;
+        if (!lights.empty() && lights[0]->QueryComponent(transform) && lights[0]->QueryComponent(light))
+        {
+            auto lightParameters = light->GetLightParameters();
+            _lightParameters.LightPosition = transform->Position;
+            _lightParameters.LightColor = lightParameters.LightColor;
+            _lightParameters.AmbientIntensity = lightParameters.AmbientIntensity;
+        }
         
         for(auto& mesh : _meshes)
         {
@@ -77,7 +90,7 @@ namespace Snowglobe::RenderOpenGL
         _camera.SetWidth(params.width);
         _camera.SetHeight(params.height);
         _camera.SetOrthographicSize(5);
-        _camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+        _camera.SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         _camera.SetMode(Render::CameraMode::Orthographic);
 
         _mainWindow->SetResizeCallback([this](int width, int height)
@@ -97,15 +110,21 @@ namespace Snowglobe::RenderOpenGL
     {
         _vertexLayoutDescriptors.insert({typeid(Render::PositionVertex), PositionVertexLayoutDescriptor::GetInstance()});
         _vertexLayoutDescriptors.insert({typeid(Render::PositionUVVertex), PositionUVVertexLayoutDescriptor::GetInstance()});
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalUVVertex), PositionNormalUVVertexLayoutDescriptor::GetInstance()});
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
+        RegisterMaterialManager<Materials::TextureLitMaterialImpl, Render::MaterialsData::TextureLitMaterialData>();
 
         RegisterTemplateRenderPass<Materials::BasicShapeMaterialImpl, PositionVertexLayoutDescriptor>(
             SnowCore::SnowFileHandle("color.vert"), SnowCore::SnowFileHandle("color.frag"));
 
         RegisterTemplateRenderPass<Materials::TextureShapeMaterialImpl, PositionUVVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("texture.vert"), SnowCore::SnowFileHandle("texture.frag"));
+            SnowCore::SnowFileHandle("textureUnlit.vert"), SnowCore::SnowFileHandle("textureUnlit.frag"));
+
+        RegisterTemplateRenderPass<Materials::TextureLitMaterialImpl, PositionNormalUVVertexLayoutDescriptor>(
+            SnowCore::SnowFileHandle("textureLit.vert"), SnowCore::SnowFileHandle("textureLit.frag"), true);
 
     }
 

@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include <VertexBufferPtr.hpp>
-#include <VertexLayoutDescriptor.hpp>
+#include "VertexBufferPtr.hpp"
+#include "VertexLayoutDescriptor.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {

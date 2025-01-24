@@ -4,6 +4,19 @@ namespace Snowglobe::RenderOpenGL
 {
     TextureManager::TextureManager()
     {
+        // Create a white texture
+        uint8_t white[3] = { 255, 255, 255 };
+        Render::Texture2DDescriptor desc;
+        auto whiteRGB = _textures.emplace(_nextTextureId++, 
+            Texture2D(desc.wrapU, desc.wrapV, desc.minFilter, desc.magFilter, desc.generateMipmaps));
+        whiteRGB.first->second.Init(white, 1, 1, 3);
+        _whiteRGB = whiteRGB.first->first;
+
+        uint8_t whiteAlpha[4] = { 255, 255, 255, 255 };
+        auto whiteRGBA = _textures.emplace(_nextTextureId++, 
+            Texture2D(desc.wrapU, desc.wrapV, desc.minFilter, desc.magFilter, desc.generateMipmaps));
+        whiteRGBA.first->second.Init(whiteAlpha, 1, 1, 4);
+        _whiteRGBA = whiteRGBA.first->first;
     }
 
     TextureManager::~TextureManager()

@@ -12,7 +12,7 @@
 #include <RenderSystem.hpp>
 #include <Window.hpp>
 
-#include <ShaderCompiler.hpp>
+#include "ShaderCompiler.hpp"
 
 #include <SnowFileSystem.hpp>
 #include "RenderEntity.hpp"
@@ -32,6 +32,7 @@
 
 #include "SnowFileSystem.hpp"
 #include "FileTexture.hpp"
+#include "LightParameters.hpp"
 
 #include "Texture2DPtr.hpp"
 #include "Texture.hpp"
@@ -62,7 +63,7 @@ namespace Snowglobe::RenderOpenGL
 
         Render::Texture2DPtr CreateTexture2D(const SnowCore::FileTexture& texture, const Render::Texture2DDescriptor& desc, const std::string& debugName = "Texture2D") override;
 
-
+        LightParameters& GetLightParameters() { return _lightParameters; }
     protected:
         Render::VertexBufferPtr* AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount, const void* bufferPtr, const std::string& debugName) override;
         Render::MaterialBase* CreateMaterialInstanceImpl(std::type_index materialType, const std::string& debugName) override;
@@ -81,6 +82,8 @@ namespace Snowglobe::RenderOpenGL
         Render::RenderID _nextMeshId = {1};
         std::list<MeshOpenGL> _meshes;
 
+        LightParameters _lightParameters;
+        
         std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass>> _renderPasses;
 
         template <typename MaterialImpl, typename MaterialData>
@@ -90,9 +93,9 @@ namespace Snowglobe::RenderOpenGL
         }
 
         template <typename MaterialImpl, typename InstanceVertexLayoutDescriptor>
-        void RegisterTemplateRenderPass(const SnowCore::SnowFileHandle& vertexShader, const SnowCore::SnowFileHandle& fragmentShader)
+        void RegisterTemplateRenderPass(const SnowCore::SnowFileHandle& vertexShader, const SnowCore::SnowFileHandle& fragmentShader, bool useLighting = false)
         {
-            auto pass = std::make_unique<TemplateRenderPass<MaterialImpl, InstanceVertexLayoutDescriptor>>(vertexShader, fragmentShader);
+            auto pass = std::make_unique<TemplateRenderPass<MaterialImpl, InstanceVertexLayoutDescriptor>>(vertexShader, fragmentShader, useLighting);
             _renderPasses.insert({pass->GetSignature(), std::move(pass)});
         }
     };    

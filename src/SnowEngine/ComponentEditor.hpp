@@ -113,6 +113,5 @@ public:
         _uiSystem.Checkbox("DrawEntityName", &component->DrawEntityName);
     }
 };
-    
 
 } // namespace Snowglobe::SnowEngine

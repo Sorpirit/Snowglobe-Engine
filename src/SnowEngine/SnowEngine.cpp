@@ -14,6 +14,20 @@
 
 namespace Snowglobe::SnowEngine
 {
+    class LightComponentEditor : public TemplateComponentEditor<RenderOpenGL::LightComponent>
+    {
+
+    public:
+        LightComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+
+        void DrawUI(RenderOpenGL::LightComponent* component) override
+        {
+            _uiSystem.Text("LightComponent");
+            _uiSystem.Color("LightColor", &component->GetLightParameters().LightColor);
+            _uiSystem.Slider("AmbientIntensity", &component->GetLightParameters().AmbientIntensity, 0.0f, 1.0f);
+        }
+    };
+
     SnowEngine::~SnowEngine()
     {
         _systems.clear();
@@ -80,6 +94,9 @@ namespace Snowglobe::SnowEngine
         componentEditorSystem->RegisterVisualiser<Physics2DComponent, Physics2DComponentEditor>();
         componentEditorSystem->RegisterVisualiser<Collider2DComponent, Collider2DComponentEditor>();
         componentEditorSystem->RegisterVisualiser<BaseComponentMaterial, BaseComponentMaterialEditor>();
+        
+        //OpenGL Only
+        componentEditorSystem->RegisterVisualiser<RenderOpenGL::LightComponent, LightComponentEditor>();
         
         renderSystem->InitializeRenderScene();
     }

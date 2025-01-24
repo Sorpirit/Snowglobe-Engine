@@ -14,32 +14,32 @@ namespace Snowglobe::SnowEngine
         glm::vec3 move = glm::vec3(0.0f);
         if (_input.IsKeyHeld(SnowCore::Key::W))
         {
-            move += glm::vec3(0.0f, 0.0f, 1.0f);
+            move += glm::vec3(0.0f, 0.0f, -1.0f);
             hasMoved = true;
         }
         if (_input.IsKeyHeld(SnowCore::Key::S))
         {
-            move += glm::vec3(0.0f, 0.0f, -1.0f);
+            move += glm::vec3(0.0f, 0.0f, 1.0f);
             hasMoved = true;
         }
         if (_input.IsKeyHeld(SnowCore::Key::A))
         {
-            move += glm::vec3(1.0f, 0.0f, 0.0f);
+            move += glm::vec3(-1.0f, 0.0f, 0.0f);
             hasMoved = true;
         }
         if (_input.IsKeyHeld(SnowCore::Key::D))
         {
-            move += glm::vec3(-1.0f, 0.0f, 0.0f);
+            move += glm::vec3(1.0f, 0.0f, 0.0f);
             hasMoved = true;
         }
         if (_input.IsKeyHeld(SnowCore::Key::Q))
         {
-            move += glm::vec3(0.0f, 1.0f, 0.0f);
+            move += glm::vec3(0.0f, -1.0f, 0.0f);
             hasMoved = true;
         }
         if (_input.IsKeyHeld(SnowCore::Key::E))
         {
-            move += glm::vec3(0.0f, -1.0f, 0.0f);
+            move += glm::vec3(0.0f, 1.0f, 0.0f);
             hasMoved = true;
         }
         

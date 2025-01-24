@@ -162,7 +162,7 @@ namespace Snowglobe::Render
             viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
             viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
             viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-            viewMatrix = glm::translate(viewMatrix, _position);
+            viewMatrix = glm::translate(viewMatrix, -_position);
 
             return viewMatrix;
         }

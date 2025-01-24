@@ -3,11 +3,13 @@
 struct SceneParameters
 {
     mat4 viewProjection;
+    vec3 viewPosition;
 };
 
 struct RenderEntity
 {
     mat4 model;
+    mat3 normalMatrix;
 };
 
 layout (location = 0) in vec3 aPos;

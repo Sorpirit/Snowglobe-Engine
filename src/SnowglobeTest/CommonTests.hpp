@@ -159,3 +159,36 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     SceneDescriptor& _descriptor;
 };
+
+
+class LightTests : public RuntimeTest
+{
+public:
+    LightTests(
+        Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
+            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
+    {}
+    
+    void Init() override;
+    void Run() override;
+private:
+    Snowglobe::Render::BasicShapeFactory _shapeFactory;
+    bool _isOrthographic = false;
+
+    Snowglobe::SnowEngine::SpectatorCamera _spectator;
+
+    std::vector<std::shared_ptr<Snowglobe::SnowCore::ECS::Entity>> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::SnowEngine::MeshComponent>>_cubeMeshC;
+
+    void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
+    void AddQuad(std::vector<Snowglobe::Render::PositionNormalUVVertex>& vertices, glm::mat4x4 transform);
+    void AddSphere(std::vector<Snowglobe::Render::PositionNormalUVVertex>& vertices, glm::mat4x4 transform);
+    
+    struct SceneCube
+    {
+        glm::vec3 Position;
+        glm::vec3 Rotation;
+        glm::vec3 Scale;
+        glm::vec4 Color;
+    };
+};
