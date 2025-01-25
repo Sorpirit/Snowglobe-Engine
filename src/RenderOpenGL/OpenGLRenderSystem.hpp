@@ -33,6 +33,7 @@
 #include "SnowFileSystem.hpp"
 #include "FileTexture.hpp"
 #include "LightParameters.hpp"
+#include "Shape2DSystem.hpp"
 
 #include "Texture2DPtr.hpp"
 #include "Texture.hpp"
@@ -41,6 +42,8 @@
 
 namespace Snowglobe::RenderOpenGL
 {
+    class Shape2DSystem;
+
     class OpenGLRenderSystem : public Render::RenderSystem
     {
     public:
@@ -83,6 +86,8 @@ namespace Snowglobe::RenderOpenGL
         std::list<MeshOpenGL> _meshes;
 
         LightParameters _lightParameters;
+
+        Shape2DSystem _shape2DSystem;
         
         std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass>> _renderPasses;
 

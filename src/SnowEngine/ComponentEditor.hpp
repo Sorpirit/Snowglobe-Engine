@@ -8,6 +8,7 @@
 #include "Physics2DComponent.hpp"
 #include "Collider2DComponent.hpp"
 #include "MeshComponent.hpp"
+#include "NEdgeShape2DComponent.hpp"
 
 
 namespace Snowglobe::SnowEngine
@@ -111,6 +112,19 @@ public:
     {
         _uiSystem.Text("DebugComponent");
         _uiSystem.Checkbox("DrawEntityName", &component->DrawEntityName);
+    }
+};
+
+class NEdgeShape2DComponentEditor : public TemplateComponentEditor<Render::NEdgeShape2DComponent>
+{
+public:
+    NEdgeShape2DComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+
+    void DrawUI(Render::NEdgeShape2DComponent* component) override
+    {
+        _uiSystem.Text("NEdgeShape2DComponent");
+        _uiSystem.Slider("EdgeCount", &component->EdgeCount, 3, 32);
+        _uiSystem.Color("Color", &component->Color);
     }
 };
 

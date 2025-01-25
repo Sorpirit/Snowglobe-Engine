@@ -10,6 +10,7 @@
 #include "CommonVertexLayouts.hpp"
 #include "ComponentEditor.hpp"
 #include "MeshComponent.hpp"
+#include "NEdgeShape2DComponent.hpp"
 #include "../RenderOpenGL/LightParameters.hpp"
 #include "../RenderOpenGL/MeshOpenGL.hpp"
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
@@ -29,6 +30,11 @@ void BaseShapeFactoryTests::Init()
     _planeMesh->SetMaterial(yellowMaterial.GetMaterialBase());
     _diskMesh->SetMaterial(_gradientMaterial.GetMaterialBase());
 
+    auto e = _engine.GetEntityManager();
+    auto nshape = e->CreateEntity();
+    nshape->AddComponent<Snowglobe::SnowCore::TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
+    nshape->AddComponent<Snowglobe::Render::NEdgeShape2DComponent>(3);
+    
 }
 
 void BaseShapeFactoryTests::Run()
@@ -161,6 +167,7 @@ void Phyiscs2DTests::Init()
     ballL->AddComponent<Snowglobe::SnowEngine::Collider2DComponent>(Snowglobe::SnowEngine::CollisionShapeType::Circle);
     ballL->AddComponent<Snowglobe::SnowEngine::MeshComponent>(ballLMesh);
     ballL->AddComponent<Snowglobe::SnowEngine::BaseComponentMaterial>(ballLMesh, &materialL.GetMaterialBase());
+    ballL->AddComponent<Snowglobe::Render::NEdgeShape2DComponent>(3);
     ballLMesh->SetMaterial(materialL.GetMaterialBase());
 
     auto ballR = manager->CreateEntity();

@@ -25,6 +25,7 @@
 #include "Collider2DComponent.hpp"
 #include "ComponentEditor.hpp"
 #include "MeshComponent.hpp"
+#include "NEdgeShape2DComponent.hpp"
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
 
 typedef Snowglobe::SnowCore::ECS::MapEntityData
@@ -35,7 +36,8 @@ Snowglobe::SnowEngine::Collider2DComponent,
 Snowglobe::SnowEngine::MeshComponent,
 Snowglobe::SnowEngine::BaseComponentMaterial,
 Snowglobe::SnowEngine::DebugComponent,
-Snowglobe::RenderOpenGL::LightComponent
+Snowglobe::RenderOpenGL::LightComponent,
+Snowglobe::Render::NEdgeShape2DComponent
 
 > SampleMapEntityData;
 
@@ -97,10 +99,10 @@ int main()
     // BaseShapeFactoryTests test(engine, fileSystem);
     // UITest test(engine, fileSystem);
     // TextureTests test(engine, fileSystem);
-    // Phyiscs2DTests test(engine, fileSystem);
+    Phyiscs2DTests test(engine, fileSystem);
     // CameraTests test(engine, fileSystem);
     // Assigment1Tests test(engine, fileSystem, sceneConfig);
-    LightTests test(engine, fileSystem);
+    // LightTests test(engine, fileSystem);
     
     test.Init();
     

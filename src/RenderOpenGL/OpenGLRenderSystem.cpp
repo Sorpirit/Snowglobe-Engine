@@ -28,7 +28,9 @@ namespace Snowglobe::RenderOpenGL
     OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
 
     OpenGLRenderSystem::OpenGLRenderSystem(SnowCore::ECS::EntityManagerBase& entityManager) :
-        RenderSystem(entityManager), _shaderCompiler(std::make_unique<ShaderCompiler>())
+        RenderSystem(entityManager),
+        _shaderCompiler(std::make_unique<ShaderCompiler>()),
+        _shape2DSystem(entityManager)
     {
         _instance = this;
 
@@ -63,6 +65,8 @@ namespace Snowglobe::RenderOpenGL
             _lightParameters.LightColor = lightParameters.LightColor;
             _lightParameters.AmbientIntensity = lightParameters.AmbientIntensity;
         }
+
+        _shape2DSystem.Update();
         
         for(auto& mesh : _meshes)
         {
@@ -113,6 +117,8 @@ namespace Snowglobe::RenderOpenGL
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalUVVertex), PositionNormalUVVertexLayoutDescriptor::GetInstance()});
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
+        _shape2DSystem.Init();
+        
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
         RegisterMaterialManager<Materials::TextureLitMaterialImpl, Render::MaterialsData::TextureLitMaterialData>();

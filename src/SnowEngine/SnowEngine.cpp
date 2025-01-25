@@ -94,6 +94,7 @@ namespace Snowglobe::SnowEngine
         componentEditorSystem->RegisterVisualiser<Physics2DComponent, Physics2DComponentEditor>();
         componentEditorSystem->RegisterVisualiser<Collider2DComponent, Collider2DComponentEditor>();
         componentEditorSystem->RegisterVisualiser<BaseComponentMaterial, BaseComponentMaterialEditor>();
+        componentEditorSystem->RegisterVisualiser<Render::NEdgeShape2DComponent, NEdgeShape2DComponentEditor>();
         
         //OpenGL Only
         componentEditorSystem->RegisterVisualiser<RenderOpenGL::LightComponent, LightComponentEditor>();
