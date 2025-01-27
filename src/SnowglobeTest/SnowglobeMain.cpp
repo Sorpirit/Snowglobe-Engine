@@ -2,21 +2,16 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include <vector>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <SnowFileSystem.hpp>
-#include <SnowEngine.hpp>
+#include "ECS/Tag.hpp"
+#include <FileSystem.hpp>
+#include <Engine.hpp>
 #include <Window.hpp>
 #include <InputReader.hpp>
 #include <RenderSystem.hpp>
 
 #include "CommonTests.hpp"
 
-#include "ECS/Component.hpp"
 #include "ECS/Entity.hpp"
 #include "ECS/EntityManager.hpp"
 
@@ -28,22 +23,19 @@
 #include "NEdgeShape2DComponent.hpp"
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
 
-typedef Snowglobe::SnowCore::ECS::MapEntityData
+typedef Snowglobe::Core::ECS::MappedTupleEntityData
 <
-Snowglobe::SnowCore::TransformComponent,
-Snowglobe::SnowEngine::Physics2DComponent,
-Snowglobe::SnowEngine::Collider2DComponent,
-Snowglobe::SnowEngine::MeshComponent,
-Snowglobe::SnowEngine::BaseComponentMaterial,
-Snowglobe::SnowEngine::DebugComponent,
+Snowglobe::Core::TransformComponent,
+Snowglobe::Engine::Physics2DComponent,
+Snowglobe::Engine::Collider2DComponent,
+Snowglobe::Engine::MeshComponent,
+Snowglobe::Engine::BaseComponentMaterial,
+Snowglobe::Engine::DebugComponent,
 Snowglobe::RenderOpenGL::LightComponent,
 Snowglobe::Render::NEdgeShape2DComponent
-
 > SampleMapEntityData;
 
-
-
-typedef Snowglobe::SnowCore::ECS::EntityManager<SampleMapEntityData> SampleEntityManager;
+typedef Snowglobe::Core::ECS::EntityManager<SampleMapEntityData> SampleEntityManager;
 
 // settings
 const unsigned int SCR_WIDTH = 1280;
@@ -51,11 +43,12 @@ const unsigned int SCR_HEIGHT = 720;
 
 int main()
 {
-    Snowglobe::SnowCore::EngineProfile profile = { "Snowglobe", Snowglobe::SnowCore::EngineRenderEngine::OpenGL };
-    Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, 0, 0, true, false, true, true, false, 0.0, 0.0, "" };
+    std::cout << Snowglobe::Tags::Default().GetName() << '\n';
+    Snowglobe::Core::EngineProfile profile = { "Snowglobe", Snowglobe::Core::EngineRenderEngine::OpenGL };
+    Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, 0, 0, true};
 
-    auto& engine = Snowglobe::SnowEngine::SnowEngine::GetInstance();
-    auto& fileSystem = Snowglobe::SnowCore::SnowFileSystem::GetInstance();
+    auto& engine = Snowglobe::Engine::Engine::GetInstance();
+    auto& fileSystem = Snowglobe::Core::FileSystem::GetInstance();
     auto manager = std::make_shared<SampleEntityManager>();
 
     //Resolve project path
@@ -80,7 +73,7 @@ int main()
     fileSystem.AddMount(project_path / "src/RenderOpenGL/Shaders");
     fileSystem.AddMount(project_path / "src/SnowglobeTest/Assets");
     
-    // auto sceneConfig = Assigment1Tests::LoadScene(fileSystem, Snowglobe::SnowCore::SnowFileHandle("scene.txt"));
+    // auto sceneConfig = Assigment1Tests::LoadScene(fileSystem, Snowglobe::Core::SnowFileHandle("scene.txt"));
     // windowParams.width = sceneConfig.WindowWidth;
     // windowParams.height = sceneConfig.WindowHeight;
     
@@ -108,7 +101,7 @@ int main()
     
     auto updateFunc = [&]()
     {
-        if(mainWindow->GetInput().IsKeyPressed(Snowglobe::SnowCore::Key::Escape))
+        if(mainWindow->GetInput().IsKeyPressed(Snowglobe::Core::Key::Escape))
         {
             std::cout << "Escape pressed" << std::endl;
             mainWindow->Close();

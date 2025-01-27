@@ -23,7 +23,7 @@ namespace Snowglobe::RenderOpenGL
     {
     }
 
-    Render::Texture2DPtr TextureManager::CreateTexture2D(const SnowCore::FileTexture &texture,
+    Render::Texture2DPtr TextureManager::CreateTexture2D(const Core::FileTexture &texture,
                                                          const Render::Texture2DDescriptor &desc,
                                                          const std::string &debugName)
     {

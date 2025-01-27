@@ -18,7 +18,7 @@ target_link_libraries(RenderOpenGL
     glm
     stb
     imgui
-    Snowglobe::SnowCore
+    Snowglobe::Core
     Snowglobe::Render
 )
 

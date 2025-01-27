@@ -29,26 +29,22 @@ namespace Snowglobe::Render
 
     struct Texture2DPtr
     {
-        uint32_t id;
+        uint32_t ID;
 
-        Texture2DPtr() : id(0) {}
-        Texture2DPtr(uint32_t id) : id(id) {}
-
+        Texture2DPtr() : ID(0) {}
+        Texture2DPtr(uint32_t id) : ID(id) {}
         
-        static Texture2DPtr WhiteRBG () { return { 0 }; }
-        static Texture2DPtr WhiteRBGA () { return { 1 }; }
-        
-        bool operator==(const Texture2DPtr& other) const { return id == other.id; }
-        bool operator!=(const Texture2DPtr& other) const { return id != other.id; }
+        bool operator==(const Texture2DPtr& other) const { return ID == other.ID; }
+        bool operator!=(const Texture2DPtr& other) const { return ID != other.ID; }
 
-        operator uint32_t() const { return id; }
+        operator uint32_t() const { return ID; }
     };
 }
 
 template <> struct std::hash<Snowglobe::Render::Texture2DPtr>
 {
-    std::size_t operator()(const Snowglobe::Render::Texture2DPtr& texture) const
+    std::size_t operator()(const Snowglobe::Render::Texture2DPtr& texture) const noexcept
     {
-        return std::hash<uint32_t>()(texture.id);
+        return std::hash<uint32_t>()(texture.ID);
     }
 };

@@ -22,8 +22,8 @@ namespace Snowglobe::Render
         Camera& operator=(Camera&&) = delete;
 
         Camera(CameraMode mode, float fov, uint32_t width, uint32_t height, float near, float far, float orthographicSize = 1)
-            : _mode(mode), _fov(fov), _width(width), _height(height), _aspectRatio(static_cast<float>(_width) / static_cast<float>(_height)), _orthographicSize(orthographicSize), _near(near), _far(far),
-            _projectionMatrix(GenerateProjectionMatrix())
+            : _projectionMatrix(GenerateProjectionMatrix()), _mode(mode), _fov(fov), _width(width), _height(height), _aspectRatio(static_cast<float>(_width) / static_cast<float>(_height)), _orthographicSize(orthographicSize), _near(near),
+            _far(far)
         { 
         }
 

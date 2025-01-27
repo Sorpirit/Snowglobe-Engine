@@ -21,7 +21,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
     class ImguiSystem : public Render::UISystem
     {
     public:
-        ImguiSystem(Render::Window* window, SnowCore::ECS::EntityManagerBase& entityManager);
+        ImguiSystem(Render::Window* window);
         ~ImguiSystem();
 
         void UpdateEarly() override;
@@ -37,7 +37,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
             _worldTexts.emplace_back(text, position, color, alignment);
         }
         
-        void SetDefaultFont(SnowCore::SnowFileHandle fontFileHandle) override;
+        void SetDefaultFont(Core::SnowFileHandle fontFileHandle) override;
 
         void Text(const std::string& text) override;
         void Text(const char* fmt, ...) override;

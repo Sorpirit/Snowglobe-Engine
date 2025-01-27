@@ -1,13 +1,12 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <string>
 
 #include <glm/glm.hpp>
 
 #include <ECS/ISystem.hpp>
-#include <SnowFileSystem.hpp>
+#include <FileSystem.hpp>
 
 namespace Snowglobe::Render
 {
@@ -32,7 +31,7 @@ namespace Snowglobe::Render
         bool _isOpen = true;
     };
 
-    enum Alignment
+    enum Alignment : uint8_t
     {
         // vertical:horizontal 00:00
         // center:center 01:01
@@ -47,7 +46,7 @@ namespace Snowglobe::Render
         VerticalBottom   = 1 << 3
     };
 
-    enum Slider
+    enum Slider : uint16_t 
     {
         None            = 0,
         Logarithmic     = 1 << 5,
@@ -59,11 +58,9 @@ namespace Snowglobe::Render
         AlwaysClamp     = ClampOnInput | ClampZeroRange
     };
 
-    class UISystem : public SnowCore::ECS::ISystem
+    class UISystem : public Core::ECS::ISystem
     {
     public:
-        UISystem(SnowCore::ECS::EntityManagerBase& entityManager) : ISystem(entityManager)  {}
-
         virtual UIPanel OpenUIPanel(const std::string& title) = 0;
         virtual void Close(UIPanel* panel) = 0;
 
@@ -113,7 +110,7 @@ namespace Snowglobe::Render
         virtual bool Button(const std::string& label) = 0;
         
         virtual void AddWorldText(const glm::vec3& position, const std::string& text, const glm::vec3& color = {1.0f, 1.0f, 0.0f}, int alignment = 0) = 0;
-        virtual void SetDefaultFont(SnowCore::SnowFileHandle fontFileHandle) = 0;
+        virtual void SetDefaultFont(Core::SnowFileHandle fontFileHandle) = 0;
     };
     
 } // namespace Snowglobe::Render

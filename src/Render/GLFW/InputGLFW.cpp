@@ -1,8 +1,5 @@
 #include "InputGLFW.hpp"
 
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
-
 #include "WindowGLFW.hpp"
 
 namespace Snowglobe::Render::GLFW
@@ -48,19 +45,19 @@ namespace Snowglobe::Render::GLFW
         instance->GetInputGLFW().CursorScrollCallback(window, xoffset, yoffset);
     }
 
-    int InputGLFW::GetGLFWCursorMode(SnowCore::CursorMode mode)
+    int InputGLFW::GetGLFWCursorMode(Core::CursorMode mode)
     {
         switch (mode)
         {
-        case SnowCore::CursorMode::CursorModeNormal:
+        case Core::CursorMode::CursorModeNormal:
             return GLFW_CURSOR_NORMAL;
-        case SnowCore::CursorMode::CursorModeHidden:
+        case Core::CursorMode::CursorModeHidden:
             return GLFW_CURSOR_HIDDEN;
-        case SnowCore::CursorMode::CursorModeDisabled:
+        case Core::CursorMode::CursorModeDisabled:
             return GLFW_CURSOR_DISABLED;
-        default:
-            return GLFW_CURSOR_NORMAL;
         }
+
+        return GLFW_CURSOR_NORMAL;
     }
 
     void InputGLFW::Init(GLFWwindow *window)
@@ -74,27 +71,27 @@ namespace Snowglobe::Render::GLFW
 
     void InputGLFW::Update()
     {
-        for (int i = 0; i < GLFW_KEY_LAST + 1; i++)
+        for (auto& _key : _keys)
         {
-            if (_keys[i] == SnowCore::KeyStatus::Pressed)
+            if (_key == Core::KeyStatus::Pressed)
             {
-                _keys[i] = SnowCore::KeyStatus::Held;
+                _key = Core::KeyStatus::Held;
             }
-            else if (_keys[i] == SnowCore::KeyStatus::Released)
+            else if (_key == Core::KeyStatus::Released)
             {
-                _keys[i] = SnowCore::KeyStatus::Up;
+                _key = Core::KeyStatus::Up;
             }
         }
 
-        for (int i = 0; i < GLFW_MOUSE_BUTTON_LAST + 1; i++)
+        for (auto& _mouseButton : _mouseButtons)
         {
-            if (_mouseButtons[i] == SnowCore::KeyStatus::Pressed)
+            if (_mouseButton == Core::KeyStatus::Pressed)
             {
-                _mouseButtons[i] = SnowCore::KeyStatus::Held;
+                _mouseButton = Core::KeyStatus::Held;
             }
-            else if (_mouseButtons[i] == SnowCore::KeyStatus::Released)
+            else if (_mouseButton == Core::KeyStatus::Released)
             {
-                _mouseButtons[i] = SnowCore::KeyStatus::Up;
+                _mouseButton = Core::KeyStatus::Up;
             }
         }
 
@@ -112,10 +109,12 @@ namespace Snowglobe::Render::GLFW
         switch (action)
         {
         case GLFW_PRESS:
-            _keys[key] = SnowCore::KeyStatus::Pressed;
+            _keys[key] = Core::KeyStatus::Pressed;
             break;
         case GLFW_RELEASE:
-            _keys[key] = SnowCore::KeyStatus::Released;
+            _keys[key] = Core::KeyStatus::Released;
+            break;
+        default:
             break;
         }
     }
@@ -131,20 +130,22 @@ namespace Snowglobe::Render::GLFW
         switch (action)
         {
         case GLFW_PRESS:
-            _mouseButtons[button] = SnowCore::KeyStatus::Pressed;
+            _mouseButtons[button] = Core::KeyStatus::Pressed;
             break;
         case GLFW_RELEASE:
-            _mouseButtons[button] = SnowCore::KeyStatus::Released;
+            _mouseButtons[button] = Core::KeyStatus::Released;
+            break;
+        default:
             break;
         }
     }
 
     void InputGLFW::CursorScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
     {
-        _scroll = yoffset;
+        _scroll = static_cast<float>(yoffset);
     }
 
-    void InputGLFW::SetCursorMode(SnowCore::CursorMode mode)
+    void InputGLFW::SetCursorMode(Core::CursorMode mode)
     {
         glfwSetInputMode(_window, GLFW_CURSOR, GetGLFWCursorMode(mode));
     }

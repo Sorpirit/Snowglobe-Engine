@@ -27,10 +27,7 @@ namespace Snowglobe::RenderOpenGL
 {
     OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
 
-    OpenGLRenderSystem::OpenGLRenderSystem(SnowCore::ECS::EntityManagerBase& entityManager) :
-        RenderSystem(entityManager),
-        _shaderCompiler(std::make_unique<ShaderCompiler>()),
-        _shape2DSystem(entityManager)
+    OpenGLRenderSystem::OpenGLRenderSystem() : _shaderCompiler(std::make_unique<ShaderCompiler>())
     {
         _instance = this;
 
@@ -47,7 +44,7 @@ namespace Snowglobe::RenderOpenGL
 
     void OpenGLRenderSystem::Update()
     {
-        SnowCore::EngineTime::GetInstance()->RenderTick();
+        Core::EngineTime::GetInstance()->RenderTick();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
@@ -55,16 +52,16 @@ namespace Snowglobe::RenderOpenGL
 
         _camera.Update();
 
-        auto lights = _entityManager.GetEntitiesByTag(LIGHT_TAG);
-        SnowCore::TransformComponent* transform = nullptr;
-        LightComponent* light = nullptr;
-        if (!lights.empty() && lights[0]->QueryComponent(transform) && lights[0]->QueryComponent(light))
-        {
-            auto lightParameters = light->GetLightParameters();
-            _lightParameters.LightPosition = transform->Position;
-            _lightParameters.LightColor = lightParameters.LightColor;
-            _lightParameters.AmbientIntensity = lightParameters.AmbientIntensity;
-        }
+        // auto lights = _entityManager->GetEntitiesByTag(LIGHT_TAG);
+        // Core::TransformComponent* transform = nullptr;
+        // LightComponent* light = nullptr;
+        // if (!lights.empty() && lights[0]->QueryComponent(transform) && lights[0]->QueryComponent(light))
+        // {
+        //     auto lightParameters = light->GetLightParameters();
+        //     _lightParameters.LightPosition = transform->Position;
+        //     _lightParameters.LightColor = lightParameters.LightColor;
+        //     _lightParameters.AmbientIntensity = lightParameters.AmbientIntensity;
+        // }
 
         _shape2DSystem.Update();
         
@@ -91,8 +88,8 @@ namespace Snowglobe::RenderOpenGL
 
         //_camera = Render::Camera(Render::CameraMode::Orthographic, 45.0f, 1.0f, 0.1f, 100.0f);
         _camera.SetFov(45.0f);
-        _camera.SetWidth(params.width);
-        _camera.SetHeight(params.height);
+        _camera.SetWidth(params.Width);
+        _camera.SetHeight(params.Height);
         _camera.SetOrthographicSize(5);
         _camera.SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         _camera.SetMode(Render::CameraMode::Orthographic);
@@ -117,20 +114,20 @@ namespace Snowglobe::RenderOpenGL
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalUVVertex), PositionNormalUVVertexLayoutDescriptor::GetInstance()});
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
-        _shape2DSystem.Init();
+        _shape2DSystem.Init(_entityManager);
         
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
         RegisterMaterialManager<Materials::TextureLitMaterialImpl, Render::MaterialsData::TextureLitMaterialData>();
 
         RegisterTemplateRenderPass<Materials::BasicShapeMaterialImpl, PositionVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("color.vert"), SnowCore::SnowFileHandle("color.frag"));
+            Core::SnowFileHandle("color.vert"), Core::SnowFileHandle("color.frag"));
 
         RegisterTemplateRenderPass<Materials::TextureShapeMaterialImpl, PositionUVVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("textureUnlit.vert"), SnowCore::SnowFileHandle("textureUnlit.frag"));
+            Core::SnowFileHandle("textureUnlit.vert"), Core::SnowFileHandle("textureUnlit.frag"));
 
         RegisterTemplateRenderPass<Materials::TextureLitMaterialImpl, PositionNormalUVVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("textureLit.vert"), SnowCore::SnowFileHandle("textureLit.frag"), true);
+            Core::SnowFileHandle("textureLit.vert"), Core::SnowFileHandle("textureLit.frag"), true);
 
     }
 
@@ -158,7 +155,7 @@ namespace Snowglobe::RenderOpenGL
         return &_indexBuffers.back();
     }
 
-    Render::Texture2DPtr OpenGLRenderSystem::CreateTexture2D(const SnowCore::FileTexture &texture,
+    Render::Texture2DPtr OpenGLRenderSystem::CreateTexture2D(const Core::FileTexture &texture,
                                                              const Render::Texture2DDescriptor &desc,
                                                              const std::string &debugName)
     {

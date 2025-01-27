@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 
-#include <SnowEngine.hpp>
-#include <SnowFileSystem.hpp>
+#include <Engine.hpp>
+#include <FileSystem.hpp>
 #include <RenderSystem.hpp>
 #include <Window.hpp>
 #include <UISystem.hpp>
@@ -14,8 +14,8 @@ class RuntimeTest
 {
     public:
         RuntimeTest(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem,
+            Snowglobe::Engine::Engine& engine, 
+            Snowglobe::Core::FileSystem& fileSystem,
             const std::string& testName) : _testName(testName), _engine(engine), _fileSystem(fileSystem) 
         {
             if(!engine.QuerySystem<Snowglobe::Render::RenderSystem>(_renderSystem))
@@ -35,8 +35,8 @@ class RuntimeTest
     protected:
         std::string _testName;
 
-        Snowglobe::SnowEngine::SnowEngine& _engine;
-        Snowglobe::SnowCore::SnowFileSystem& _fileSystem;
+        Snowglobe::Engine::Engine& _engine;
+        Snowglobe::Core::FileSystem& _fileSystem;
         Snowglobe::Render::RenderSystem* _renderSystem;
         Snowglobe::Render::Window* _window;
         Snowglobe::Render::UISystem* _uiSystem;

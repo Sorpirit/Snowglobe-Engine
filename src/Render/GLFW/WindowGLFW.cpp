@@ -4,8 +4,7 @@ namespace Snowglobe::Render::GLFW
 {
     void WindowGLFW::WindowResizeCallbackStatic(GLFWwindow* window, int width, int height) {
         // Retrieve the Window instance using glfwGetWindowUserPointer
-        WindowGLFW* instance = static_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
-        if (instance) {
+        if (WindowGLFW* instance = static_cast<WindowGLFW*>(glfwGetWindowUserPointer(window))) {
             // Call the non-static member function
             instance->WindowResizeCallback(window, width, height);
         }
@@ -17,8 +16,8 @@ namespace Snowglobe::Render::GLFW
         _resizeCallback(nullptr),
         _closeCallback(nullptr)
     {
-        glfwWindowHint(GLFW_RESIZABLE, params.resizable);
-        _window = glfwCreateWindow(params.width, params.height, params.title.c_str(), nullptr, nullptr);
+        glfwWindowHint(GLFW_RESIZABLE, params.Resizable);
+        _window = glfwCreateWindow(static_cast<int>(params.Width), static_cast<int>(params.Height), params.Title.c_str(), nullptr, nullptr);
         glfwSetWindowUserPointer(_window, this);
         glfwMakeContextCurrent(_window);
     
@@ -63,12 +62,11 @@ namespace Snowglobe::Render::GLFW
         if(!_isOpen)
             return;
 
+        Window::Close();
+        
         glfwSetWindowShouldClose(_window, true);
-        _isOpen = false;
         if(_closeCallback)
-        {
             _closeCallback();
-        }
     }
 
     bool WindowGLFW::IsOpen()
@@ -78,19 +76,15 @@ namespace Snowglobe::Render::GLFW
 
         _isOpen = !glfwWindowShouldClose(_window);
         if(!_isOpen && _closeCallback)
-        {
             _closeCallback();
-        }
 
         return _isOpen;
     }
 
-    void WindowGLFW::WindowResizeCallback(GLFWwindow *windowImpl, int width, int height)
+    void WindowGLFW::WindowResizeCallback(GLFWwindow *windowImpl, int width, int height) const
     {
         if(_resizeCallback)
-        {
             _resizeCallback(width, height);
-        }
     }
 
 } // namespace Snowglobe::Render::GLFW

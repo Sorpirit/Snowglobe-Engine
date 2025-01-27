@@ -10,16 +10,13 @@
 
 namespace Snowglobe::RenderOpenGL
 {
-
-    Shape2DSystem::Shape2DSystem(SnowCore::ECS::EntityManagerBase& entityManager) : ISystem(entityManager), _material("Shape2DMaterial")
+    void Shape2DSystem::Init(std::shared_ptr<Core::ECS::EntityManagerBase> entityManager)
     {
-    }
-
-    void Shape2DSystem::Init()
-    {
+        ISystem::Init(entityManager);
+        
         auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
-        auto vertexShader = shaderCompiler->GetOrCompileShader(SnowCore::SnowFileHandle("Shape2D.vert"));
-        auto fragmentShader = shaderCompiler->GetOrCompileShader(SnowCore::SnowFileHandle("Shape2D.frag"));
+        auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Shape2D.vert"));
+        auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Shape2D.frag"));
 
         PipelineSetupParams params = {vertexShader, fragmentShader};
         _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
@@ -32,9 +29,9 @@ namespace Snowglobe::RenderOpenGL
         glUseProgram(_shaderProgram);
         _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
         
-        for (auto& entity : _entityManager.GetAllEntities())
+        for (auto& entity : _entityManager->GetAllEntities())
         {
-            SnowCore::TransformComponent* transform = nullptr;
+            Core::TransformComponent* transform = nullptr;
             Render::NEdgeShape2DComponent* shape2DComponent = nullptr;
             if (!entity->QueryComponents(transform, shape2DComponent))
             {

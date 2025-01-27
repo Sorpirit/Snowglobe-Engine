@@ -11,7 +11,7 @@ target_include_directories(SnowglobeTest
 target_link_libraries(SnowglobeTest
     PRIVATE
     glm
-    Snowglobe::SnowCore
-    Snowglobe::SnowEngine
+    Snowglobe::Core
+    Snowglobe::Engine
     Snowglobe::Render
 )

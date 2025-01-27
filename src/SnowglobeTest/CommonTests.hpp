@@ -18,7 +18,7 @@
 class BaseShapeFactoryTests : public RuntimeTest
 {
     public:
-        BaseShapeFactoryTests(Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
+        BaseShapeFactoryTests(Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
             RuntimeTest(engine, fileSystem, "BaseShapeFactoryTests"),
             _shapeFactory(_renderSystem),
             _gradientMaterial(_renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>())
@@ -46,8 +46,8 @@ class UITest : public RuntimeTest
 {
     public:
         UITest(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "UITest") {}
+            Snowglobe::Engine::Engine& engine, 
+            Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "UITest") {}
         void Init() override;
         void Run() override;
 
@@ -75,8 +75,8 @@ class TextureTests : public RuntimeTest
 {
     public:
         TextureTests(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "TextureTests") {}
+            Snowglobe::Engine::Engine& engine, 
+            Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "TextureTests") {}
         void Init() override;
         void Run() override;
 };
@@ -85,8 +85,8 @@ class Phyiscs2DTests : public RuntimeTest
 {
 public:
     Phyiscs2DTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
+        Snowglobe::Engine::Engine& engine, 
+        Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
     void Init() override;
     void Run() override;
 
@@ -98,7 +98,7 @@ class CameraTests : public RuntimeTest
 {
 public:
     CameraTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
+        Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
             RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
     {
         auto manager = _engine.GetEntityManager();
@@ -115,10 +115,10 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     bool _isOrthographic = false;
 
-    Snowglobe::SnowEngine::SpectatorCamera _spectator;
+    Snowglobe::Engine::SpectatorCamera _spectator;
 
-    std::vector<std::shared_ptr<Snowglobe::SnowCore::ECS::Entity>> _cubes;
-    std::vector<std::shared_ptr<Snowglobe::SnowEngine::MeshComponent>>_cubeMeshC;
+    std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;
 
     void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
 };
@@ -147,13 +147,13 @@ public:
     };
 
     Assigment1Tests(
-        Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem,
+        Snowglobe::Engine::Engine& engine, 
+        Snowglobe::Core::FileSystem& fileSystem,
         SceneDescriptor& descriptor) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
     void Init() override;
     void Run() override;
     
-    static SceneDescriptor LoadScene(Snowglobe::SnowCore::SnowFileSystem& fileSystem, const Snowglobe::SnowCore::SnowFileHandle& sceneFile);
+    static SceneDescriptor LoadScene(Snowglobe::Core::FileSystem& fileSystem, const Snowglobe::Core::SnowFileHandle& sceneFile);
     
 private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
@@ -165,7 +165,7 @@ class LightTests : public RuntimeTest
 {
 public:
     LightTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
+        Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
             RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
     {}
     
@@ -175,10 +175,10 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     bool _isOrthographic = false;
 
-    Snowglobe::SnowEngine::SpectatorCamera _spectator;
+    Snowglobe::Engine::SpectatorCamera _spectator;
 
-    std::vector<std::shared_ptr<Snowglobe::SnowCore::ECS::Entity>> _cubes;
-    std::vector<std::shared_ptr<Snowglobe::SnowEngine::MeshComponent>>_cubeMeshC;
+    std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;
 
     void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
     void AddQuad(std::vector<Snowglobe::Render::PositionNormalUVVertex>& vertices, glm::mat4x4 transform);

@@ -1,12 +1,11 @@
 #pragma once
-#include <cstdint>
 
 #include "ECS/Component.hpp"
 
 namespace Snowglobe::Render
 {
     
-class NEdgeShape2DComponent : public SnowCore::ECS::Component
+class NEdgeShape2DComponent : public Core::ECS::Component
 {
 public:
     NEdgeShape2DComponent() = default;

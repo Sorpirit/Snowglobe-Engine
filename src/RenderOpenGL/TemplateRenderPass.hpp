@@ -4,7 +4,7 @@
 #include <typeinfo>
 
 #include "RenderPass.hpp"
-#include "SnowFileSystem.hpp"
+#include "FileSystem.hpp"
 
 #include "OpenGLRenderSystem.hpp"
 
@@ -16,7 +16,7 @@ template <class MaterialType, class VertexType>
 class TemplateRenderPass : public RenderPass
 {
 public:
-    TemplateRenderPass(const SnowCore::SnowFileHandle& vertex, SnowCore::SnowFileHandle fragment, bool useLighting = false) :
+    TemplateRenderPass(const Core::SnowFileHandle& vertex, Core::SnowFileHandle fragment, bool useLighting = false) :
         RenderPass({ typeid(MaterialType), typeid(VertexType) }),
         _useLighting(useLighting) 
     {

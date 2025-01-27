@@ -19,11 +19,8 @@ namespace Snowglobe::RenderOpenGL
     private:
         CachedUniformLocations<3> _uniformLocations;
     };
-
-
-    const uint32_t LIGHT_TAG = 16; 
     
-    class LightComponent : public SnowCore::ECS::Component
+    class LightComponent : public Core::ECS::Component
     {
     public:
         LightComponent() = default;

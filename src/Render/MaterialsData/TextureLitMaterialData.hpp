@@ -7,8 +7,8 @@ namespace Snowglobe::Render::MaterialsData
 {
     struct TextureLitMaterialData
     {
-        Texture2DPtr diffuseTexture = Texture2DPtr::WhiteRBG();
-        Texture2DPtr specularTexture = Texture2DPtr::WhiteRBG();
+        Texture2DPtr diffuseTexture;
+        Texture2DPtr specularTexture;
         glm::vec4 baseColor = glm::vec4(1.0f);
         int specularPower = 32;
     };
