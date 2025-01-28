@@ -14,7 +14,7 @@ public:
     MeshComponent() = default; 
     MeshComponent(Render::MeshProxy* meshProxy) : _meshProxy(meshProxy) {}
 
-    Render::MeshProxy* GetMeshProxy() { return _meshProxy; }
+    Render::MeshProxy* GetMeshProxy() const { return _meshProxy; }
 private:
     Render::MeshProxy* _meshProxy = nullptr;
 
@@ -34,5 +34,4 @@ private:
     Render::MeshProxy* _proxy;
 
 };
-
-} // namespace Snowglobe::Engine
+}

@@ -1,6 +1,7 @@
 #include "PhysicsEngine2DSystem.hpp"
 
 #include "EngineTime.hpp"
+#include "Physics2DComponent.hpp"
 
 namespace Snowglobe::Engine
 {
@@ -18,9 +19,9 @@ namespace Snowglobe::Engine
             if (entity1->IsActive() == false)
                 continue;
 
-            Core::TransformComponent* tranfrom1 = nullptr;
+            Core::TransformComponent* transform1 = nullptr;
             Collider2DComponent* collider1 = nullptr;
-            if(!entity1->QueryComponents(tranfrom1, collider1))
+            if(!entity1->QueryComponents(transform1, collider1))
                 continue;
 
             for (size_t j = i + 1; j < entities.size(); j++)
@@ -29,12 +30,12 @@ namespace Snowglobe::Engine
                 if (entity2->IsActive() == false)
                     continue;
 
-                Core::TransformComponent* tranfrom2 = nullptr;
+                Core::TransformComponent* transform2 = nullptr;
                 Collider2DComponent* collider2 = nullptr;
-                if(!entity2->QueryComponents(tranfrom2, collider2))
+                if(!entity2->QueryComponents(transform2, collider2))
                     continue;
 
-                auto collisionData = Overlap(*tranfrom1, *collider1, *tranfrom2, *collider2);
+                auto collisionData = Overlap(*transform1, *collider1, *transform2, *collider2);
 
                 if (!collisionData.IsColliding)
                     continue;
@@ -86,16 +87,16 @@ namespace Snowglobe::Engine
             if (entity->IsActive() == false)
                 continue;
 
-            Core::TransformComponent* tranfrom = nullptr;
+            Core::TransformComponent* transform = nullptr;
             Physics2DComponent* physics = nullptr;
-            if(!entity->QueryComponents(tranfrom, physics))
+            if(!entity->QueryComponents(transform, physics))
                 continue;
 
-            tranfrom->Position += glm::vec3(physics->Velocity * physicsDeltaTime, 0.0f);
-            tranfrom->Rotation.z += physics->AngularVelocity * physicsDeltaTime;
+            transform->Position += glm::vec3(physics->Velocity * physicsDeltaTime, 0.0f);
+            transform->Rotation.z += physics->AngularVelocity * physicsDeltaTime;
             
             physics->Velocity = physics->Velocity * (1 - physics->Drag);
             physics->AngularVelocity = physics->AngularVelocity * (1 - physics->AngularDrag);
         }
     }
-} // namespace Snowglobe::Engine
+}

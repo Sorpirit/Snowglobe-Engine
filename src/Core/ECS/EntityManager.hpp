@@ -70,7 +70,15 @@ public:
             std::get<std::shared_ptr<Entity>>(entityPair)->Update();
         }
 
-        std::erase_if(_entityPairs, [](auto& entityPair) { return std::get<std::shared_ptr<Entity>>(entityPair)->IsDestroyed(); });
+        std::erase_if(_entityPairs, [](auto& entityPair)
+        {
+            auto entity = std::get<std::shared_ptr<Entity>>(entityPair);
+            bool isDestroyed = entity->IsDestroyed();
+            // 1(_entityPairs) + 1(_entities) + 1(_entityMap) + 1(entity) = 4
+            assert(entity.use_count() > 4 && "Unable to destroy entity because it is referenced somewhere else");
+
+            return isDestroyed;
+        });
         std::erase_if(_entities, [](auto& entity) { return entity->IsDestroyed(); });
         for (auto& entities : _entityMap | std::views::values)
         {
@@ -99,4 +107,4 @@ private:
 
 };
 
-} // namespace Snowglobe::Core::ESC
+}

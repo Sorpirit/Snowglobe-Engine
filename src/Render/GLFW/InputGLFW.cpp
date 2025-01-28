@@ -150,4 +150,4 @@ namespace Snowglobe::Render::GLFW
         glfwSetInputMode(_window, GLFW_CURSOR, GetGLFWCursorMode(mode));
     }
 
-} // namespace Snowglobe::Render::GLFW
+}

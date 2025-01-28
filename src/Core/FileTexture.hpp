@@ -25,4 +25,4 @@ private:
     uint32_t _channels;
 };
     
-} // namespace Snowglobe::Core
+}

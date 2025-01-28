@@ -22,4 +22,4 @@ public:
     float GravityScale = 1.0f;
 };
 
-} // namespace Snowglobe::Core
+}

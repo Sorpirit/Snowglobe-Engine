@@ -39,4 +39,4 @@ namespace Snowglobe::Render::GLFW
         static void WindowResizeCallbackStatic(GLFWwindow* window, int width, int height);
     };
     
-} // namespace Snowglobe::Render::GLFW
+}

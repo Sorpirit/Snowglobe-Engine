@@ -3,14 +3,13 @@
 #include <glm/glm.hpp>
 
 #include "RenderSystem.hpp"
-#include "RenderProxy.hpp"
 #include "VertexBufferPtr.hpp"
 #include "IndexBufferPtr.hpp"
 #include "MeshProxy.hpp"
 
 namespace Snowglobe::Render
 {
-    enum class BasicShape
+    enum class BasicShape : uint8_t
     {
         Triangle,
         Plane,

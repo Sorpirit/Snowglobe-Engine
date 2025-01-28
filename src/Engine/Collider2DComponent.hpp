@@ -5,7 +5,7 @@
 namespace Snowglobe::Engine
 {
 
-enum class CollisionShapeType
+enum class CollisionShapeType : uint8_t
 {
     Circle,
     AABB

@@ -17,114 +17,102 @@ namespace Snowglobe::Engine
 class ComponentEditor
 {
 public:
-    ComponentEditor(Render::UISystem& uiSystem) : _uiSystem(uiSystem) {}
+    virtual ~ComponentEditor() = default;
+    ComponentEditor(Render::UISystem* uiSystem) : _uiSystem(uiSystem) {}
+    
     virtual void DrawUI(Core::ECS::Component* component) = 0;
-
+    virtual std::type_index GetComponentRuntimeType() const = 0;
+    
+    
 protected:
-    Render::UISystem& _uiSystem;
+    Render::UISystem* _uiSystem;
 };
 
 template <class TComponent>
 class TemplateComponentEditor : public ComponentEditor
 {
-public:
-    TemplateComponentEditor(Render::UISystem& uiSystem) : ComponentEditor(uiSystem) {}
+    static_assert(std::is_base_of_v<Core::ECS::Component, TComponent>, "TComponent must derive from Component");
     
-    void DrawUI(Core::ECS::Component* component) override { DrawUI(static_cast<TComponent*>(component)); }
-
+public:
+    TemplateComponentEditor(Render::UISystem* uiSystem) : ComponentEditor(uiSystem), _componentType(typeid(TComponent)) {}
+    
+    void DrawUI(Core::ECS::Component* component) override { DrawUITemplate(static_cast<TComponent*>(component)); }
+    std::type_index GetComponentRuntimeType() const override { return _componentType; }
 protected:
-    virtual void DrawUI(TComponent* component) = 0;    
+    virtual void DrawUITemplate(TComponent* component) = 0;
+
+private:
+    std::type_index _componentType;
 };
 
 class TransformComponentEditor : public TemplateComponentEditor<Core::TransformComponent>
 {
 public:
-    TransformComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+    TransformComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
     
-    void DrawUI(Core::TransformComponent* component) override
+    void DrawUITemplate(Core::TransformComponent* component) override
     {
-        _uiSystem.Text("Transform");
-        _uiSystem.Drag("Position", &component->Position, 0.1f);
-        _uiSystem.Drag("Rotation", &component->Rotation, 0.1f);
-        _uiSystem.Drag("Scale", &component->Scale, 0.1f, 0.001f, 100.0f);
+        _uiSystem->Text("Transform");
+        _uiSystem->Drag("Position", &component->Position, 0.1f);
+        _uiSystem->Drag("Rotation", &component->Rotation, 0.1f);
+        _uiSystem->Drag("Scale", &component->Scale, 0.1f, 0.001f, 100.0f);
     }
 };
 
 class Physics2DComponentEditor : public TemplateComponentEditor<Physics2DComponent>
 {
 public:
-    Physics2DComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+    Physics2DComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
     
-    void DrawUI(Physics2DComponent* component) override
+    void DrawUITemplate(Physics2DComponent* component) override
     {
-        _uiSystem.Text("Physics2D");
-        _uiSystem.Drag("Velocity", &component->Velocity, 0.1f);
-        _uiSystem.Drag("AngularVelocity", &component->AngularVelocity, 0.1f);
-        _uiSystem.Drag("Mass", &component->Mass, 0.1f, 0.001f, 100.0f);
+        _uiSystem->Text("Physics2D");
+        _uiSystem->Drag("Velocity", &component->Velocity, 0.1f);
+        _uiSystem->Drag("AngularVelocity", &component->AngularVelocity, 0.1f);
+        _uiSystem->Drag("Mass", &component->Mass, 0.1f, 0.001f, 100.0f);
     }
 };
 
 class Collider2DComponentEditor : public TemplateComponentEditor<Collider2DComponent>
 {
 public:
-    Collider2DComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+    Collider2DComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
     
-    void DrawUI(Collider2DComponent* component) override
+    void DrawUITemplate(Collider2DComponent* component) override
     {
-        _uiSystem.Text("Collider2D");
+        _uiSystem->Text("Collider2D");
     }
 };
     
 class BaseComponentMaterialEditor : public TemplateComponentEditor<BaseComponentMaterial>
 {
 public:
-    BaseComponentMaterialEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+    BaseComponentMaterialEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
     
-    void DrawUI(BaseComponentMaterial* component) override
+    void DrawUITemplate(BaseComponentMaterial* component) override
     {
-        _uiSystem.Text("BaseComponentMaterial");
+        _uiSystem->Text("BaseComponentMaterial");
         auto material = component->GetMaterial();
         auto proxy = component->GetProxy();
         bool drawMesh = proxy->IsVisible();
-        if (_uiSystem.Checkbox("DrawMesh: ", &drawMesh))
+        if (_uiSystem->Checkbox("DrawMesh: ", &drawMesh))
         {
             proxy->SetVisible(drawMesh);
         }
-        _uiSystem.Color("Color: ", &material->color);
-    }
-};
-
-class DebugComponent : public Core::ECS::Component
-{
-public:
-    DebugComponent() = default;
-    DebugComponent(bool drawEntityName) : DrawEntityName(drawEntityName) {}
-
-    bool DrawEntityName = true;
-};
-
-class DebugComponentEditor : public TemplateComponentEditor<DebugComponent>
-{
-public:
-    DebugComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
-    
-    void DrawUI(DebugComponent* component) override
-    {
-        _uiSystem.Text("DebugComponent");
-        _uiSystem.Checkbox("DrawEntityName", &component->DrawEntityName);
+        _uiSystem->Color("Color: ", &material->color);
     }
 };
 
 class NEdgeShape2DComponentEditor : public TemplateComponentEditor<Render::NEdgeShape2DComponent>
 {
 public:
-    NEdgeShape2DComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+    NEdgeShape2DComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
 
-    void DrawUI(Render::NEdgeShape2DComponent* component) override
+    void DrawUITemplate(Render::NEdgeShape2DComponent* component) override
     {
-        _uiSystem.Text("NEdgeShape2DComponent");
-        _uiSystem.Slider("EdgeCount", &component->EdgeCount, 3, 32);
-        _uiSystem.Color("Color", &component->Color);
+        _uiSystem->Text("NEdgeShape2DComponent");
+        _uiSystem->Slider("EdgeCount", &component->EdgeCount, 3, 32);
+        _uiSystem->Color("Color", &component->Color);
     }
 };
 

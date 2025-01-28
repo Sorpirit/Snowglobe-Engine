@@ -5,14 +5,24 @@
 namespace Snowglobe::RenderOpenGL
 {
 
-MeshOpenGL::MeshOpenGL(const Render::RenderID &id, const VertexBufferPtrOpenGL& vertexBuffer, const IndexBufferPtrOpenGL& indexBuffer, const std::string& debugName) 
-    : MeshProxy(id), _debugName(debugName), _vertexBuffer(&vertexBuffer), _indexBuffer(&indexBuffer), _material(nullptr)
+MeshOpenGL::MeshOpenGL(
+    const Render::RenderID &id,
+    const VertexBufferPtrOpenGL& vertexBuffer,
+    const IndexBufferPtrOpenGL& indexBuffer,
+    std::string debugName) 
+    : MeshProxy(id),
+    _debugName(std::move(debugName)),
+    _vertexBuffer(&vertexBuffer),
+    _vertexType(typeid(vertexBuffer)),
+    _indexBuffer(&indexBuffer),
+    _material(nullptr), 
+    _materialType(typeid(void))
 {
     Init();
 }
 
-MeshOpenGL::MeshOpenGL(const Render::RenderID &id, const VertexBufferPtrOpenGL& vertexBuffer, const std::string& debugName) 
-    : MeshProxy(id), _debugName(debugName), _vertexBuffer(&vertexBuffer), _indexBuffer(nullptr), _material(nullptr)
+MeshOpenGL::MeshOpenGL(const Render::RenderID &id, const VertexBufferPtrOpenGL& vertexBuffer, std::string debugName) 
+    : MeshProxy(id), _debugName(std::move(debugName)), _vertexBuffer(&vertexBuffer), _vertexType(typeid(vertexBuffer)), _indexBuffer(nullptr), _material(nullptr), _materialType(typeid(void))
 {
     Init();
 }
@@ -28,7 +38,7 @@ void MeshOpenGL::Bind(uint32_t pipelineId)
     _vertexBuffer->Bind();
 }
 
-void MeshOpenGL::Draw()
+void MeshOpenGL::Draw() const
 {
     
     if(_indexBuffer)

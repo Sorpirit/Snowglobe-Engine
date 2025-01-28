@@ -15,14 +15,14 @@ namespace Snowglobe::Engine
 class ComponentEditorSystem : public Core::ECS::ISystem
 {
 public:
-    ComponentEditorSystem(Render::UISystem& uiSystem) :  _uiSystem(uiSystem) {}
+    ComponentEditorSystem(Render::UISystem* uiSystem) :  _uiSystem(uiSystem) {}
 
-    template <class TComponent, class TVisualiser>
+    template <class TVisualiser>
     void RegisterVisualiser()
     {
-        static_assert(std::is_base_of<ComponentEditor, TVisualiser>::value, "TVisualiser must derive from ComponentVisualiser");
-        static_assert(std::is_base_of<Core::ECS::Component, TComponent>::value, "TComponent must derive from Component");
-        _visualisers[typeid(TComponent)] = std::make_shared<TVisualiser>(_uiSystem);
+        static_assert(std::is_base_of_v<ComponentEditor, TVisualiser>, "TVisualiser must derive from ComponentVisualiser");
+        auto visualiser = std::make_shared<TVisualiser>(_uiSystem);
+        _visualisers[visualiser->GetComponentRuntimeType()] = std::move(visualiser); 
     }
 
     void Update() override
@@ -32,7 +32,8 @@ public:
         if (entities.empty())
             return;
 
-        _selectedEntity = std::clamp(_selectedEntity, 0, static_cast<int>(entities.size() - 1));
+        if (_selectedEntity >= entities.size())
+            _selectedEntity = entities.size() - 1;
         
         std::vector<std::string> componentNames;
         for (auto& entity : entities)
@@ -40,29 +41,28 @@ public:
             componentNames.push_back(entity->GetName());
 
             Core::TransformComponent* transform = nullptr;
-            DebugComponent* debug = nullptr;
-            if (entity->QueryComponents(transform, debug) && debug->DrawEntityName)
+            if (entity->QueryComponents(transform))
             {
-                _uiSystem.AddWorldText(transform->Position, entity->GetName(), {1.0f, 1.0f, 0.0f}, Render::Alignment::HorizontalCenter | Render::Alignment::VerticalCenter);
+                _uiSystem->AddWorldText(transform->Position, entity->GetName(), {1.0f, 1.0f, 0.0f}, Render::Alignment::HorizontalCenter | Render::Alignment::VerticalCenter);
             }
         }
-        _uiSystem.Combo("Select Entity", &_selectedEntity, componentNames);
+        _uiSystem->Combo("Select Entity", &_selectedEntity, componentNames);
 
         auto selectedEntity = entities[_selectedEntity];
 
         char buffer[128];
         strncpy_s(buffer, selectedEntity->GetName().c_str(), _TRUNCATE);
-        if (_uiSystem.Input("Name", buffer, 128))
+        if (_uiSystem->Input("Name", buffer, 128))
         {
             selectedEntity->SetName(buffer);
         }
-        _uiSystem.SameLine();
+        _uiSystem->SameLine();
         bool isActive = selectedEntity->IsActive();
-        if (_uiSystem.Checkbox("Is Active", &isActive))
+        if (_uiSystem->Checkbox("Is Active", &isActive))
         {
             selectedEntity->SetActive(isActive);
         }
-        if (_uiSystem.Button("Destroy"))
+        if (_uiSystem->Button("Destroy"))
         {
             selectedEntity->Destroy();
             _selectedEntity--;
@@ -83,9 +83,7 @@ public:
 private:
     std::unordered_map<std::type_index, std::shared_ptr<ComponentEditor>> _visualisers;
 
-    int _selectedEntity = 0;
-    Render::UISystem& _uiSystem;
+    size_t _selectedEntity = 0;
+    Render::UISystem* _uiSystem;
 };
-
-
-} // namespace Snowglobe::Engine
+}

@@ -39,6 +39,4 @@ private:
     bool _needsToBeRemoved = false;
 };
     
-} // namespace Snowglobe::Core::ESC
-
-
+} 

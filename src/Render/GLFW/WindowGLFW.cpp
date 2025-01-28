@@ -87,4 +87,4 @@ namespace Snowglobe::Render::GLFW
             _resizeCallback(width, height);
     }
 
-} // namespace Snowglobe::Render::GLFW
+}

@@ -52,4 +52,4 @@ std::shared_ptr<FileTexture> FileSystem::LoadTexture(const SnowFileHandle &handl
     return std::make_shared<FileTexture>(handle.GetFullPath());
 }
     
-} // namespace Snowglobe::Engine
+}

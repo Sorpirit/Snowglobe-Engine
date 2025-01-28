@@ -63,7 +63,7 @@ private:
         glm::vec3 Color;
     };
 
-    int _selectedEntity = 0;
+    size_t _selectedEntity = 0;
     std::vector<DemoEntity> _entities = {
         {"Foo", glm::vec3(1, -2, 3), glm::vec2(4, -3), 1.0f, true, glm::vec3(1, 0, 0)},
         {"Bar", glm::vec3(4, 5, -6), glm::vec2(0, 0), 4.0f, false, glm::vec3(0, 1, 0)},
@@ -99,7 +99,7 @@ class CameraTests : public RuntimeTest
 public:
     CameraTests(
         Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
+            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
     {
         auto manager = _engine.GetEntityManager();
         _cubes.emplace_back(manager->CreateEntity());
@@ -166,7 +166,7 @@ class LightTests : public RuntimeTest
 public:
     LightTests(
         Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
+            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
     {}
     
     void Init() override;

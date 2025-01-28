@@ -1,5 +1,6 @@
 #include "RenderEngineSyncSystem.hpp"
 
+#include "MeshComponent.hpp"
 #include "TransformComponent.hpp"
 
 namespace Snowglobe::Engine
@@ -23,7 +24,7 @@ void RenderEngineSyncSystem::UpdateLate()
         mesh->GetMeshProxy()->SetScale(transform->Scale);
     }
 }
-
+    
 }
 
 

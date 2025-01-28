@@ -1,6 +1,5 @@
 #include "ImguiSystem.hpp"
 
-#include <glad/gl.h>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -25,7 +24,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-        auto glfwWindow = static_cast<Render::GLFW::WindowGLFW*>(window);
+        auto glfwWindow = dynamic_cast<Render::GLFW::WindowGLFW*>(window);
 
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(glfwWindow->GetWindow(), true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
@@ -106,7 +105,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
     Render::UIPanel ImguiSystem::OpenUIPanel(const std::string& title)
     {
         ImGui::Begin(title.c_str());
-        return Render::UIPanel(this);
+        return {this};
     }
 
     void ImguiSystem::Close(Render::UIPanel *panel)
@@ -126,12 +125,12 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     void ImguiSystem::Text(const std::string& text)
     {
-        ImGui::Text(text.c_str());
+        ImGui::TextUnformatted(text.c_str());
     }
 
     void ImguiSystem::Text(const char* fmt, ...)
     {
-        ImGui::Text(fmt);
+        ImGui::TextUnformatted(fmt);
     }
 
     bool ImguiSystem::Checkbox(const std::string& label, bool* value)
@@ -163,25 +162,25 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImGui::SliderFloat4(label.c_str(), &value->x, min, max, format.c_str(), flags);
     }
 
-    void ImguiSystem::Slider(const std::string& label, int* value, float min, float max, const std::string& format,
+    void ImguiSystem::Slider(const std::string& label, int* value, int min, int max, const std::string& format,
         int flags)
     {
         ImGui::SliderInt(label.c_str(), value, min, max, format.c_str(), flags);
     }
 
-    void ImguiSystem::Slider(const std::string& label, glm::ivec2* value, float min, float max,
+    void ImguiSystem::Slider(const std::string& label, glm::ivec2* value, int min, int max,
         const std::string& format, int flags)
     {
         ImGui::SliderInt2(label.c_str(), &value->x, min, max, format.c_str(), flags);
     }
 
-    void ImguiSystem::Slider(const std::string& label, glm::ivec3* value, float min, float max,
+    void ImguiSystem::Slider(const std::string& label, glm::ivec3* value, int min, int max,
         const std::string& format, int flags)
     {
         ImGui::SliderInt3(label.c_str(), &value->x, min, max, format.c_str(), flags);
     }
 
-    void ImguiSystem::Slider(const std::string& label, glm::ivec4* value, float min, float max,
+    void ImguiSystem::Slider(const std::string& label, glm::ivec4* value, int min, int max,
         const std::string& format, int flags)
     {
         ImGui::SliderInt4(label.c_str(), &value->x, min, max, format.c_str(), flags);
@@ -203,11 +202,11 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImGui::ColorEdit4(label.c_str(), &value->x, flags);
     }
 
-    void ImguiSystem::Combo(const std::string& label, int* current, const std::string items[], int itemsCount, int flags)
+    void ImguiSystem::Combo(const std::string& label, size_t* current, const std::string items[], size_t itemsCount, int flags)
     {
         if (ImGui::BeginCombo(label.c_str(), items[*current].c_str(), flags))
         {
-            for (int n = 0; n < itemsCount; n++)
+            for (size_t n = 0; n < itemsCount; n++)
             {
                 const bool is_selected = (*current == n);
                 if (ImGui::Selectable(items[n].c_str(), is_selected))
@@ -221,11 +220,11 @@ namespace Snowglobe::RenderOpenGL::Imgui
         }
     }
 
-    void ImguiSystem::Combo(const std::string& label, int* current, const std::vector<std::string>& items, int flags)
+    void ImguiSystem::Combo(const std::string& label, size_t* current, const std::vector<std::string>& items, int flags)
     {
         if (ImGui::BeginCombo(label.c_str(), items[*current].c_str(), flags))
         {
-            for (int n = 0; n < items.size(); n++)
+            for (size_t n = 0; n < items.size(); n++)
             {
                 const bool is_selected = (*current == n);
                 if (ImGui::Selectable(items[n].c_str(), is_selected))
@@ -246,7 +245,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     void ImguiSystem::ToolTip(const std::string& text)
     {
-        ImGui::SetItemTooltip(text.c_str());
+        ImGui::SetItemTooltip("%s", text.c_str());
     }
 
     bool ImguiSystem::Button(const std::string& label)
@@ -277,7 +276,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     bool ImguiSystem::Input(const std::string& label, glm::vec4* value, const std::string& format, int flags)
     {
-        ImGui::InputFloat4(label.c_str(), &value->x, format.c_str(), flags);
+        return ImGui::InputFloat4(label.c_str(), &value->x, format.c_str(), flags);
     }
 
     bool ImguiSystem::Input(const std::string& label, int* value, int step, int stepFast,

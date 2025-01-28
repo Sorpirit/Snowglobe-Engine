@@ -6,7 +6,7 @@
 
 namespace Snowglobe::Render
 {
-    enum CameraMode
+    enum CameraMode : uint8_t
     {
         Orthographic,
         Perspective
@@ -41,17 +41,17 @@ namespace Snowglobe::Render
         const glm::vec3& GetPosition() const { return _position; }
         const glm::vec3& GetRotation() const { return _rotation; }
 
-        const glm::mat4 GetViewMatrix() const
+        const glm::mat4& GetViewMatrix() const
         {
             return _viewMatrix;
         }
 
-        const glm::mat4 GetProjectionMatrix() const
+        const glm::mat4& GetProjectionMatrix() const
         {
             return _projectionMatrix;
         }
 
-        const glm::mat4 GetViewProjectionMatrix() const
+        glm::mat4 GetViewProjectionMatrix() const
         {
             return _projectionMatrix * GetViewMatrix();
         }
@@ -119,9 +119,9 @@ namespace Snowglobe::Render
 
             glm::vec3 screenPosition = glm::project(worldPosition, _viewMatrix, _projectionMatrix, viewport);
 
-            screenPosition.y = _height - screenPosition.y;
+            screenPosition.y = static_cast<float>(_height) - screenPosition.y;
             
-            return glm::vec2(screenPosition);
+            return screenPosition;
         }
 
     private:
@@ -156,7 +156,7 @@ namespace Snowglobe::Render
             }
         }
 
-        glm::mat4 GenerateViewMatrix()
+        glm::mat4 GenerateViewMatrix() const
         {
             glm::mat4 viewMatrix = glm::mat4(1.0f);
             viewMatrix = glm::rotate(viewMatrix, glm::radians(_rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));

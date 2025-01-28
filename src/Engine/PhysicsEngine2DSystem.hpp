@@ -3,14 +3,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <memory>
-#include <vector>
-
 #include "ECS/ISystem.hpp"
 #include "ECS/Entity.hpp"
 
 #include "TransformComponent.hpp"
-#include "Physics2DComponent.hpp"
 #include "Collider2DComponent.hpp"
 
 namespace Snowglobe::Engine
@@ -69,7 +65,7 @@ namespace Snowglobe::Engine
             return result;
         }
 
-        return CollisionData{false, glm::vec2(0.0f), 0.0f};
+        return CollisionData{.IsColliding= false, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapPoint(const Core::TransformComponent& transform, const Collider2DComponent& collider, const glm::vec2& point)
@@ -83,7 +79,7 @@ namespace Snowglobe::Engine
             return OverlapPointAABB(GetMin(transform), GetMax(transform), point);
         }
 
-        return CollisionData{false, glm::vec2(0.0f), 0.0f};
+        return CollisionData{.IsColliding= false, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapPointCircle(const glm::vec2& center, float radius,
@@ -94,14 +90,14 @@ namespace Snowglobe::Engine
         float radiusSq = radius * radius;
         if (distSq <= radiusSq)
         {
-            return CollisionData{true, glm::normalize(dist), radius - glm::length(dist)};
+            return {.IsColliding= true, .Normal = glm::normalize(dist), .Penetration= radius - glm::length(dist)};
         }
 
-        return CollisionData{false, glm::vec2(0.0f), 0.0f};
+        return {.IsColliding= false, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapCircle(const glm::vec2& centerA, float radiusA,
-        const glm::vec2& centerB, float radiusB)
+                                                              const glm::vec2& centerB, float radiusB)
     {
         glm::vec2 dist = centerB - centerA;
         float radiusSum = radiusA + radiusB;
@@ -111,22 +107,22 @@ namespace Snowglobe::Engine
 
         if (distSq <= radiusSumSq)
         {
-            return CollisionData{true, glm::normalize(dist), radiusSum - glm::length(dist)};
+            return {.IsColliding= true, .Normal = glm::normalize(dist), .Penetration= radiusSum - glm::length(dist)};
         }
 
-        return CollisionData{false, glm::vec2(0.0f), 0.0f};
+        return {.IsColliding= false, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapPointAABB(const glm::vec2& minA, const glm::vec2& maxA,
-        const glm::vec2& point)
+                                                                 const glm::vec2& point)
     {
         bool xOverlap = point.x >= minA.x && point.x <= maxA.x;
         bool yOverlap = point.y >= minA.y && point.y <= maxA.y;
-        return CollisionData{xOverlap && yOverlap, glm::vec2(0.0f), 0.0f};
+        return {.IsColliding= xOverlap && yOverlap, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapAABB(const glm::vec2& minA, const glm::vec2& maxA,
-        const glm::vec2& minB, const glm::vec2& maxB)
+                                                            const glm::vec2& minB, const glm::vec2& maxB)
     {
         bool xOverlap = minA.x <= maxB.x && maxA.x >= minB.x;
         bool yOverlap = minA.y <= maxB.y && maxA.y >= minB.y;
@@ -137,19 +133,27 @@ namespace Snowglobe::Engine
             float overlapY = std::min(maxA.y, maxB.y) - std::max(minA.y, minB.y);
             if (overlapX < overlapY)
             {
-                return CollisionData{true, glm::vec2((minA.x < minB.x) ? 1.0f : -1.0f, 0.0f), overlapX};
+                return {
+                    .IsColliding= true,
+                    .Normal = glm::vec2((minA.x < minB.x) ? 1.0f : -1.0f, 0.0f),
+                    .Penetration=overlapX
+                };
             }
             else
             {
-                return CollisionData{true, glm::vec2(0.0f, (minA.y < minB.y) ? 1.0f : -1.0f), overlapY};
+                return {
+                    .IsColliding= true,
+                    .Normal = glm::vec2(0.0f, (minA.y < minB.y) ? 1.0f : -1.0f),
+                    .Penetration=overlapY
+                };
             }
         }
         
-        return CollisionData{xOverlap && yOverlap, glm::vec2(0.0f), 0.0f};
+        return {.IsColliding= xOverlap && yOverlap, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
 
     inline CollisionData PhysicsEngine2DSystem::OverlapCircleAABB(const glm::vec2& center, float radius,
-        const glm::vec2& minA, const glm::vec2& maxA)
+                                                                  const glm::vec2& minA, const glm::vec2& maxA)
     {
         glm::vec2 closest = glm::clamp(center, minA, maxA);
         glm::vec2 dist = closest - center;
@@ -157,10 +161,9 @@ namespace Snowglobe::Engine
         float radiusSq = radius * radius;
         if (distSq <= radiusSq)
         {
-            return CollisionData{true, glm::normalize(dist), radius - glm::length(dist)};
+            return {.IsColliding= true, .Normal = glm::normalize(dist), .Penetration= radius - glm::length(dist)};
         }
 
-        return CollisionData{false, glm::vec2(0.0f), 0.0f};
+        return {.IsColliding= false, .Normal= glm::vec2(0.0f), .Penetration= 0.0f};
     }
-    
-} // namespace Snowglobe::Engine
+}

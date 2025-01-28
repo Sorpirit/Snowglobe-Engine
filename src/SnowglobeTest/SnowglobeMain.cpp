@@ -30,7 +30,6 @@ Snowglobe::Engine::Physics2DComponent,
 Snowglobe::Engine::Collider2DComponent,
 Snowglobe::Engine::MeshComponent,
 Snowglobe::Engine::BaseComponentMaterial,
-Snowglobe::Engine::DebugComponent,
 Snowglobe::RenderOpenGL::LightComponent,
 Snowglobe::Render::NEdgeShape2DComponent
 > SampleMapEntityData;

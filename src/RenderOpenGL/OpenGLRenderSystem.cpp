@@ -135,7 +135,7 @@ namespace Snowglobe::RenderOpenGL
         const std::string& debugName)
     {
         _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, debugName);
-        _nextMeshId = { _nextMeshId.id + 1 };
+        _nextMeshId = { _nextMeshId.GetId() + 1 };
         return &_meshes.back();
     }
 
@@ -144,7 +144,7 @@ namespace Snowglobe::RenderOpenGL
                                                            const std::string& debugName)
     {
         _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, (const IndexBufferPtrOpenGL&) indexBuffer, debugName);
-        _nextMeshId = { _nextMeshId.id + 1 };
+        _nextMeshId = { _nextMeshId.GetId() + 1 };
         return &_meshes.back();
     }
 

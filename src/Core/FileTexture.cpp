@@ -25,4 +25,4 @@ namespace Snowglobe::Core
     }
 
 
-} // namespace Snowglobe::Core
+}

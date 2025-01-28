@@ -27,14 +27,16 @@ public:
     
     ~Engine();
 
-    void Setup(const Core::EngineProfile& profile, const Render::WindowParams& windowParams, const
-               std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager);
+    void Setup(
+        const Core::EngineProfile& profile,
+        const Render::WindowParams& windowParams,
+        std::shared_ptr<Core::ECS::EntityManagerBase> entityManager);
     void Run();
 
     template <class T, typename... TArgs>
     bool TryAddSystem(TArgs&&... args)
     {
-        static_assert(std::is_base_of<Core::ECS::ISystem, T>::value, "T must derive from ISystem");
+        static_assert(std::is_base_of_v<Core::ECS::ISystem, T>, "T must derive from ISystem");
         auto entry = _systems.find(typeid(T));
         if(entry != _systems.end())
         {
@@ -49,7 +51,7 @@ public:
     template <typename T>
     bool QuerySystem(T*& ptr)
     {
-        static_assert(std::is_base_of<Core::ECS::ISystem, T>::value, "T must derive from ISystem");
+        static_assert(std::is_base_of_v<Core::ECS::ISystem, T>, "T must derive from ISystem");
         
         auto entry = _systems.find(typeid(T));
         

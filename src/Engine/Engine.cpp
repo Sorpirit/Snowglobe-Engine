@@ -1,5 +1,4 @@
 #include <iostream>
-#include <utility>
 
 #include "Engine.hpp"
 #include "RenderSystem.hpp"
@@ -18,13 +17,13 @@ namespace Snowglobe::Engine
     {
 
     public:
-        LightComponentEditor(Render::UISystem& uiSystem) : TemplateComponentEditor(uiSystem) {}
+        LightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
 
-        void DrawUI(RenderOpenGL::LightComponent* component) override
+        void DrawUITemplate(RenderOpenGL::LightComponent* component) override
         {
-            _uiSystem.Text("LightComponent");
-            _uiSystem.Color("LightColor", &component->GetLightParameters().LightColor);
-            _uiSystem.Slider("AmbientIntensity", &component->GetLightParameters().AmbientIntensity, 0.0f, 1.0f);
+            _uiSystem->Text("LightComponent");
+            _uiSystem->Color("LightColor", &component->GetLightParameters().LightColor);
+            _uiSystem->Slider("AmbientIntensity", &component->GetLightParameters().AmbientIntensity, 0.0f, 1.0f);
         }
     };
 
@@ -36,7 +35,7 @@ namespace Snowglobe::Engine
     void Engine::Setup(
         const Core::EngineProfile& profile,
         const Render::WindowParams& windowParams,
-        const std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager)
+        std::shared_ptr<Core::ECS::EntityManagerBase> entityManager)
     {
         _entityManager = std::move(entityManager);
 
@@ -49,25 +48,22 @@ namespace Snowglobe::Engine
         case Core::EngineRenderEngine::Vulkan:
             //todo disable vulkan until implemented
             //success = TryAddSystem<Render::RenderSystem>(new RenderVulkan::VulkanRenderingSystem());
-            std::cout << "Vulkan is not implemented yet" << std::endl;
+            std::cout << "Vulkan is not implemented yet" << '\n';
             break;
         case Core::EngineRenderEngine::DirectX:
-            std::cout << "DirectX is not implemented yet" << std::endl;
-            break;
-        default:
-            std::cout << "Unknown render engine" << std::endl;
+            std::cout << "DirectX is not implemented yet" << '\n';
             break;
         }
 
         if(!success)
         {
-            std::cout << "Failed to add render system" << std::endl;
+            std::cout << "Failed to add render system" << '\n';
         }
 
         Render::RenderSystem* renderSystem = nullptr; 
         if(!QuerySystem<Render::RenderSystem>(renderSystem))
         {
-            std::cout << "Failed to get render system" << std::endl;
+            std::cout << "Failed to get render system" << '\n';
             return;
         }
 
@@ -78,7 +74,7 @@ namespace Snowglobe::Engine
         Render::UISystem* uiSystem = nullptr;
         if(!QuerySystem<Render::UISystem>(uiSystem))
         {
-            std::cout << "Failed to get Imgui system" << std::endl;
+            std::cout << "Failed to get ImGui system" << '\n';
             return;
         }
         renderSystem->SetUISystem(uiSystem);
@@ -86,18 +82,17 @@ namespace Snowglobe::Engine
         _systems[typeid(PhysicsEngine2DSystem)] = std::make_shared<PhysicsEngine2DSystem>();
         _systems[typeid(RenderEngineSyncSystem)] = std::make_shared<RenderEngineSyncSystem>();
 
-        auto componentEditorSystem = std::make_shared<ComponentEditorSystem>(*uiSystem);
+        auto componentEditorSystem = std::make_shared<ComponentEditorSystem>(uiSystem);
         _systems[typeid(ComponentEditorSystem)] = componentEditorSystem;
 
-        componentEditorSystem->RegisterVisualiser<DebugComponent, DebugComponentEditor>();
-        componentEditorSystem->RegisterVisualiser<Core::TransformComponent, TransformComponentEditor>();
-        componentEditorSystem->RegisterVisualiser<Physics2DComponent, Physics2DComponentEditor>();
-        componentEditorSystem->RegisterVisualiser<Collider2DComponent, Collider2DComponentEditor>();
-        componentEditorSystem->RegisterVisualiser<BaseComponentMaterial, BaseComponentMaterialEditor>();
-        componentEditorSystem->RegisterVisualiser<Render::NEdgeShape2DComponent, NEdgeShape2DComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<TransformComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<Physics2DComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<Collider2DComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<BaseComponentMaterialEditor>();
+        componentEditorSystem->RegisterVisualiser<NEdgeShape2DComponentEditor>();
         
         //OpenGL Only
-        componentEditorSystem->RegisterVisualiser<RenderOpenGL::LightComponent, LightComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<LightComponentEditor>();
 
         for(const auto& system : _systems | std::views::values)
         {
@@ -136,4 +131,4 @@ namespace Snowglobe::Engine
         _entityManager->Update();
     }
 
-} // namespace Snowglobe::Engine
+}

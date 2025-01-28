@@ -54,4 +54,4 @@ namespace Snowglobe::Render::GLFW
 
         static int GetGLFWCursorMode(Core::CursorMode mode);
     };
-} // namespace Snowglobe::Render::GLFW
+}

@@ -33,4 +33,4 @@ private:
     bool _isActive = true;
 };
     
-} // namespace Snowglobe::Core::ECS
+}

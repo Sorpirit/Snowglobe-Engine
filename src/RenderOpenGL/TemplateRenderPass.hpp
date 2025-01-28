@@ -17,8 +17,8 @@ class TemplateRenderPass : public RenderPass
 {
 public:
     TemplateRenderPass(const Core::SnowFileHandle& vertex, Core::SnowFileHandle fragment, bool useLighting = false) :
-        RenderPass({ typeid(MaterialType), typeid(VertexType) }),
-        _useLighting(useLighting) 
+        RenderPass({typeid(MaterialType), typeid(VertexType)}), _sceneParameters(),
+        _useLighting(useLighting)
     {
         auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
         auto vertexShader = shaderCompiler->GetOrCompileShader(vertex);
@@ -27,7 +27,7 @@ public:
         PipelineSetupParams params = {vertexShader, fragmentShader};
         _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
     }
-    
+
     virtual void Execute(MeshOpenGL& mesh) override
     {
         glUseProgram(_shaderProgram);

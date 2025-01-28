@@ -242,4 +242,4 @@ ECSTestMapEntityData;
 
 typedef EntityManager<ECSTestMapEntityData> ECSTestEntityManager;    
 
-} // namespace Snowglobe::Core::ECS::ECSTest
+}

@@ -92,17 +92,17 @@ namespace Snowglobe::Render
         virtual void Slider(const std::string& label, glm::vec2* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
         virtual void Slider(const std::string& label, glm::vec3* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
         virtual void Slider(const std::string& label, glm::vec4* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, int* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec2* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec3* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec4* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, int* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec2* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec3* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec4* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
         virtual void SliderAngle(const std::string& label, float* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
 
         virtual void Color(const std::string& label, glm::vec3* value, int flags = 0) = 0;
         virtual void Color(const std::string& label, glm::vec4* value, int flags = 0) = 0;
 
-        virtual void Combo(const std::string& label, int* current, const std::string items[], int itemsCount, int flags = 0) = 0;
-        virtual void Combo(const std::string& label, int* current, const std::vector<std::string>& items, int flags = 0) = 0;
+        virtual void Combo(const std::string& label, size_t* current, const std::string items[], size_t itemsCount, int flags = 0) = 0;
+        virtual void Combo(const std::string& label, size_t* current, const std::vector<std::string>& items, int flags = 0) = 0;
 
         virtual void SameLine() = 0;
         virtual void ToolTip(const std::string& text) = 0;
