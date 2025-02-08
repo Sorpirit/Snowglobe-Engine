@@ -12,7 +12,7 @@ namespace Snowglobe::Core
 {
 struct SnowFileHandle
 {
-public:
+  public:
     bool IsValid() const { return _isValid; }
     std::filesystem::path GetFullPath() const { return _path; }
 
@@ -20,7 +20,7 @@ public:
     SnowFileHandle(const std::string& path) : _path(path) { Initialize(path); }
     SnowFileHandle(const char* path) : _path(path) { Initialize(path); }
 
-private:
+  private:
     std::filesystem::path _path;
     bool _isValid;
 
@@ -29,7 +29,7 @@ private:
 
 class FileSystem
 {
-public:
+  public:
     static FileSystem& GetInstance()
     {
         static FileSystem _instance;
@@ -41,12 +41,13 @@ public:
     void AddMount(const std::filesystem::path& path);
 
     bool TryResolvePath(const std::filesystem::path& path, std::filesystem::path& fullPath) const;
-    
+
     static bool TryReadTextFile(const SnowFileHandle& handle, std::stringstream& buffer);
     static bool TryReadTextFile(const SnowFileHandle& handle, std::function<void(std::ifstream&)> read);
 
     static std::shared_ptr<FileTexture> LoadTexture(const SnowFileHandle& handle);
-private:
+
+  private:
     FileSystem() = default;
 
     std::unordered_set<std::filesystem::path> _mounts;
@@ -72,4 +73,4 @@ inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::f
     return false;
 }
 
-}
+} // namespace Snowglobe::Core

@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <filesystem>
 
@@ -7,7 +7,7 @@ namespace Snowglobe::Core
 
 class FileTexture
 {
-public:
+  public:
     FileTexture(const std::filesystem::path& path);
     ~FileTexture();
 
@@ -17,12 +17,12 @@ public:
     uint32_t GetHeight() const { return _height; }
     uint32_t GetChannels() const { return _channels; }
 
-private:
+  private:
     uint8_t* _data;
 
     uint32_t _width;
     uint32_t _height;
     uint32_t _channels;
 };
-    
-}
+
+} // namespace Snowglobe::Core

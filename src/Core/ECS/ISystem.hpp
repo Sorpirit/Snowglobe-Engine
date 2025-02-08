@@ -10,33 +10,34 @@ namespace Snowglobe::Core::ECS
 /// @brief Base class for all systems in the ECS. Provides a basic interface for updating the system.
 class ISystem
 {
-public:
+  public:
     ISystem() = default;
     ISystem(bool isPermanent) : _isPermanent(isPermanent) {}
     virtual ~ISystem() = default;
 
-    virtual void Init(std::shared_ptr<EntityManagerBase> entityManager)
-    {
-        _entityManager = std::move(entityManager);
-    }
-    
-    virtual void UpdateEarly() { }
-    virtual void Update() { }
-    virtual void UpdateLate() { }
+    virtual void Init(std::shared_ptr<EntityManagerBase> entityManager) { _entityManager = std::move(entityManager); }
 
-    virtual void DrawDebugUI() { }
-    
+    virtual void UpdateEarly() {}
+    virtual void Update() {}
+    virtual void UpdateLate() {}
+
+    virtual void DrawDebugUI() {}
 
     bool IsPermanent() const { return _isPermanent; }
     bool IsActive() const { return _isActive; }
-    void SetActive(bool isActive) { if (_isPermanent) return; _isActive = isActive; }
-    
-protected:
+    void SetActive(bool isActive)
+    {
+        if (_isPermanent)
+            return;
+        _isActive = isActive;
+    }
+
+  protected:
     std::shared_ptr<EntityManagerBase> _entityManager = nullptr;
 
-private:
+  private:
     bool _isPermanent = false;
     bool _isActive = true;
 };
-    
-}
+
+} // namespace Snowglobe::Core::ECS

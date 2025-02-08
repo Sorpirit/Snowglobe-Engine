@@ -4,9 +4,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "Tag.hpp"
 #include "Component.hpp"
 #include "EntityData.hpp"
+#include "Tag.hpp"
 
 namespace Snowglobe::Core::ECS
 {
@@ -14,52 +14,53 @@ namespace Snowglobe::Core::ECS
 /// @brief Stores and manages components of an entity
 class Entity
 {
-public:
-    Entity(EntityData* data, uint32_t id, Tag tag, std::string name) : _tag(tag), _id(id), _name(std::move(name)), _components(data) {}
+  public:
+    Entity(EntityData* data, uint32_t id, Tag tag, std::string name)
+        : _tag(tag), _id(id), _name(std::move(name)), _components(data)
+    {
+    }
 
     uint32_t GetId() const { return _id; }
-    
+
     bool operator==(const Entity& other) const { return _id == other._id; }
-    
-    /// @brief Adds a component to the entity. Component mast inherit from Component, and must be defined in the EntityData template
+
+    /// @brief Adds a component to the entity. Component mast inherit from Component, and must be defined in the
+    /// EntityData template
     /// @return True if component is added, false if component is already attached
-    template <class TComponent, typename... TArgs>
-    bool AddComponent(TArgs&&... args)
+    template <class TComponent, typename... TArgs> bool AddComponent(TArgs&&... args)
     {
         static_assert(std::is_base_of_v<Component, TComponent>, "TComponent must inherit from Component");
         auto& component = _components->GetComponent<TComponent>();
 
-        if(component.IsAttached())
+        if (component.IsAttached())
             return false;
-        
+
         component = TComponent(std::forward<TArgs>(args)...);
         component.OnAttach();
 
-        if(_isActive)
+        if (_isActive)
             component.OnActivate();
-        
+
         return true;
     }
 
     /// @brief Removes a component from the entity
     /// @return True if component is removed, false if component is not attached
-    template <class TComponent>
-    bool RemoveComponent()
+    template <class TComponent> bool RemoveComponent()
     {
         static_assert(std::is_base_of_v<Component, TComponent>, "TComponent must inherit from Component");
         auto& component = _components->GetComponent<TComponent>();
 
-        if(!component.IsAttached())
+        if (!component.IsAttached())
             return false;
-        
+
         component.OnRemove();
         return true;
     }
 
     /// @brief Checks if a component is attached to the entity
     /// @return True if component is attached, false if component is not attached
-    template <class TComponent>
-    bool HasComponent() const
+    template <class TComponent> bool HasComponent() const
     {
         static_assert(std::is_base_of_v<Component, TComponent>, "TComponent must inherit from Component");
         auto& component = _components->GetComponent<TComponent>();
@@ -68,24 +69,23 @@ public:
 
     /// @brief Queries a component from the entity. If component is attached, componentPtr is set to the component
     /// @return True if component is attached, false if component is not attached
-    template <class TComponent>
-    bool QueryComponent(TComponent*& componentPtr)
+    template <class TComponent> bool QueryComponent(TComponent*& componentPtr)
     {
         static_assert(std::is_base_of_v<Component, TComponent>, "TComponent must inherit from Component");
 
         componentPtr = nullptr;
         auto& component = _components->GetComponent<TComponent>();
-        if(!component.IsAttached())
+        if (!component.IsAttached())
             return false;
-        
+
         componentPtr = &component;
         return true;
     }
 
-    /// @brief Queries multiple components from the entity. If all components are attached, componentPointers are set to the components
+    /// @brief Queries multiple components from the entity. If all components are attached, componentPointers are set to
+    /// the components
     /// @return True if ALL components are attached, false if ANY component is not attached
-    template <class... TComponents>
-    bool QueryComponents(TComponents*&... componentPointers)
+    template <class... TComponents> bool QueryComponents(TComponents*&... componentPointers)
     {
         return (QueryComponent(componentPointers) && ...);
     }
@@ -93,28 +93,27 @@ public:
     /// @brief Lists all attached components of the entity. Components are added to the components vector
     void ListAttachedComponents(std::vector<Component*>& components) const
     {
-        _components->ForEachComponent([&components](Component& component)
-        {
+        _components->ForEachComponent([&components](Component& component) {
             if (!component.IsAttached())
                 return;
-            
+
             components.push_back(&component);
         });
     }
 
-    /// @brief Sets the entity to active or inactive. If entity is set to active, all attached components are activated as well and vice versa
+    /// @brief Sets the entity to active or inactive. If entity is set to active, all attached components are activated
+    /// as well and vice versa
     void SetActive(bool isActive)
     {
-        if(_isActive == isActive)
+        if (_isActive == isActive)
             return;
-            
+
         _isActive = isActive;
-        _components->ForEachComponent([isActive](Component& component)
-        {
+        _components->ForEachComponent([isActive](Component& component) {
             if (!component.IsAttached())
                 return;
 
-            if(isActive)
+            if (isActive)
                 component.OnActivate();
             else
                 component.OnDeactivate();
@@ -126,15 +125,15 @@ public:
     bool IsActive() const { return _isActive; }
 
     /// @brief Destroys the entity. All attached components are removed.
-    /// IMPORTANT: Entity is not destroyed immediately, but is marked for destruction. Entity is destroyed on EntityManager::Update() (at the start of the frame)
+    /// IMPORTANT: Entity is not destroyed immediately, but is marked for destruction. Entity is destroyed on
+    /// EntityManager::Update() (at the start of the frame)
     void Destroy()
     {
-        if(_isDestroyed)
+        if (_isDestroyed)
             return;
 
         _isDestroyed = true;
-        _components->ForEachComponent([](Component& component)
-        {
+        _components->ForEachComponent([](Component& component) {
             if (!component.IsAttached())
                 return;
 
@@ -154,12 +153,11 @@ public:
     void Update() const
     {
         bool isDestroyed = _isDestroyed;
-        _components->ForEachComponent([isDestroyed](Component& component)
-        {
+        _components->ForEachComponent([isDestroyed](Component& component) {
             if (!component.IsAttached())
                 return;
 
-            if(component.NeedsToBeDetached() || isDestroyed)
+            if (component.NeedsToBeDetached() || isDestroyed)
             {
                 component.OnDetach();
             }
@@ -176,21 +174,23 @@ public:
     /// @brief Return whether to draw debug information for this entity
     bool DrawDebug() const { return _drawDebug; }
 
-private:
+  private:
     bool _isActive = true;
     bool _isDestroyed = false;
     Tag _tag = Tags::Default();
     uint32_t _id = 0;
 
     std::string _name = "Entity";
-    bool _drawDebug = false; 
-    
+    bool _drawDebug = false;
+
     EntityData* _components = nullptr;
 };
-}
+} // namespace Snowglobe::Core::ECS
 
-template <>
-struct std::hash<Snowglobe::Core::ECS::Entity>
+template <> struct std::hash<Snowglobe::Core::ECS::Entity>
 {
-    std::size_t operator()(const Snowglobe::Core::ECS::Entity& entity) const noexcept { return std::hash<uint32_t>()(entity.GetId()); }
+    std::size_t operator()(const Snowglobe::Core::ECS::Entity& entity) const noexcept
+    {
+        return std::hash<uint32_t>()(entity.GetId());
+    }
 };

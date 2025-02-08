@@ -4,7 +4,7 @@
 
 namespace Snowglobe::Core
 {
-    
+
 enum class EngineRenderEngine : uint8_t
 {
     OpenGL,
@@ -17,5 +17,5 @@ struct EngineProfile
     std::string applicationName;
     EngineRenderEngine preferredRenderEngine;
 };
-    
-}
+
+} // namespace Snowglobe::Core

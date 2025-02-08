@@ -10,11 +10,10 @@ namespace Snowglobe::Core
 /// @brief Provides time information for the engine
 class EngineTime
 {
-public:
-    EngineTime() :
-        _startTime(std::chrono::system_clock::now()),
-        _lastEngineFrameTime(_startTime),
-        _lastRenderFrameTime(_startTime)
+  public:
+    EngineTime()
+        : _startTime(std::chrono::system_clock::now()), _lastEngineFrameTime(_startTime),
+          _lastRenderFrameTime(_startTime)
     {
     }
 
@@ -42,42 +41,21 @@ public:
         _lastRenderFrameTime = currentTime;
     }
 
-    static float GetTimeSinceStart()
-    {
-        return static_cast<float>(GetInstance()->_timeSinceStart);
-    }
+    static float GetTimeSinceStart() { return static_cast<float>(GetInstance()->_timeSinceStart); }
 
-    static float GetDeltaEngineFrameTime()
-    {
-        return static_cast<float>(GetInstance()->_deltaEngineFrameTime);
-    }
+    static float GetDeltaEngineFrameTime() { return static_cast<float>(GetInstance()->_deltaEngineFrameTime); }
 
-    static float GetDeltaRenderFrameTime()
-    {
-        return static_cast<float>(GetInstance()->_deltaRenderFrameTime);
-    }
-    
-    static double GetTimeSinceStartD()
-    {
-        return GetInstance()->_timeSinceStart;
-    }
+    static float GetDeltaRenderFrameTime() { return static_cast<float>(GetInstance()->_deltaRenderFrameTime); }
 
-    static double GetDeltaEngineFrameTimeD()
-    {
-        return GetInstance()->_deltaEngineFrameTime;
-    }
+    static double GetTimeSinceStartD() { return GetInstance()->_timeSinceStart; }
 
-    static double GetDeltaRenderFrameTimeD()
-    {
-        return GetInstance()->_deltaRenderFrameTime;
-    }
+    static double GetDeltaEngineFrameTimeD() { return GetInstance()->_deltaEngineFrameTime; }
 
-    static uint64_t GetFrameN()
-    {
-        return GetInstance()->_frameN;
-    }
+    static double GetDeltaRenderFrameTimeD() { return GetInstance()->_deltaRenderFrameTime; }
 
-private:
+    static uint64_t GetFrameN() { return GetInstance()->_frameN; }
+
+  private:
     time_point _startTime;
     double _timeSinceStart = 0.0;
 
@@ -88,7 +66,6 @@ private:
     double _deltaRenderFrameTime = 0.0;
 
     uint64_t _frameN = 0;
-
 };
-    
-}
+
+} // namespace Snowglobe::Core

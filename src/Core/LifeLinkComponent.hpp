@@ -8,13 +8,12 @@
 
 namespace Snowglobe::Core
 {
-    
+
 class LifeLinkComponent : public ECS::Component
 {
-public:
+  public:
     LifeLinkComponent() = default;
 
     std::vector<std::weak_ptr<ECS::Entity>> LinkedEntities;
 };
-
-}
+} // namespace Snowglobe::Core

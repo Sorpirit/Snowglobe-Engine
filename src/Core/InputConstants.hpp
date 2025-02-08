@@ -73,7 +73,7 @@ enum Key : uint16_t
     Right = 262,
     Left = 263,
     Down = 264,
-    //Up = 265,
+    // Up = 265,
     PageUp = 266,
     PageDown = 267,
     Home = 268,
@@ -161,5 +161,5 @@ enum CursorMode : uint8_t
     CursorModeHidden = 1,
     CursorModeDisabled = 2
 };
-    
-}
+
+} // namespace Snowglobe::Core
