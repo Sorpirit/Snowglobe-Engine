@@ -32,26 +32,6 @@ public:
     TestComponent(int testData, float testData2, std::string testData3) : _testData(testData), _testData2(testData2), _testData3(std::move(
                                                                               testData3)) {}
 
-    void OnAttach() override
-    {
-        std::cout << "TestComponent attached" << '\n';
-    }
-
-    void OnActivate() override
-    {
-        std::cout << "TestComponent activated" << '\n';
-    }
-
-    void OnDeactivate() override
-    {
-        std::cout << "TestComponent deactivated" << '\n';
-    }
-
-    void OnDetach() override
-    {
-        std::cout << "TestComponent detached" << '\n';
-    }
-
     int GetTestData() const { return _testData; }
     float GetTestData2() const { return _testData2; }
     const std::string& GetTestData3() const { return _testData3; }
@@ -98,27 +78,6 @@ public:
 
     SpriteComponent() = default;
     SpriteComponent(ISpriteAllocator* allocator, std::string spriteName) : SpriteName(std::move(spriteName)), _allocator(allocator) {}
-
-    void OnAttach() override
-    {
-        Component::OnAttach();
-        
-        std::cout << "SpriteComponent attached" << '\n';
-        if (_allocator)
-        {
-            SpriteID = _allocator->AllocateSprite(SpriteName);
-            Size = _allocator->GetSpriteSize(SpriteID);
-        }
-    }
-
-    void OnDetach() override
-    {
-        Component::OnDetach();
-        
-        std::cout << "SpriteComponent detached" << '\n';
-        if (_allocator)
-            _allocator->DeallocateSprite(SpriteID);
-    }
 
 private:
     ISpriteAllocator* _allocator = nullptr;

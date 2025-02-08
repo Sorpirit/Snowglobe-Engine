@@ -20,16 +20,16 @@ class Component
     bool IsActive() const { return _isActive; }
 
     /// @brief Called when component is attached to an entity. Called from Entity::AddComponent.
-    virtual void OnAttach() { _attached = true; }
+    void OnAttach() { _attached = true; }
     /// @brief Called when component is detached from an entity. Called from Entity::RemoveComponent or when entity is
     /// destroyed.
-    virtual void OnDetach() { _attached = false; }
+    void OnDetach() { _attached = false; }
 
     /// @brief Called when component is activated. Called on attached after OnAttach if entity is Active. Every time
     /// entity is activated OnActivate will be called.
-    virtual void OnActivate() { _isActive = true; }
+    void OnActivate() { _isActive = true; }
     /// @brief Called when component is deactivated. Every time entity is deactivated OnDeactivate will be called.
-    virtual void OnDeactivate() { _isActive = false; }
+    void OnDeactivate() { _isActive = false; }
 
     /// @brief Activates delayed removal process. Component will be removed only on the next EntityManager Update.
     /// Should be called only from the Entity.
