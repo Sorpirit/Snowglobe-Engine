@@ -11,11 +11,8 @@ project(
 
 add_subdirectory(thirdparty)
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
-set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+#add_compile_options(-fsanitize=address)
+#add_link_options(-fsanitize=address)
 
 add_subdirectory(src)
 

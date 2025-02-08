@@ -24,8 +24,23 @@
 #include "TextureManager.hpp"
 #include "TransformComponent.hpp"
 
+#include "TemplateRenderPass.hpp"
+
 namespace Snowglobe::RenderOpenGL
 {
+    template <typename MaterialImpl, typename MaterialData>
+    void OpenGLRenderSystem::RegisterMaterialManager()
+    {
+        _materialManages.insert({typeid(MaterialData), Materials::TemplateMaterialManager<MaterialImpl, MaterialData>::GetInstance()});
+    }
+
+    template <typename MaterialImpl, typename InstanceVertexLayoutDescriptor>
+    void OpenGLRenderSystem::RegisterTemplateRenderPass(const Core::SnowFileHandle& vertexShader, const Core::SnowFileHandle& fragmentShader, bool useLighting)
+    {
+        auto pass = std::make_unique<TemplateRenderPass<MaterialImpl, InstanceVertexLayoutDescriptor>>(vertexShader, fragmentShader, useLighting);
+        _renderPasses.insert({pass->GetSignature(), std::move(pass)});
+    }
+
     OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
 
     OpenGLRenderSystem::OpenGLRenderSystem() : _shaderCompiler(std::make_unique<ShaderCompiler>())
