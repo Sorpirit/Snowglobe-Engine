@@ -27,6 +27,7 @@ namespace Snowglobe::Render
     class RenderSystem : public Core::ECS::ISystem
     {
     public:
+        RenderSystem() : ISystem(true) {}
         void Update() override = 0;
 
         virtual void InitializeWindow(const WindowParams& params) = 0;

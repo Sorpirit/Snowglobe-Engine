@@ -1,7 +1,7 @@
 file(GLOB SNOW_ENGINE_SOURCE *.cpp)
 file(GLOB SNOW_ENGINE_HEADER *.hpp)
 
-add_library(Engine ${SNOW_ENGINE_SOURCE} ${SNOW_ENGINE_HEADER})
+add_library(Engine ${SNOW_ENGINE_SOURCE} ${SNOW_ENGINE_HEADER} "ComponentEditorSystem.cpp")
 add_library(Snowglobe::Engine ALIAS Engine)
 
 target_include_directories(Engine

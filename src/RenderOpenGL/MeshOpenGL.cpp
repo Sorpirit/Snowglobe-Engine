@@ -13,7 +13,7 @@ MeshOpenGL::MeshOpenGL(
     : MeshProxy(id),
     _debugName(std::move(debugName)),
     _vertexBuffer(&vertexBuffer),
-    _vertexType(typeid(vertexBuffer)),
+    _vertexType(typeid(*vertexBuffer.GetLayoutDescriptor())),
     _indexBuffer(&indexBuffer),
     _material(nullptr), 
     _materialType(typeid(void))
@@ -22,7 +22,13 @@ MeshOpenGL::MeshOpenGL(
 }
 
 MeshOpenGL::MeshOpenGL(const Render::RenderID &id, const VertexBufferPtrOpenGL& vertexBuffer, std::string debugName) 
-    : MeshProxy(id), _debugName(std::move(debugName)), _vertexBuffer(&vertexBuffer), _vertexType(typeid(vertexBuffer)), _indexBuffer(nullptr), _material(nullptr), _materialType(typeid(void))
+    : MeshProxy(id),
+    _debugName(std::move(debugName)),
+    _vertexBuffer(&vertexBuffer),
+    _vertexType(typeid(*vertexBuffer.GetLayoutDescriptor())),
+    _indexBuffer(nullptr),
+    _material(nullptr),
+    _materialType(typeid(void))
 {
     Init();
 }

@@ -22,14 +22,19 @@ namespace Snowglobe::RenderOpenGL
         _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
         
         GenerateVertexBuffers();
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void Shape2DSystem::Update()
     {
         glUseProgram(_shaderProgram);
+
         _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
-        
-        for (auto& entity : _entityManager->GetAllEntities())
+
+        auto& entities = _entityManager->GetAllEntities();
+        for (auto& entity : entities)
         {
             Core::TransformComponent* transform = nullptr;
             Render::NEdgeShape2DComponent* shape2DComponent = nullptr;
@@ -39,11 +44,24 @@ namespace Snowglobe::RenderOpenGL
             }
             
             auto mesh = _mesh[shape2DComponent->EdgeCount - 3];
-            mesh->SetPosition(transform->Position);
-            mesh->SetRotation(transform->Rotation);
-            mesh->SetScale(transform->Scale);
+            mesh->SetPosition(transform->GetWorldPosition());
+            mesh->SetRotation(transform->GetWorldRotation());
+            mesh->SetScale(transform->GetWorldScale());
+
+            if (shape2DComponent->UseOutline)
+            {
+                mesh->SetPosition(transform->GetWorldPosition() - glm::vec3(0, 0, 0.1f));
+                mesh->Bind(_shaderProgram);
+                _material.GetMaterialData().color = glm::vec4(shape2DComponent->Outline, shape2DComponent->Alpha);
+                _material.Bind(_shaderProgram);
+                mesh->Draw();
+
+                mesh->SetPosition(transform->GetWorldPosition());
+                mesh->SetScale(transform->GetWorldScale() - glm::vec3(shape2DComponent->OutlineWidth));
+            }
+            
             mesh->Bind(_shaderProgram);
-            _material.GetMaterialData().color = shape2DComponent->Color;
+            _material.GetMaterialData().color = glm::vec4(shape2DComponent->Color, shape2DComponent->Alpha);
             _material.Bind(_shaderProgram);
             mesh->Draw();
         }

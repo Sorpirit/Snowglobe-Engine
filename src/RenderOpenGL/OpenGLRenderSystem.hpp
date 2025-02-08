@@ -32,7 +32,7 @@
 
 #include "FileSystem.hpp"
 #include "FileTexture.hpp"
-#include "LightParameters.hpp"
+#include "LightsManager.hpp"
 #include "Shape2DSystem.hpp"
 
 #include "Texture2DPtr.hpp"
@@ -66,7 +66,7 @@ namespace Snowglobe::RenderOpenGL
 
         Render::Texture2DPtr CreateTexture2D(const Core::FileTexture& texture, const Render::Texture2DDescriptor& desc, const std::string& debugName = "Texture2D") override;
 
-        LightParameters& GetLightParameters() { return _lightParameters; }
+        LightsManager& GetLightParameters() { return _lightParameters; }
     protected:
         Render::VertexBufferPtr* AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount, const void* bufferPtr, const std::string& debugName) override;
         Render::MaterialBase* CreateMaterialInstanceImpl(std::type_index materialType, const std::string& debugName) override;
@@ -85,7 +85,7 @@ namespace Snowglobe::RenderOpenGL
         Render::RenderID _nextMeshId = {1};
         std::list<MeshOpenGL> _meshes;
 
-        LightParameters _lightParameters;
+        LightsManager _lightParameters;
 
         Shape2DSystem _shape2DSystem;
         

@@ -17,6 +17,8 @@ class Entity
 public:
     Entity(EntityData* data, uint32_t id, Tag tag, std::string name) : _tag(tag), _id(id), _name(std::move(name)), _components(data) {}
 
+    uint32_t GetId() const { return _id; }
+    
     bool operator==(const Entity& other) const { return _id == other._id; }
     
     /// @brief Adds a component to the entity. Component mast inherit from Component, and must be defined in the EntityData template
@@ -169,6 +171,11 @@ public:
     /// @brief Gets entity's debug name
     const std::string& GetName() const { return _name; }
 
+    /// @brief Is used in systems with debug drawing(aka drawing entity name)
+    void SetDrawDebug(bool drawDebug) { _drawDebug = drawDebug; }
+    /// @brief Return whether to draw debug information for this entity
+    bool DrawDebug() const { return _drawDebug; }
+
 private:
     bool _isActive = true;
     bool _isDestroyed = false;
@@ -176,8 +183,14 @@ private:
     uint32_t _id = 0;
 
     std::string _name = "Entity";
+    bool _drawDebug = false; 
     
     EntityData* _components = nullptr;
 };
-    
 }
+
+template <>
+struct std::hash<Snowglobe::Core::ECS::Entity>
+{
+    std::size_t operator()(const Snowglobe::Core::ECS::Entity& entity) const noexcept { return std::hash<uint32_t>()(entity.GetId()); }
+};

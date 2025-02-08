@@ -20,6 +20,7 @@ public:
     float Drag = 0.0f;
     float AngularDrag = 0.0f;
     float GravityScale = 1.0f;
+    float Bouncines = 1.0f;
 };
 
 }

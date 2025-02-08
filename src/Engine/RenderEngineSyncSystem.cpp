@@ -19,9 +19,9 @@ void RenderEngineSyncSystem::UpdateLate()
         if (!entity->QueryComponents(transform, mesh))
             continue;
 
-        mesh->GetMeshProxy()->SetPosition(transform->Position);
-        mesh->GetMeshProxy()->SetRotation(transform->Rotation);
-        mesh->GetMeshProxy()->SetScale(transform->Scale);
+        mesh->GetMeshProxy()->SetPosition(transform->GetWorldPosition());
+        mesh->GetMeshProxy()->SetRotation(transform->GetWorldRotation());
+        mesh->GetMeshProxy()->SetScale(transform->GetWorldScale());
     }
 }
     

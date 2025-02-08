@@ -109,7 +109,7 @@ namespace Snowglobe::Render
             glm::vec3 screenPosition3D = glm::vec3(screenPosition, 0.0f);
 
             glm::vec3 worldPosition = glm::unProject(screenPosition3D, _viewMatrix, _projectionMatrix, viewport);
-
+            worldPosition.y *= -1; // invert y
             return worldPosition;
         }
 

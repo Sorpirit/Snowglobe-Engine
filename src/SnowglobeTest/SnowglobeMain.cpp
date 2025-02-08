@@ -18,20 +18,33 @@
 #include "TransformComponent.hpp"
 #include "Physics2DComponent.hpp"
 #include "Collider2DComponent.hpp"
-#include "ComponentEditor.hpp"
+#include "LifeLinkComponent.hpp"
+#include "LifetimeComponent.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
+#include "ShapesShooter2DTest.hpp"
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
 
 typedef Snowglobe::Core::ECS::MappedTupleEntityData
 <
 Snowglobe::Core::TransformComponent,
+Snowglobe::Core::LifeLinkComponent,
 Snowglobe::Engine::Physics2DComponent,
 Snowglobe::Engine::Collider2DComponent,
 Snowglobe::Engine::MeshComponent,
 Snowglobe::Engine::BaseComponentMaterial,
-Snowglobe::RenderOpenGL::LightComponent,
-Snowglobe::Render::NEdgeShape2DComponent
+Snowglobe::RenderOpenGL::DirectionalLightComponent,
+Snowglobe::RenderOpenGL::PointLightComponent,
+Snowglobe::RenderOpenGL::SpotLightComponent,
+Snowglobe::Render::NEdgeShape2DComponent,
+Snowglobe::Engine::LifetimeComponent,
+Snowglobe::PawnInputComponent,
+Snowglobe::FadeOutLifetime,
+Snowglobe::ExplodeOnDeath,
+Snowglobe::DestroyOnCollision,
+Snowglobe::MouseControllerComponent,
+Snowglobe::RotationAnimationComponent,
+Snowglobe::ScoreComponent
 > SampleMapEntityData;
 
 typedef Snowglobe::Core::ECS::EntityManager<SampleMapEntityData> SampleEntityManager;
@@ -91,10 +104,11 @@ int main()
     // BaseShapeFactoryTests test(engine, fileSystem);
     // UITest test(engine, fileSystem);
     // TextureTests test(engine, fileSystem);
-    Phyiscs2DTests test(engine, fileSystem);
+    // Phyiscs2DTests test(engine, fileSystem);
     // CameraTests test(engine, fileSystem);
     // Assigment1Tests test(engine, fileSystem, sceneConfig);
     // LightTests test(engine, fileSystem);
+    Snowglobe::ShapesShooter2DTest test(engine, fileSystem);
     
     test.Init();
     

@@ -58,6 +58,11 @@ namespace Snowglobe::RenderOpenGL
             glUniform1i(NextLocation(variable), value);
         }
 
+        void Set(const std::string& variable, uint32_t value)
+        {
+            glUniform1ui(NextLocation(variable), value);
+        }
+
         void Set(const std::string& variable, float value)
         {
             glUniform1f(NextLocation(variable), value);

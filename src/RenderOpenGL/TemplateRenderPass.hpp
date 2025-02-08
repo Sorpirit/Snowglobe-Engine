@@ -6,12 +6,14 @@
 #include "RenderPass.hpp"
 #include "FileSystem.hpp"
 
-#include "OpenGLRenderSystem.hpp"
+//#include "OpenGLRenderSystem.hpp"
 
 #include "glad/gl.h"
 
 namespace Snowglobe::RenderOpenGL
 {
+    class OpenGLRenderSystem;
+
 template <class MaterialType, class VertexType>
 class TemplateRenderPass : public RenderPass
 {
@@ -30,6 +32,7 @@ public:
 
     virtual void Execute(MeshOpenGL& mesh) override
     {
+        
         glUseProgram(_shaderProgram);
         _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
         if (_useLighting)

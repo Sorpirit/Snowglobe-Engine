@@ -130,7 +130,10 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     void ImguiSystem::Text(const char* fmt, ...)
     {
-        ImGui::TextUnformatted(fmt);
+        va_list args;
+        va_start(args, fmt);
+        ImGui::TextV(fmt, args);
+        va_end(args);
     }
 
     bool ImguiSystem::Checkbox(const std::string& label, bool* value)
@@ -236,6 +239,41 @@ namespace Snowglobe::RenderOpenGL::Imgui
             }
             ImGui::EndCombo();
         }
+    }
+
+    bool ImguiSystem::BeginTreeNode(const std::string& label, int flags)
+    {
+        return ImGui::TreeNode(label.c_str());
+    }
+
+    void ImguiSystem::EndTreeNode()
+    {
+        ImGui::TreePop();
+    }
+
+    bool ImguiSystem::BeginTabBar(const std::string& label, int flags)
+    {
+        return ImGui::BeginTabBar(label.c_str(), flags);
+    }
+
+    void ImguiSystem::EndTabBar()
+    {
+        ImGui::EndTabBar();
+    }
+
+    bool ImguiSystem::BeginTabBarItem(const std::string& label, int flags)
+    {
+        return ImGui::BeginTabItem(label.c_str(), 0, flags);
+    }
+
+    void ImguiSystem::EndTabBarItem()
+    {
+        ImGui::EndTabItem();
+    }
+
+    void ImguiSystem::Separator(int flags)
+    {
+        ImGui::Separator();
     }
 
     void ImguiSystem::SameLine()

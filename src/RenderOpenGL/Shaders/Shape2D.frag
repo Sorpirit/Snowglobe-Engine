@@ -1,6 +1,6 @@
 #version 330 core
 struct Material {  
-    vec3 color;
+    vec4 color;
 };
 
 out vec4 FragColor;
@@ -9,5 +9,5 @@ uniform Material material;
 
 void main()
 {
-    FragColor = vec4(material.color, 1.0f);
+    FragColor = material.color;
 }

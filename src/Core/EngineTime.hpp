@@ -31,6 +31,7 @@ public:
         _deltaEngineFrameTime = std::chrono::duration<double>(currentTime - _lastEngineFrameTime).count();
         _timeSinceStart = std::chrono::duration<double>(currentTime - _startTime).count();
         _lastEngineFrameTime = currentTime;
+        _frameN++;
     }
 
     /// @brief Updates render timer counter. Should be called only once pre frame
@@ -71,6 +72,11 @@ public:
         return GetInstance()->_deltaRenderFrameTime;
     }
 
+    static uint64_t GetFrameN()
+    {
+        return GetInstance()->_frameN;
+    }
+
 private:
     time_point _startTime;
     double _timeSinceStart = 0.0;
@@ -80,6 +86,8 @@ private:
 
     time_point _lastRenderFrameTime;
     double _deltaRenderFrameTime = 0.0;
+
+    uint64_t _frameN = 0;
 
 };
     

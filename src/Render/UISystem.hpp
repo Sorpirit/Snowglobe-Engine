@@ -61,6 +61,7 @@ namespace Snowglobe::Render
     class UISystem : public Core::ECS::ISystem
     {
     public:
+        UISystem() : ISystem(true) {}
         virtual UIPanel OpenUIPanel(const std::string& title) = 0;
         virtual void Close(UIPanel* panel) = 0;
 
@@ -103,6 +104,17 @@ namespace Snowglobe::Render
 
         virtual void Combo(const std::string& label, size_t* current, const std::string items[], size_t itemsCount, int flags = 0) = 0;
         virtual void Combo(const std::string& label, size_t* current, const std::vector<std::string>& items, int flags = 0) = 0;
+
+        virtual bool BeginTreeNode(const std::string& label, int flags = 0) = 0;
+        virtual void EndTreeNode() = 0;
+
+        virtual bool BeginTabBar(const std::string& label, int flags = 0) = 0;
+        virtual void EndTabBar() = 0;
+
+        virtual bool BeginTabBarItem(const std::string& label, int flags = 0) = 0;
+        virtual void EndTabBarItem() = 0;
+
+        virtual void Separator(int flags = 0) = 0;
 
         virtual void SameLine() = 0;
         virtual void ToolTip(const std::string& text) = 0;

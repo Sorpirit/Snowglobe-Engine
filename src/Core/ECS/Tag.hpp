@@ -47,6 +47,9 @@ public:
         assert(it != _tags.end() && "Tag does not exist");
         return it->second;
     }
+
+    std::unordered_map<uint32_t, std::string>& GetAllTags() { return _tags; }
+
 private:
     TagManager() = default;
     
@@ -67,15 +70,6 @@ struct std::hash<Snowglobe::Core::ECS::Tag>
     std::size_t operator()(const Snowglobe::Core::ECS::Tag& tag) const noexcept { return std::hash<uint32_t>()(tag.GetId()); }
 };
 
-namespace Snowglobe::Tags
-{
-    inline Core::ECS::Tag Default()
-    {
-        static Core::ECS::Tag Default = Core::ECS::TagManager::GetInstance().CreateTag("Default");
-        return Default;
-    } 
-}
-
-//#define REGISTER_TAG(name) namespace Snowglobe::Tags { static const Snowglobe::Core::ECS::Tag name = Snowglobe::Core::ECS::TagManager::GetInstance().CreateTag(#name); }
-//REGISTER_TAG(Default)
+#define REGISTER_TAG(name) namespace Snowglobe::Tags { inline Core::ECS::Tag name() { static Core::ECS::Tag name = Core::ECS::TagManager::GetInstance().CreateTag(#name); return name; }}
+REGISTER_TAG(Default)
 

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <memory>
+#include <variant>
 #include <vector>
 
 #include "EngineTime.hpp"
@@ -51,20 +52,39 @@ namespace Snowglobe::RenderOpenGL
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         _camera.Update();
+        _lightParameters.Reset();
+        for (auto lightEntity : _entityManager->GetEntitiesByTag(Tags::Lights()))
+        {
+            Core::TransformComponent* transform = nullptr;
+            if (!lightEntity->QueryComponent(transform))
+                continue;
 
-        // auto lights = _entityManager->GetEntitiesByTag(LIGHT_TAG);
-        // Core::TransformComponent* transform = nullptr;
-        // LightComponent* light = nullptr;
-        // if (!lights.empty() && lights[0]->QueryComponent(transform) && lights[0]->QueryComponent(light))
-        // {
-        //     auto lightParameters = light->GetLightParameters();
-        //     _lightParameters.LightPosition = transform->Position;
-        //     _lightParameters.LightColor = lightParameters.LightColor;
-        //     _lightParameters.AmbientIntensity = lightParameters.AmbientIntensity;
-        // }
+            DirectionalLightComponent* directional;
+            if (lightEntity->QueryComponent(directional))
+            {
+                auto& directionalRef = _lightParameters.GetDirectionalLight();
+                directionalRef = directional->Light;
+                directionalRef.LightDirection = -transform->GetUp();
+            }
 
-        _shape2DSystem.Update();
-        
+            PointLightComponent* pointLight;
+            if (lightEntity->QueryComponent(pointLight))
+            {
+                auto& pointLightRef = _lightParameters.NextPointLight();
+                pointLightRef = pointLight->Light;
+                pointLightRef.LightPosition = transform->Position;
+            }
+
+            SpotLightComponent* spotLight;
+            if (lightEntity->QueryComponent(spotLight))
+            {
+                auto& spotLightRef = _lightParameters.NextSpotLight();
+                spotLightRef = spotLight->Light;
+                spotLightRef.LightPosition = transform->Position;
+                spotLightRef.LightDirection = -transform->GetUp();
+            }
+        }
+
         for(auto& mesh : _meshes)
         {
             if (mesh.GetMaterial() == nullptr || mesh.GetVertexBuffer() == nullptr || !mesh.IsVisible())
@@ -80,6 +100,8 @@ namespace Snowglobe::RenderOpenGL
 
             renderPass->second->Execute(mesh);
         }
+
+        _shape2DSystem.Update();
     }
 
     void OpenGLRenderSystem::InitializeWindow(const Render::WindowParams& params)

@@ -11,7 +11,7 @@
 #include "ComponentEditor.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
-#include "../RenderOpenGL/LightParameters.hpp"
+#include "../RenderOpenGL/LightsManager.hpp"
 #include "../RenderOpenGL/MeshOpenGL.hpp"
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
 #include "MaterialsData/TextureColorMaterialData.hpp"
@@ -24,7 +24,7 @@ void BaseShapeFactoryTests::Init()
     _diskMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(1.0f));
 
     auto yellowMaterial = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-    yellowMaterial.Properties()->color = glm::vec3(1.0f, 1.0f, 0.0f);
+    yellowMaterial.Properties()->color = glm::vec4(1.0f, 1.0f, 0.0f, 1.0f);
 
     _triangleMesh->SetMaterial(yellowMaterial.GetMaterialBase());
     _planeMesh->SetMaterial(yellowMaterial.GetMaterialBase());
@@ -52,10 +52,11 @@ void BaseShapeFactoryTests::Run()
     _planeMesh->SetPosition(glm::vec3(cos(x * 2.0f * 3.14159f), sin(x * 2.0f * 3.14159f), 0.0f));
     _planeMesh->SetRotation(glm::vec3(0.0f, 0.0f, x * 360));
 
-    _gradientMaterial.Properties()->color = glm::vec3(
+    _gradientMaterial.Properties()->color = glm::vec4(
         std::lerp(_gradient1.x, _gradient2.x, x),
         std::lerp(_gradient1.y, _gradient2.y, x),
-        std::lerp(_gradient1.z, _gradient2.z, x));
+        std::lerp(_gradient1.z, _gradient2.z, x),
+        1.0f);
 
     _diskMesh->SetScale(glm::vec3(
         std::lerp(_scale1.x, _scale2.x, x),
@@ -151,11 +152,11 @@ void TextureTests::Run()
 void Phyiscs2DTests::Init()
 {
     auto materialL = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-    materialL.Properties()->color = glm::vec3(1.0f, 0.0f, 0.0f);
+    materialL.Properties()->color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     auto materialR = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-    materialR.Properties()->color = glm::vec3(0.0f, 0.0f, 1.0f);
+    materialR.Properties()->color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-    materialG.Properties()->color = glm::vec3(0.1f, 1.0f, 0.1f);
+    materialG.Properties()->color = glm::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 
     auto manager = _engine.GetEntityManager();
 
@@ -354,7 +355,7 @@ void Assigment1Tests::Init()
     _uiSystem->SetDefaultFont(Snowglobe::Core::SnowFileHandle(_descriptor.Font));
     
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-    materialG.Properties()->color = glm::vec3(0.4f, 0.7f, 0.4f);
+    materialG.Properties()->color = glm::vec4(0.4f, 0.7f, 0.4f, 1.0f);
 
     auto manager = _engine.GetEntityManager();
 
@@ -365,7 +366,7 @@ void Assigment1Tests::Init()
         auto collisionShape = desc.Shape == "Circle" ? Snowglobe::Engine::CollisionShapeType::Circle : Snowglobe::Engine::CollisionShapeType::AABB;
         auto ballLMesh = _shapeFactory.CreateShape(shape, glm::vec3(0.0f), glm::vec3(1.0f));
         auto materialL = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
-        materialL.Properties()->color = desc.Color;
+        materialL.Properties()->color = glm::vec4(desc.Color, 1.0f);
 
         entity->SetName(desc.Name);
         entity->AddComponent<Snowglobe::Core::TransformComponent>(desc.Position, glm::vec3(0), glm::vec3(desc.Scale));
@@ -468,6 +469,7 @@ void LightTests::Init()
     auto containerFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container.jpg"));
     auto diffuseFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container2.png"));
     auto specularFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container2_specular.png"));
+    auto emissiveFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container2_emissive.png"));
 
     auto textureDesc = Snowglobe::Render::Texture2DDescriptor{
         Snowglobe::Render::TextureWrap::Repeat,
@@ -478,6 +480,7 @@ void LightTests::Init()
     // auto containerTexture2D = _renderSystem->CreateTexture2D(*containerFileTexture, textureDesc, "Container");
     auto diffuseTexture2D = _renderSystem->CreateTexture2D(*diffuseFileTexture, textureDesc, "Diffuse");
     auto specularTexture2D = _renderSystem->CreateTexture2D(*specularFileTexture, textureDesc, "Specular");
+    auto emissivityTexture2D = _renderSystem->CreateTexture2D(*emissiveFileTexture, textureDesc, "Emissive");
     
     std::vector<Snowglobe::Render::PositionUVVertex> cubeVertices;
     AddQuad(cubeVertices, glm::mat4x4(1.0f));
@@ -505,6 +508,7 @@ void LightTests::Init()
     // containerMaterial.Properties()->texture = diffuseTexture2D;
     containerMaterial.Properties()->diffuseTexture = diffuseTexture2D;
     containerMaterial.Properties()->specularTexture = specularTexture2D;
+    containerMaterial.Properties()->emissiveTexture = emissivityTexture2D;
     containerMaterial.Properties()->specularPower = 32;
 
     auto lightMaterial = _renderSystem->CreateMaterialInstance<Snowglobe::Render::MaterialsData::TextureColorMaterialData>();
@@ -512,13 +516,36 @@ void LightTests::Init()
     lightMaterial.Properties()->color = glm::vec4(1.0f);
 
     auto manager = _engine.GetEntityManager();
-    auto light = manager->CreateEntity();
-    light->SetName("Light" );
-    auto mesh = _renderSystem->CreateMeshProxy(*cubeVB, "LighMesh");
-    mesh->SetMaterial(lightMaterial.GetMaterialBase());
-    light->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(0, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.3f));
-    light->AddComponent<Snowglobe::Engine::MeshComponent>(mesh);
-    light->AddComponent<Snowglobe::RenderOpenGL::LightComponent>();
+    auto pointLight = manager->CreateEntity(Snowglobe::Tags::Lights());
+    pointLight->SetName("PointLight" );
+    auto pointLightMesh = _renderSystem->CreateMeshProxy(*cubeVB, "PointLightMesh");
+    pointLightMesh->SetMaterial(lightMaterial.GetMaterialBase());
+    pointLight->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(0, 1.0f, 0.0f), glm::vec3(0.0f), glm::vec3(0.3f));
+    pointLight->AddComponent<Snowglobe::Engine::MeshComponent>(pointLightMesh);
+    pointLight->AddComponent<Snowglobe::RenderOpenGL::PointLightComponent>();
+
+    auto pointLight2 = manager->CreateEntity(Snowglobe::Tags::Lights());
+    pointLight2->SetName("PointLight2" );
+    auto pointLight2Mesh = _renderSystem->CreateMeshProxy(*cubeVB, "PointLight2Mesh");
+    pointLight2Mesh->SetMaterial(lightMaterial.GetMaterialBase());
+    pointLight2->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(-1, -3.0f, -1.0f), glm::vec3(0.0f), glm::vec3(0.3f));
+    pointLight2->AddComponent<Snowglobe::Engine::MeshComponent>(pointLight2Mesh);
+    Snowglobe::RenderOpenGL::PointLight p;
+    p.LightColor = glm::vec3(1, .0f, .0f);
+    pointLight2->AddComponent<Snowglobe::RenderOpenGL::PointLightComponent>(p);
+    
+    auto spotLight = manager->CreateEntity(Snowglobe::Tags::Lights());
+    spotLight->SetName("SpotLight" );
+    auto spotLightMesh = _renderSystem->CreateMeshProxy(*cubeVB, "SpotLightMesh");
+    spotLightMesh->SetMaterial(lightMaterial.GetMaterialBase());
+    spotLight->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(2, 2.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.3f));
+    spotLight->AddComponent<Snowglobe::Engine::MeshComponent>(spotLightMesh);
+    spotLight->AddComponent<Snowglobe::RenderOpenGL::SpotLightComponent>();
+
+    auto directionalLight = manager->CreateEntity(Snowglobe::Tags::Lights());
+    directionalLight->SetName("DirectionalLight" );
+    directionalLight->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(2, 2.0f, 1.0f), glm::vec3(0.0f), glm::vec3(0.3f));
+    directionalLight->AddComponent<Snowglobe::RenderOpenGL::DirectionalLightComponent>();
     
     std::vector<SceneCube> cubes = {
         {glm::vec3(3, 1, -1), glm::vec3(14, 0, 25), glm::vec3(1.0f), glm::vec4(1.0f)},
@@ -526,6 +553,7 @@ void LightTests::Init()
         {glm::vec3(0, -1, -4), glm::vec3(25, 0, 52), glm::vec3(0.5f), glm::vec4(1.0f)},
         {glm::vec3(-2, -2, -2), glm::vec3(50, 0, 39), glm::vec3(1.0f), glm::vec4(1.0f)},
         {glm::vec3(3, -3, -5), glm::vec3(87, 0, 23), glm::vec3(1.0f), glm::vec4(1.0f)},
+        {glm::vec3(0, -5, 0), glm::vec3(0), glm::vec3(10.0f, 0.5f, 10.0f ), glm::vec4(1.0f)},
     };
     
     for (int i = 0; i < cubes.size(); ++i)

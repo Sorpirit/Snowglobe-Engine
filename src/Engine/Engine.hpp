@@ -15,7 +15,23 @@
 
 namespace Snowglobe::Engine
 {
-    
+
+class DefaultUpdate : public Core::ECS::ISystem
+{
+public:
+    void Update() override 
+    {
+        for (auto& updateFunction : _updateCallbacks)
+        {
+            updateFunction();
+        }
+    }
+
+    void RegisterUpdateCallback(const std::function<void()>& callback) { _updateCallbacks.push_back(callback); }
+private:
+    std::vector<std::function<void()>> _updateCallbacks;
+};
+
 class Engine
 {
 public:
@@ -43,8 +59,8 @@ public:
             return false;
         }
 
-        _systems[typeid(T)] = std::make_shared<T>(_entityManager, std::forward<TArgs>(args)...);
-        
+        _systems[typeid(T)] = std::make_shared<T>(std::forward<TArgs>(args)...);
+        _systems[typeid(T)]->Init(_entityManager);
         return true;
     }
     
@@ -64,9 +80,11 @@ public:
         return false;
     }
 
-    void RegisterUpdateCallback(const std::function<void()>& callback) { _updateCallbacks.push_back(callback); }
+    void RegisterUpdateCallback(const std::function<void()>& callback) { _defaultUpdater->RegisterUpdateCallback(callback); }
 
     std::shared_ptr<Core::ECS::EntityManagerBase> GetEntityManager() const { return _entityManager; }
+
+    std::unordered_map<std::type_index, std::shared_ptr<Core::ECS::ISystem>>& GetAllSystems() { return _systems; }
 
 private:
     Engine() = default;
@@ -74,7 +92,7 @@ private:
     std::shared_ptr<Core::ECS::EntityManagerBase> _entityManager = nullptr;
     std::unordered_map<std::type_index, std::shared_ptr<Core::ECS::ISystem>> _systems;
     
-    std::vector<std::function<void()>> _updateCallbacks;
+    std::shared_ptr<DefaultUpdate> _defaultUpdater;
 
     std::string _applicationName;
 };

@@ -10,7 +10,6 @@
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
 
-
 namespace Snowglobe::Engine
 {
     
@@ -70,6 +69,8 @@ public:
         _uiSystem->Drag("Velocity", &component->Velocity, 0.1f);
         _uiSystem->Drag("AngularVelocity", &component->AngularVelocity, 0.1f);
         _uiSystem->Drag("Mass", &component->Mass, 0.1f, 0.001f, 100.0f);
+        _uiSystem->Drag("Drag", &component->Drag, 0.01f, 0.0f, 1.0f);
+        _uiSystem->Slider("Bouncines", &component->Bouncines, 0.01f, 1.0f);
     }
 };
 
@@ -115,5 +116,5 @@ public:
         _uiSystem->Color("Color", &component->Color);
     }
 };
-
+    
 }

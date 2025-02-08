@@ -8,6 +8,7 @@ namespace Snowglobe::Engine
     void PhysicsEngine2DSystem::Update()
     {
         float physicsDeltaTime = Core::EngineTime::GetDeltaEngineFrameTime();
+        uint64_t frameN = Core::EngineTime::GetFrameN();
         
         auto& entities = _entityManager->GetAllEntities();
         if (entities.size() <= 1)
@@ -24,6 +25,12 @@ namespace Snowglobe::Engine
             if(!entity1->QueryComponents(transform1, collider1))
                 continue;
 
+            if (collider1->CollisionData.LastFrameN != frameN)
+            {
+                collider1->CollisionData.LastFrameN = frameN;
+                collider1->CollisionData.IsColliding = false;
+            }
+
             for (size_t j = i + 1; j < entities.size(); j++)
             {
                 auto& entity2 = entities[j];
@@ -35,26 +42,49 @@ namespace Snowglobe::Engine
                 if(!entity2->QueryComponents(transform2, collider2))
                     continue;
 
+                if (collider2->CollisionData.LastFrameN != frameN)
+                {
+                    collider2->CollisionData.LastFrameN = frameN;
+                    collider2->CollisionData.IsColliding = false;
+                }
+                
                 auto collisionData = Overlap(*transform1, *collider1, *transform2, *collider2);
 
                 if (!collisionData.IsColliding)
                     continue;
 
+                collider1->CollisionData.IsColliding = true;
+                collider1->CollisionData.Other = entity2;
+                collider1->CollisionData.OtherTag = entity2->GetTag();
+                collider1->CollisionData.Data = collisionData;
+                
+                collider2->CollisionData.IsColliding = true;
+                collider2->CollisionData.Other = entity1;
+                collider2->CollisionData.OtherTag = entity1->GetTag();
+                collider2->CollisionData.Data = collisionData;
+                collider2->CollisionData.Data.Normal *= -1;
+
+                if (collider1->IsTrigger || collider2->IsTrigger)
+                    continue;
+                
                 Physics2DComponent* physics1 = nullptr;
                 glm::vec2 physic1Velocity = glm::vec2(0.0f);
                 float physic1Mass = 0.0f;
                 float physic1MassInv = 0.0f;
+                float physic1Bounciness = 0.0f;
                 
                 Physics2DComponent* physics2 = nullptr;
                 glm::vec2 physic2Velocity = glm::vec2(0.0f);
                 float physic2Mass = 0.0f;
                 float physic2MassInv = 0.0f;
+                float physic2Bounciness= 0.0f;
 
                 if (entity1->QueryComponent(physics1))
                 {
                     physic1Velocity = physics1->Velocity;
                     physic1Mass = physics1->Mass;
                     physic1MassInv = physic1Mass > 0.0f ? 1.0f / physic1Mass : 0.0f;
+                    physic1Bounciness = physics1->Bouncines;
                 }
 
                 if (entity2->QueryComponent(physics2))
@@ -62,6 +92,7 @@ namespace Snowglobe::Engine
                     physic2Velocity = physics2->Velocity;
                     physic2Mass = physics2->Mass;
                     physic2MassInv = physic2Mass > 0.0f ? 1.0f / physic2Mass : 0.0f;
+                    physic2Bounciness = physics2->Bouncines;
                 }
                 
                 glm::vec2 relativeVelocity = physic2Velocity - physic1Velocity;
@@ -69,7 +100,7 @@ namespace Snowglobe::Engine
                 if (velocityAlongNormal > 0)
                     continue;
                 
-                float e = 1;
+                float e = std::max(physic1Bounciness, physic2Bounciness);
                 float energy = -(1 + e) * velocityAlongNormal;
                 energy /= physic1MassInv + physic2MassInv;
                 
@@ -95,7 +126,7 @@ namespace Snowglobe::Engine
             transform->Position += glm::vec3(physics->Velocity * physicsDeltaTime, 0.0f);
             transform->Rotation.z += physics->AngularVelocity * physicsDeltaTime;
             
-            physics->Velocity = physics->Velocity * (1 - physics->Drag);
+            physics->Velocity -= physics->Velocity * physics->Drag * physicsDeltaTime;
             physics->AngularVelocity = physics->AngularVelocity * (1 - physics->AngularDrag);
         }
     }

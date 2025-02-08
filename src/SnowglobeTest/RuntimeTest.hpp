@@ -12,8 +12,10 @@
 
 class RuntimeTest
 {
-    public:
-        RuntimeTest(
+public:
+    virtual ~RuntimeTest() = default;
+
+    RuntimeTest(
             Snowglobe::Engine::Engine& engine, 
             Snowglobe::Core::FileSystem& fileSystem,
             const std::string& testName) : _testName(testName), _engine(engine), _fileSystem(fileSystem) 
@@ -25,6 +27,7 @@ class RuntimeTest
 
             _window = _renderSystem->GetMainWindow();
             _uiSystem = _renderSystem->GetUISystem();
+            _input = &_window->GetInput();
         }
 
         virtual void Init() = 0;
@@ -32,13 +35,14 @@ class RuntimeTest
 
         const std::string& GetTestName() const { return _testName; }
     
-    protected:
+protected:
         std::string _testName;
 
         Snowglobe::Engine::Engine& _engine;
         Snowglobe::Core::FileSystem& _fileSystem;
         Snowglobe::Render::RenderSystem* _renderSystem;
         Snowglobe::Render::Window* _window;
+        Snowglobe::Core::InputReader* _input;
         Snowglobe::Render::UISystem* _uiSystem;
 };
 

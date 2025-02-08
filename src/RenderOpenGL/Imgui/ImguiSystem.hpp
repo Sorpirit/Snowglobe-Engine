@@ -34,7 +34,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         {
             if (!_drawWorldText)
                 return;
-            _worldTexts.emplace_back(text, position, color, alignment);
+            _worldTexts.push_back({text, position, color, alignment});
         }
         
         void SetDefaultFont(Core::SnowFileHandle fontFileHandle) override;
@@ -78,6 +78,18 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
         void Combo(const std::string& label, size_t* current, const std::string items[], size_t itemsCount, int flags = 0) override;
         void Combo(const std::string& label, size_t* current, const std::vector<std::string>& items, int flags = 0) override;
+
+        
+        bool BeginTreeNode(const std::string& label, int flags = 0) override;
+        void EndTreeNode() override;
+
+        bool BeginTabBar(const std::string& label, int flags = 0) override;
+        void EndTabBar() override;
+
+        bool BeginTabBarItem(const std::string& label, int flags = 0) override;
+        void EndTabBarItem() override;
+
+        void Separator(int flags = 0) override;
 
         void SameLine() override;
         void ToolTip(const std::string& text) override;

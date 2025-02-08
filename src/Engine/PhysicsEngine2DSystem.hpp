@@ -11,13 +11,6 @@
 
 namespace Snowglobe::Engine
 {
-    struct CollisionData
-    {
-        bool IsColliding;
-        glm::vec2 Normal;
-        float Penetration;
-    };
-
     class PhysicsEngine2DSystem : public Core::ECS::ISystem
     {
     public:

@@ -10,23 +10,55 @@
 #include "ComponentEditorSystem.hpp"
 #include "ComponentEditor.hpp"
 #include "EngineTime.hpp"
+#include "LifeLinkSystem.hpp"
+#include "LifetimeSystem.hpp"
+#include "TweenerSystem.hpp"
 
 namespace Snowglobe::Engine
 {
-    class LightComponentEditor : public TemplateComponentEditor<RenderOpenGL::LightComponent>
+    class DirectionalLightComponentEditor : public TemplateComponentEditor<RenderOpenGL::DirectionalLightComponent>
     {
-
     public:
-        LightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
+        DirectionalLightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
 
-        void DrawUITemplate(RenderOpenGL::LightComponent* component) override
+        void DrawUITemplate(RenderOpenGL::DirectionalLightComponent* component) override
         {
-            _uiSystem->Text("LightComponent");
-            _uiSystem->Color("LightColor", &component->GetLightParameters().LightColor);
-            _uiSystem->Slider("AmbientIntensity", &component->GetLightParameters().AmbientIntensity, 0.0f, 1.0f);
+            _uiSystem->Text("DirectionalLightComponent");
+            _uiSystem->Color("Color", &component->Light.LightColor);
+            _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
         }
     };
 
+    class PointLightComponentComponentEditor : public TemplateComponentEditor<RenderOpenGL::PointLightComponent>
+    {
+    public:
+        PointLightComponentComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
+
+        void DrawUITemplate(RenderOpenGL::PointLightComponent* component) override
+        {
+            _uiSystem->Text("DirectionalLightComponent");
+            _uiSystem->Color("Color", &component->Light.LightColor);
+            _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
+            _uiSystem->Slider("AttenuationCoefficients", &component->Light.AttenuationCoefficients, 0.0f, 1.0f);
+            _uiSystem->Slider("MaxDistance", &component->Light.MaxDistance, 0.05f, 100.0f);
+        }
+    };
+
+    class SpotLightComponentEditor : public TemplateComponentEditor<RenderOpenGL::SpotLightComponent>
+    {
+    public:
+        SpotLightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
+
+        void DrawUITemplate(RenderOpenGL::SpotLightComponent* component) override
+        {
+            _uiSystem->Text("DirectionalLightComponent");
+            _uiSystem->Color("Color", &component->Light.LightColor);
+            _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
+            _uiSystem->SliderAngle("InnerCutoffAngle", &component->Light.InnerCutoffAngle, 0.0f, 360.0f);
+            _uiSystem->SliderAngle("OuterCutoffAngle", &component->Light.OuterCutoffAngle, 0.0f, 360.0f);
+        }
+    };
+    
     Engine::~Engine()
     {
         _systems.clear();
@@ -79,10 +111,16 @@ namespace Snowglobe::Engine
         }
         renderSystem->SetUISystem(uiSystem);
 
+        _systems[typeid(LifeLinkSystem)] = std::make_shared<LifeLinkSystem>();
         _systems[typeid(PhysicsEngine2DSystem)] = std::make_shared<PhysicsEngine2DSystem>();
         _systems[typeid(RenderEngineSyncSystem)] = std::make_shared<RenderEngineSyncSystem>();
+        _systems[typeid(TweenerSystem)] = std::make_shared<TweenerSystem>();
+        _systems[typeid(LifetimeSystem)] = std::make_shared<LifetimeSystem>();
+        
+        _defaultUpdater = std::make_shared<DefaultUpdate>();
+        _systems[typeid(DefaultUpdate)] = _defaultUpdater;
 
-        auto componentEditorSystem = std::make_shared<ComponentEditorSystem>(uiSystem);
+        auto componentEditorSystem = std::make_shared<ComponentEditorSystem>(uiSystem, &renderSystem->GetMainWindow()->GetInput(), this);
         _systems[typeid(ComponentEditorSystem)] = componentEditorSystem;
 
         componentEditorSystem->RegisterVisualiser<TransformComponentEditor>();
@@ -92,11 +130,13 @@ namespace Snowglobe::Engine
         componentEditorSystem->RegisterVisualiser<NEdgeShape2DComponentEditor>();
         
         //OpenGL Only
-        componentEditorSystem->RegisterVisualiser<LightComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<DirectionalLightComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<PointLightComponentComponentEditor>();
+        componentEditorSystem->RegisterVisualiser<SpotLightComponentEditor>();
 
         for(const auto& system : _systems | std::views::values)
         {
-            system->Init(entityManager);
+            system->Init(_entityManager);
         }
         
         renderSystem->InitializeRenderScene();
@@ -111,11 +151,6 @@ namespace Snowglobe::Engine
                 system->UpdateEarly();
         }
 
-        for (auto& updateFunction : _updateCallbacks)
-        {
-            updateFunction();
-        }
-        
         for(const auto& system : _systems | std::views::values)
         {
             if(system->IsActive())
