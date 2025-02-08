@@ -19,7 +19,7 @@ namespace Snowglobe
 {
     void PlayerInputMovementSystem::UpdateEarly()
     {
-        for (auto& entity : _entityManager->GetEntitiesByTag(Tags::Player()))
+        for (auto& entity : _entityManager->GetEntitiesWithTag(Tags::Player()))
         {
             PawnInputComponent* input;
             if (entity->QueryComponent(input))
@@ -45,7 +45,7 @@ namespace Snowglobe
     }
     void PawnMovementSystem::UpdateEarly()
     {
-        for (auto& entity : _entityManager->GetEntitiesByTag(Tags::Player()))
+        for (auto& entity : _entityManager->GetEntitiesWithTag(Tags::Player()))
         {
             PawnInputComponent* input;
             Engine::Physics2DComponent* physics2d;
@@ -245,7 +245,6 @@ namespace Snowglobe
         Engine::Engine::GetInstance().QuerySystem(tweener);
         
         auto nshape = manager->CreateEntity(tag);
-        nshape->SetDrawDebug(true);
         nshape->AddComponent<Core::TransformComponent>(description.Position, glm::vec3(0.0f), description.Scale);
         nshape->AddComponent<Render::NEdgeShape2DComponent>(description.SideCount, description.Color, description.OutlineColor);
         nshape->AddComponent<Engine::Physics2DComponent>(description.Velocity);
@@ -265,7 +264,6 @@ namespace Snowglobe
         auto manager = _engine.GetEntityManager();
         
         auto bullet = manager->CreateEntity(Tags::Bullets());
-        bullet->SetDrawDebug(true);
         bullet->AddComponent<Core::TransformComponent>(glm::vec3(position + direction * 0.35f, 0), glm::vec3(0.0f), glm::vec3(0.1f));
         bullet->AddComponent<Render::NEdgeShape2DComponent>(sides, color);
         bullet->AddComponent<Engine::Physics2DComponent>(direction * speed);

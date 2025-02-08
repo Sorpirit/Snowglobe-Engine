@@ -86,9 +86,6 @@ private:
         {
             componentNames.push_back(entity->GetName());
 
-            if (!entity->DrawDebug())
-                continue;
-
             Core::TransformComponent* transform = nullptr;
             if (entity->QueryComponents(transform))
             {

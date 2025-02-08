@@ -170,7 +170,7 @@ public:
             }
         }
 
-        auto specialEntities = _entityManager->GetEntitiesByTag(1);
+        auto specialEntities = _entityManager->GetEntitiesWithTag(1);
         for (auto& entity : specialEntities)
         {
             if (entity->IsActive() == false)

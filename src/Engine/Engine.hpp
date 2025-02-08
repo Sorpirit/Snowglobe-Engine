@@ -8,10 +8,12 @@
 #include <typeinfo>
 #include <functional>
 
-#include "EngineProfile.hpp"
-#include "Window.hpp"
 #include "ECS/EntityManager.hpp"
 #include "ECS/ISystem.hpp"
+#include "ECS/LifetimeSystem.hpp"
+#include "EngineProfile.hpp"
+#include "LifetimeSystem.hpp"
+#include "Window.hpp"
 
 namespace Snowglobe::Engine
 {
@@ -91,7 +93,8 @@ private:
 
     std::shared_ptr<Core::ECS::EntityManagerBase> _entityManager = nullptr;
     std::unordered_map<std::type_index, std::shared_ptr<Core::ECS::ISystem>> _systems;
-    
+    Core::ECS::LifetimeSystem _lifetimeSystem;
+
     std::shared_ptr<DefaultUpdate> _defaultUpdater;
 
     std::string _applicationName;

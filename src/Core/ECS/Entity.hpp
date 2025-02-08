@@ -6,6 +6,7 @@
 
 #include "Component.hpp"
 #include "EntityData.hpp"
+#include "Lifetime.hpp"
 #include "Tag.hpp"
 
 namespace Snowglobe::Core::ECS
@@ -15,8 +16,8 @@ namespace Snowglobe::Core::ECS
 class Entity
 {
   public:
-    Entity(EntityData* data, uint32_t id, Tag tag, std::string name)
-        : _tag(tag), _id(id), _name(std::move(name)), _components(data)
+    Entity(std::unique_ptr<EntityData> data, const uint32_t id, const Tag tag, const Lifetime lifetime, std::string name)
+        : _id(id), _tag(tag), _lifetime(lifetime), _name(std::move(name)), _components(std::move(data))
     {
     }
 
@@ -149,6 +150,9 @@ class Entity
     /// @return The entity's tag
     Tag GetTag() const { return _tag; }
 
+    /// @brief Returns lifetime attached to the entity
+    Lifetime GetLifetime() const { return _lifetime; }
+
     /// @brief Updates attached components. If a component is marked for detachment, the component is detached
     void Update() const
     {
@@ -169,21 +173,16 @@ class Entity
     /// @brief Gets entity's debug name
     const std::string& GetName() const { return _name; }
 
-    /// @brief Is used in systems with debug drawing(aka drawing entity name)
-    void SetDrawDebug(bool drawDebug) { _drawDebug = drawDebug; }
-    /// @brief Return whether to draw debug information for this entity
-    bool DrawDebug() const { return _drawDebug; }
-
   private:
     bool _isActive = true;
     bool _isDestroyed = false;
-    Tag _tag = Tags::Default();
     uint32_t _id = 0;
+    Tag _tag = Tags::Default();
+    Lifetime _lifetime = {0};
 
     std::string _name = "Entity";
-    bool _drawDebug = false;
 
-    EntityData* _components = nullptr;
+    std::unique_ptr<EntityData> _components;
 };
 } // namespace Snowglobe::Core::ECS
 

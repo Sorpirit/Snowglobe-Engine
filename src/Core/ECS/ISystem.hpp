@@ -38,6 +38,8 @@ class ISystem
   private:
     bool _isPermanent = false;
     bool _isActive = true;
+
+    Lifetime _lifetime = DefaultLifetime;
 };
 
 } // namespace Snowglobe::Core::ECS

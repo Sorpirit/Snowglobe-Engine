@@ -63,7 +63,7 @@ namespace Snowglobe::Engine
 				if (!_uiSystem->BeginTreeNode(tagPair.second))
 					continue;
 
-				for (auto entity : _entityManager->GetEntitiesByTag(Core::ECS::Tag(tagPair.first)))
+				for (auto entity : _entityManager->GetEntitiesWithTag(Core::ECS::Tag(tagPair.first)))
 				{
 					std::string delLable = "Del##" + entity->GetId();
 					if (_uiSystem->Button(delLable))

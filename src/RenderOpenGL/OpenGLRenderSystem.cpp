@@ -68,7 +68,7 @@ namespace Snowglobe::RenderOpenGL
 
         _camera.Update();
         _lightParameters.Reset();
-        for (auto lightEntity : _entityManager->GetEntitiesByTag(Tags::Lights()))
+        for (auto lightEntity : _entityManager->GetEntitiesWithTag(Tags::Lights()))
         {
             Core::TransformComponent* transform = nullptr;
             if (!lightEntity->QueryComponent(transform))
