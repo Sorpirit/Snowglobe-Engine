@@ -136,7 +136,7 @@ namespace Snowglobe
 
             auto screenPos = _input->GetCursorScreenPosition();
             auto worldPos = _camera->ScreenToWorld(screenPos);
-            glm::vec2 cursorDirection = worldPos - transform->GetWorldPosition();
+            glm::vec2 cursorDirection = worldPos - transform->Position;
             cursorDirection = normalize(cursorDirection);
 
             float dotProd = glm::dot(physicsBody->Velocity, cursorDirection);
@@ -309,7 +309,7 @@ namespace Snowglobe
 
         auto screenPos = _input->GetCursorScreenPosition();
         auto worldPos = _renderSystem->GetCamera().ScreenToWorld(screenPos);
-        glm::vec2 cursorDirection = worldPos - transform->GetWorldPosition();
+        glm::vec2 cursorDirection = worldPos - transform->Position;
         cursorDirection = normalize(cursorDirection);
         CreateBullet(16, glm::vec3(0.78f, 0.22f, 0.3f), transform->Position, cursorDirection, _bulletSpeed);
 
@@ -329,7 +329,7 @@ namespace Snowglobe
 
         auto screenPos = _input->GetCursorScreenPosition();
         auto worldPos = _renderSystem->GetCamera().ScreenToWorld(screenPos);
-        glm::vec2 cursorDirection = worldPos - transform->GetWorldPosition();
+        glm::vec2 cursorDirection = worldPos - transform->Position;
         cursorDirection = normalize(cursorDirection);
         for (int i = 0; i < 20; i++)
         {

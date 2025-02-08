@@ -92,7 +92,7 @@ private:
             Core::TransformComponent* transform = nullptr;
             if (entity->QueryComponents(transform))
             {
-                _uiSystem->AddWorldText(transform->GetWorldPosition(), entity->GetName(), { 1.0f, 1.0f, 0.0f }, Render::Alignment::HorizontalCenter | Render::Alignment::VerticalCenter);
+                _uiSystem->AddWorldText(transform->Position, entity->GetName(), { 1.0f, 1.0f, 0.0f }, Render::Alignment::HorizontalCenter | Render::Alignment::VerticalCenter);
             }
         }
         _uiSystem->Combo("Select Entity", &_selectedEntity, componentNames);

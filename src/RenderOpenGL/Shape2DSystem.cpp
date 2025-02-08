@@ -44,20 +44,20 @@ namespace Snowglobe::RenderOpenGL
             }
             
             auto mesh = _mesh[shape2DComponent->EdgeCount - 3];
-            mesh->SetPosition(transform->GetWorldPosition());
-            mesh->SetRotation(transform->GetWorldRotation());
-            mesh->SetScale(transform->GetWorldScale());
+            mesh->SetPosition(transform->Position);
+            mesh->SetRotation(transform->Rotation);
+            mesh->SetScale(transform->Scale);
 
             if (shape2DComponent->UseOutline)
             {
-                mesh->SetPosition(transform->GetWorldPosition() - glm::vec3(0, 0, 0.1f));
+                mesh->SetPosition(transform->Position - glm::vec3(0, 0, 0.1f));
                 mesh->Bind(_shaderProgram);
                 _material.GetMaterialData().color = glm::vec4(shape2DComponent->Outline, shape2DComponent->Alpha);
                 _material.Bind(_shaderProgram);
                 mesh->Draw();
 
-                mesh->SetPosition(transform->GetWorldPosition());
-                mesh->SetScale(transform->GetWorldScale() - glm::vec3(shape2DComponent->OutlineWidth));
+                mesh->SetPosition(transform->Position);
+                mesh->SetScale(transform->Scale - glm::vec3(shape2DComponent->OutlineWidth));
             }
             
             mesh->Bind(_shaderProgram);
