@@ -20,7 +20,7 @@ public:
             Snowglobe::Core::FileSystem& fileSystem,
             const std::string& testName) : _testName(testName), _engine(engine), _fileSystem(fileSystem) 
         {
-            if(!engine.QuerySystem<Snowglobe::Render::RenderSystem>(_renderSystem))
+            if(!engine.GetSystemManager()->QuerySystem<Snowglobe::Render::RenderSystem>(_renderSystem))
             {
                 std::cout << "Failed to get render system" << std::endl;
             }

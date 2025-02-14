@@ -15,7 +15,7 @@ namespace Snowglobe::Engine
 			PuaseAllSystems(!_allSystemsPuased);
 		}
 
-		for (auto& systemPair : _engine->GetAllSystems())
+		for (auto& systemPair : _engine->GetSystemManager()->GetTypedSystems())
 		{
 			//skip "class Snowglobe::"
 			const int skipChars = 17;
@@ -29,8 +29,6 @@ namespace Snowglobe::Engine
 						systemPair.second->SetActive(isActive);
 					}
 				}
-
-				systemPair.second->DrawDebugUI();
 
 				_uiSystem->EndTreeNode();
 			}
@@ -82,7 +80,7 @@ namespace Snowglobe::Engine
 	void ComponentEditorSystem::PuaseAllSystems(bool pause)
 	{
 		_allSystemsPuased = pause;
-		for (auto& systemPair : _engine->GetAllSystems())
+		for (auto& systemPair : _engine->GetSystemManager()->GetTypedSystems())
 		{
 			if (systemPair.second->IsPermanent())
 				continue;

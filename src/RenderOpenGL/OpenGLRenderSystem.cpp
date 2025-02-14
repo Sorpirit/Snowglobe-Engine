@@ -47,6 +47,8 @@ namespace Snowglobe::RenderOpenGL
     {
         _instance = this;
 
+        _updateOrder = Core::ECS::UpdateOrder::Render;
+
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -117,6 +119,8 @@ namespace Snowglobe::RenderOpenGL
         }
 
         _shape2DSystem.Update();
+
+        _uiSystem->EndRendering();
     }
 
     void OpenGLRenderSystem::InitializeWindow(const Render::WindowParams& params)

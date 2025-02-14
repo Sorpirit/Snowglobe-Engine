@@ -5,7 +5,7 @@
 namespace Snowglobe::Engine
 {
 
-void LifeLinkSystem::UpdateLate()
+void LifeLinkSystem::Update()
 {
     for (const auto& entity : _entityManager->GetAllEntities())
     {

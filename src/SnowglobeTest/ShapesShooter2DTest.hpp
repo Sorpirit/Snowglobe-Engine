@@ -55,51 +55,6 @@ public:
     int Score = 10;
 };
 
-
-class PlayerInputMovementSystem : public Core::ECS::ISystem
-{
-public:
-    PlayerInputMovementSystem(Core::InputReader* inputReader) : _inputReader(inputReader) {}
-    void UpdateEarly() override;
-
-private:
-    Core::InputReader* _inputReader;
-};
-class PawnMovementSystem : public Core::ECS::ISystem
-{
-public:
-    void UpdateEarly() override;
-};
-class FadeOutLifetimeSystem : public Core::ECS::ISystem
-{
-public:
-    void Update() override;
-}; 
-class DestroyOnCollisionSystem : public Core::ECS::ISystem
-{
-public:
-    void Update() override;
-};
-class ExplodeOnDeathSystem : public Core::ECS::ISystem
-{
-public:
-    void UpdateLate() override;
-};
-class MouseControllerSystem : public Core::ECS::ISystem
-{
-public:
-    MouseControllerSystem(Core::InputReader* input, Render::Camera* camera) : _input(input), _camera(camera) { }
-
-    void UpdateLate() override;
-
-private:
-    Core::InputReader* _input;
-    Render::Camera* _camera;
-};
-class RotationAnimationSystem : public Core::ECS::ISystem
-{
-    void Update() override;
-};
 class EnemieSpawnerSystem : public Core::ECS::ISystem
 {
 public:
@@ -110,12 +65,11 @@ public:
     }
 
     void Update() override;
-    void DrawDebugUI() override;
 private:
     void SpawnEnemie();
 
     float _spawnTimer = 1.0f;
-    float _spawnReloadDuration = 8.0f;
+    float _spawnReloadDuration = 1.0f;
 
     std::random_device rd;
     std::mt19937 gen;
@@ -127,16 +81,7 @@ private:
 
     Render::UISystem* _uiSystem;
 };
-class ScoreSystem : public Core::ECS::ISystem
-{
-public:
-    ScoreSystem(Render::UISystem* uiSystem) : _uiSystem(uiSystem) { }
 
-    void Update() override;
-private:
-    int _score = 0;
-    Render::UISystem* _uiSystem;
-};
 const std::vector All = {Tags::Default(), Tags::Player(), Tags::Enemies(), Tags::Bullets(), Tags::EnemiesGhost()};
     
 struct ShapeDescription
@@ -156,31 +101,7 @@ struct ShapeDescription
 class ShapesShooter2DTest : public RuntimeTest
 {
 public:
-    ShapesShooter2DTest(Engine::Engine& engine, Core::FileSystem& fileSystem) :
-        RuntimeTest(engine, fileSystem, "SpaceShooter2DTest"), 
-        _shapeFactory(_renderSystem), 
-        _bulletDist(-1.0f, 1.0f), 
-        _bulletRangeDist(0.1f, 0.6f)
-    {
-        engine.QuerySystem(_tweenerSystem);
-
-        engine.TryAddSystem<PlayerInputMovementSystem>(_input);
-        engine.TryAddSystem<PawnMovementSystem>();
-        
-        engine.TryAddSystem<DestroyOnCollisionSystem>();
-        engine.TryAddSystem<ExplodeOnDeathSystem>();
-        engine.TryAddSystem<FadeOutLifetimeSystem>();
-
-        engine.TryAddSystem<MouseControllerSystem>(_input, &_renderSystem->GetCamera());
-
-        engine.TryAddSystem<RotationAnimationSystem>();
-
-        engine.TryAddSystem<EnemieSpawnerSystem>(_uiSystem);
-
-        engine.TryAddSystem<ScoreSystem>(_uiSystem);
-
-        gen.seed(rd());
-    }
+    ShapesShooter2DTest(Engine::Engine& engine, Core::FileSystem& fileSystem);
 
     void Init() override;
     void Run() override;
@@ -194,7 +115,8 @@ private:
     float _shootSpecialTimer = 0.0f;
     float _shootSpecialReloadDuration = 5.0f;
     float _bulletSpeed = 8.0f;
-    Engine::TweenerSystem* _tweenerSystem;
+
+    float _score = 0;
 
     Render::BasicShapeFactory _shapeFactory;
 

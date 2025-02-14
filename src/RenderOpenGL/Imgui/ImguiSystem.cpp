@@ -38,7 +38,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImGui::DestroyContext();
     }
 
-    void ImguiSystem::UpdateEarly()
+    void ImguiSystem::Update()
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -96,7 +96,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         
     }
 
-    void ImguiSystem::UpdateLate()
+    void ImguiSystem::EndRendering()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

@@ -112,7 +112,7 @@ public:
         _entityTweenLink.erase(entity.GetId());
     }
 
-    void UpdateLate() override;
+    void Update() override;
 private:
     std::array<Tween<float>, POOL_SIZE> _floatTweenPool;
     size_t _floatTweenPoolIndex = 0;

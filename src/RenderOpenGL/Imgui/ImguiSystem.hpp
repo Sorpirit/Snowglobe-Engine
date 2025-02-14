@@ -24,8 +24,8 @@ namespace Snowglobe::RenderOpenGL::Imgui
         ImguiSystem(Render::Window* window);
         ~ImguiSystem();
 
-        void UpdateEarly() override;
-        void UpdateLate() override;
+        void Update() override;
+        void EndRendering() override;
 
         Render::UIPanel OpenUIPanel(const std::string& title) override;
         void Close(Render::UIPanel* panel) override;

@@ -4,7 +4,7 @@
 
 namespace Snowglobe::Engine
 {
-    void TweenerSystem::UpdateLate()
+    void TweenerSystem::Update()
     {
         float deltaTime = Core::EngineTime::GetDeltaEngineFrameTime();
         

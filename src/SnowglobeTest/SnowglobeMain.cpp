@@ -28,7 +28,6 @@
 typedef Snowglobe::Core::ECS::MappedTupleEntityData
 <
 Snowglobe::Core::TransformComponent,
-Snowglobe::Core::LifeLinkComponent,
 Snowglobe::Engine::Physics2DComponent,
 Snowglobe::Engine::Collider2DComponent,
 Snowglobe::Engine::MeshComponent,
@@ -55,14 +54,7 @@ const unsigned int SCR_HEIGHT = 720;
 
 int main()
 {
-    std::cout << Snowglobe::Tags::Default().GetName() << '\n';
-    Snowglobe::Core::EngineProfile profile = { "Snowglobe", Snowglobe::Core::EngineRenderEngine::OpenGL };
-    Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, 0, 0, true};
-
-    auto& engine = Snowglobe::Engine::Engine::GetInstance();
     auto& fileSystem = Snowglobe::Core::FileSystem::GetInstance();
-    auto manager = std::make_shared<SampleEntityManager>();
-
     //Resolve project path
     auto project_path = std::filesystem::current_path();
     bool foundProjectPath = false;
@@ -84,16 +76,16 @@ int main()
     
     fileSystem.AddMount(project_path / "src/RenderOpenGL/Shaders");
     fileSystem.AddMount(project_path / "src/SnowglobeTest/Assets");
-    
-    // auto sceneConfig = Assigment1Tests::LoadScene(fileSystem, Snowglobe::Core::SnowFileHandle("scene.txt"));
-    // windowParams.width = sceneConfig.WindowWidth;
-    // windowParams.height = sceneConfig.WindowHeight;
-    
+
+    Snowglobe::Core::EngineProfile profile = { "Snowglobe", Snowglobe::Core::EngineRenderEngine::OpenGL };
+    Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, false, false, true};
+
+    auto& engine = Snowglobe::Engine::Engine::GetInstance();
+    auto manager = std::make_shared<SampleEntityManager>();
     engine.Setup(profile, windowParams, manager);
     
-    // Get render proxy
-    Snowglobe::Render::RenderSystem* renderSystem = nullptr; 
-    if(!engine.QuerySystem<Snowglobe::Render::RenderSystem>(renderSystem))
+    Snowglobe::Render::RenderSystem* renderSystem = nullptr;
+    if(!engine.GetSystemManager()->QuerySystem<Snowglobe::Render::RenderSystem>(renderSystem))
     {
         std::cout << "Failed to get render system" << std::endl;
         return -1;
@@ -111,19 +103,7 @@ int main()
     Snowglobe::ShapesShooter2DTest test(engine, fileSystem);
     
     test.Init();
-    
-    auto updateFunc = [&]()
-    {
-        if(mainWindow->GetInput().IsKeyPressed(Snowglobe::Core::Key::Escape))
-        {
-            std::cout << "Escape pressed" << std::endl;
-            mainWindow->Close();
-        }
 
-        test.Run();
-    };
-
-    engine.RegisterUpdateCallback(updateFunc);
     while(mainWindow->IsOpen())
     {
         mainWindow->PollEvents();

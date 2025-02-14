@@ -62,6 +62,8 @@ namespace Snowglobe::Render
     {
     public:
         UISystem() : ISystem(true) {}
+        virtual void EndRendering() = 0;
+
         virtual UIPanel OpenUIPanel(const std::string& title) = 0;
         virtual void Close(UIPanel* panel) = 0;
 

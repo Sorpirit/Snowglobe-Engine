@@ -1,99 +1,48 @@
 #include "ECSTest.hpp"
 
+#include "ECS/LifetimeSystem.hpp"
+#include "ECS/SystemManager.hpp"
+#include "ECS/UpdateOrder.hpp"
+
 #include <iostream>
 
 using namespace Snowglobe::Core::ECS::ECSTest;
+
+void Update(
+    const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>& entityManager,
+    const std::shared_ptr<Snowglobe::Core::ECS::SystemManager>& systems,
+    const std::shared_ptr<Snowglobe::Core::ECS::LifetimeSystem>& lifetimeSystem)
+{
+    static uint32_t frameN = 0;
+
+    entityManager->Update();
+    systems->Update();
+
+    frameN++;
+}
 
 int main()
 {
     auto nativeEntityManager = std::make_shared<ECSTestEntityManager>();
     std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase> entityManager = nativeEntityManager;
+    auto systemManager = std::make_shared<Snowglobe::Core::ECS::SystemManager>(entityManager);
+    auto lifetimeSystem = std::make_shared<Snowglobe::Core::ECS::LifetimeSystem>();
 
-    RenderSystem renderSystem;
-    Physics2DSystem physicsEngine;
+    systemManager->TryAddSystem<RenderSystem>();
+    systemManager->TryAddSystem<Physics2DSystem>();
 
-    renderSystem.Init(entityManager);
-    physicsEngine.Init(entityManager);
+    systemManager->TryAddSystem([](const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>& enityManager) {
+            std::cout << "DSystem update" << '\n';
+    });
 
-    auto baseEnt1 = entityManager->CreateEntity();
-    auto baseEnt2 = entityManager->CreateEntity();
+    Update(entityManager, systemManager, lifetimeSystem);
+    Update(entityManager, systemManager, lifetimeSystem);
+    Update(entityManager, systemManager, lifetimeSystem);
 
-    auto taggedEnt1 = entityManager->CreateEntity(1);
-
-    std::string b1 = "BaseEnt1";
-    baseEnt1->AddComponent<DebugComponent>(b1);
-    baseEnt2->AddComponent<DebugComponent>("BaseEnt2");
-    taggedEnt1->AddComponent<DebugComponent>("TaggedEnt1");
-
-    baseEnt1->AddComponent<TestComponent>(1, 2.0f, "Test1");
-    
-    baseEnt1->AddComponent<TransformComponent>();
-    
-    baseEnt2->AddComponent<TransformComponent>();
-    TransformComponent* transform2 = nullptr;
-    if (baseEnt2->QueryComponent(transform2))
-    {
-        transform2->Position = glm::vec3(3.0f, 2.0f, 1.0f);
-        transform2->Rotation = glm::vec3(45.0f, 0.0f, 45.0f);
-        transform2->Scale = glm::vec3(1.0f, 2.0f, 3.0f);
-    }
-    
-    baseEnt1->AddComponent<Physics2DComponent>(glm::vec2(1.0f, 2.0f), 1.0f);
-    baseEnt2->AddComponent<Physics2DComponent>(glm::vec2(2.0f, 1.0f), 2.0f);
-    
-    baseEnt1->AddComponent<SpriteComponent>(&renderSystem, "Sprite1");
-    baseEnt2->AddComponent<SpriteComponent>(&renderSystem, "Sprite2");
-    
-    if (baseEnt1->HasComponent<Physics2DComponent>() && !taggedEnt1->HasComponent<Physics2DComponent>())
-    {
-        std::cout << "baseEnt1 has Physics2DComponent and taggedEnt1 does not. HasComponent works" << '\n';
-    }
-    else
-    {
-        std::cout << "baseEnt1 has Physics2DComponent and taggedEnt1 does not. HasComponent failed" << '\n';
-    }
-    
-    //Game loop
-    {
-        //Frame 1
-        entityManager->Update();
-        renderSystem.Update();
-        physicsEngine.Update();
-        
-        baseEnt1->SetActive(false);
-    
-        //Frame 2
-        entityManager->Update();
-        renderSystem.Update();
-        physicsEngine.Update();
-    
-        baseEnt1->SetActive(true);
-    
-        //Frame 3
-        entityManager->Update();
-        renderSystem.Update();
-        physicsEngine.Update();
-    
-        baseEnt2->RemoveComponent<Physics2DComponent>();
-    
-        //Frame 4
-        entityManager->Update();
-        // renderSystem.Update(); //skip
-        physicsEngine.Update();
-    
-        baseEnt2->RemoveComponent<SpriteComponent>();
-    
-        //Frame 5
-        entityManager->Update();
-        renderSystem.Update(); 
-        // physicsEngine.Update(); //skip
-    
-        baseEnt1->Destroy();
-    
-        //Frame 6
-        entityManager->Update();
-        renderSystem.Update();
-        physicsEngine.Update();
-    }
-    
+    //todo
+    //Systems
+    // Register/Unregister
+    // Permanents Test: Permanent systems cant be deactivated or Removed
+    // Inactive systems should not get update
+    // Update order
 }

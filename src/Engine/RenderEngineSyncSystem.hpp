@@ -8,7 +8,8 @@ namespace Snowglobe::Engine
 class RenderEngineSyncSystem : public Core::ECS::ISystem
 {
 public:
-    void UpdateLate() override;
+    RenderEngineSyncSystem() { _updateOrder = Core::ECS::UpdateOrder::PostPhysics; }
+    void Update() override;
 };
 
 }

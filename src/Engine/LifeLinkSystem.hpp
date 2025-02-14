@@ -8,7 +8,8 @@ namespace Snowglobe::Engine
 class LifeLinkSystem : public Core::ECS::ISystem
 {
 public:
-    void UpdateLate() override;
+    LifeLinkSystem() { _updateOrder = Core::ECS::UpdateOrder::PostRender; }
+    void Update();
 };
 
 }

@@ -6,7 +6,7 @@
 namespace Snowglobe::Engine
 {
 
-void RenderEngineSyncSystem::UpdateLate()
+void RenderEngineSyncSystem::Update()
 {
     auto& entities = _entityManager->GetAllEntities();
     for (auto& entity : entities)
