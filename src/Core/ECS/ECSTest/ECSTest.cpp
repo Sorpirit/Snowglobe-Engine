@@ -2,47 +2,123 @@
 
 #include "ECS/LifetimeSystem.hpp"
 #include "ECS/SystemManager.hpp"
-#include "ECS/UpdateOrder.hpp"
-
-#include <iostream>
 
 using namespace Snowglobe::Core::ECS::ECSTest;
 
-void Update(
-    const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>& entityManager,
-    const std::shared_ptr<Snowglobe::Core::ECS::SystemManager>& systems,
-    const std::shared_ptr<Snowglobe::Core::ECS::LifetimeSystem>& lifetimeSystem)
+void TestEntityManager()
 {
-    static uint32_t frameN = 0;
+    auto nativeEntityManager = std::make_shared<ECSTestEntityManager>();
+    std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase> entityManager = nativeEntityManager;
+    const Snowglobe::Core::ECS::Lifetime testLifetime(42);
+
+    auto ent1 = entityManager->CreateEntity();
+    auto ent2 = entityManager->CreateEntity(Snowglobe::Tags::TestTag());
+    auto ent3 = entityManager->CreateEntity(testLifetime, Snowglobe::Tags::TestTag());
+    auto ent4 = entityManager->CreateEntity(testLifetime);
 
     entityManager->Update();
-    systems->Update();
 
-    frameN++;
+    assert(entityManager->GetAllEntities().size() == 4);
+    assert(entityManager->GetEntitiesWithTag(Snowglobe::Tags::TestTag()).size() == 2);
+    assert(entityManager->GetEntitiesWithLifetime(testLifetime).size() == 2);
+    assert(entityManager->GetEntitiesWithLifetimeAndTag(testLifetime, Snowglobe::Tags::TestTag()).size() == 1);
+
+    const Snowglobe::Core::ECS::Lifetime sceneLifetime(43);
+    Snowglobe::Core::ECS::SceneEntityManager sceneManager(entityManager, sceneLifetime);
+    auto scnEnt1 = sceneManager.CreateEntity();
+    auto scnEnt2 = sceneManager.CreateEntity(Snowglobe::Tags::TestTag());
+
+    entityManager->Update();
+
+    assert(entityManager->GetAllEntities().size() == 6);
+    assert(entityManager->GetEntitiesWithTag(Snowglobe::Tags::TestTag()).size() == 3);
+    assert(sceneManager.GetAllEntities().size() == 2);
+    assert(sceneManager.GetEntitiesWithTag(Snowglobe::Tags::TestTag()).size() == 1);
 }
 
-int main()
+void TestSystemManager()
 {
     auto nativeEntityManager = std::make_shared<ECSTestEntityManager>();
     std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase> entityManager = nativeEntityManager;
     auto systemManager = std::make_shared<Snowglobe::Core::ECS::SystemManager>(entityManager);
-    auto lifetimeSystem = std::make_shared<Snowglobe::Core::ECS::LifetimeSystem>();
+    const Snowglobe::Core::ECS::Lifetime testLifetime(42);
 
-    systemManager->TryAddSystem<RenderSystem>();
-    systemManager->TryAddSystem<Physics2DSystem>();
+    uint32_t counter = 0;
 
-    systemManager->TryAddSystem([](const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>& enityManager) {
-            std::cout << "DSystem update" << '\n';
-    });
+    bool addTestA = systemManager->TryAddSystem<TestSystemA>(Snowglobe::Core::ECS::DefaultLifetime, 0, &counter);
+    assert(addTestA && "Unable to add TestSystemA");
 
-    Update(entityManager, systemManager, lifetimeSystem);
-    Update(entityManager, systemManager, lifetimeSystem);
-    Update(entityManager, systemManager, lifetimeSystem);
+    TestSystemA* testAPtr = nullptr;
+    bool queryTestA = systemManager->QuerySystem(testAPtr);
 
-    //todo
-    //Systems
-    // Register/Unregister
-    // Permanents Test: Permanent systems cant be deactivated or Removed
-    // Inactive systems should not get update
-    // Update order
+    assert(queryTestA && testAPtr != nullptr && "Unable to query TestSystemA");
+
+    TestSystemB* testBPtr = nullptr;
+    bool queryTestB = systemManager->QuerySystem(testBPtr);
+
+    assert(!queryTestB && testBPtr == nullptr &&
+           "Was able to get TestSystemB that was not added yet");
+
+    bool testBSystem = false;
+    testBSystem = systemManager->TryAddSystem<TestSystemB>(testLifetime, 1, &counter);
+    assert(testBSystem && "Unable to add TestSystemB");
+    testBSystem = systemManager->QuerySystem(testBPtr);
+    assert(testBSystem && "Was not able to get TestSystemB");
+    testBSystem = systemManager->TryAddSystem<TestSystemB>(testLifetime, 1, &counter);
+    assert(!testBSystem && "Was able to add TestSystemB two times");
+
+    systemManager->TryAddSystem([&](auto& entityManager) {
+        assert(counter == 2 && "TestSystem Update Order is incorrect");
+        counter++;
+    }, 2, testLifetime, "TestAnonymousSystem");
+
+    {
+        auto systemsWithTestLifetime = systemManager->GetSystemsWithLifetime(testLifetime);
+        assert(systemsWithTestLifetime.size() == 2 && (systemsWithTestLifetime[0].get() == testBPtr) &&
+               "Unable to get physics system with target lifetime");
+    }
+
+    {
+        auto orderedSystems = systemManager->GetSortedSystems();
+        assert(orderedSystems.size() == 3 && "Unable to get physics system with target lifetime");
+    }
+
+    {
+        auto typedSystems = systemManager->GetTypedSystems();
+        assert(typedSystems.size() == 2 && typedSystems[typeid(TestSystemA)].get() == testAPtr && "Typed system map is wrong");
+    }
+
+    systemManager->Update();
+    assert(counter == 3 && "Update is not full");
+
+    counter = 0;
+    testAPtr->UnregisterSystem();
+    assert(testAPtr->NeedsUnregisterSystem());
+    systemManager->Update();
+
+    uint32_t systemCount = 0;
+    for (auto vec : systemManager->GetSortedSystems())
+    {
+        systemCount += vec.size();
+    }
+
+    assert(systemCount == 2 && "System has not been removed properly");
+    assert(systemManager->GetTypedSystems().size() == 1 && "System has not been removed properly");
+
+    TestSystemC* testCPtr = nullptr;
+    systemManager->TryAddSystem<TestSystemC>(Snowglobe::Core::ECS::DefaultLifetime);
+    systemManager->QuerySystem(testCPtr);
+
+    assert(testBPtr->IsPermanent());
+    assert(testCPtr->IsActive());
+    testBPtr->SetActive(false);
+    testCPtr->SetActive(false);
+    assert(testBPtr->IsActive());
+    assert(!testCPtr->IsActive());
+}
+
+int main()
+{
+    TestEntityManager();
+    TestSystemManager();
 }
