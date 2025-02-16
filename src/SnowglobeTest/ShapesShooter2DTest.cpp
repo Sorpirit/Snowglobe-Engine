@@ -4,10 +4,10 @@
 
 #include "BasicShapeFactory.hpp"
 #include "Collider2DComponent.hpp"
+#include "DependencyManager.hpp"
 #include "EngineTime.hpp"
 #include "LifeLinkComponent.hpp"
 #include "LifetimeComponent.hpp"
-#include "LifetimeSystem.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
 #include "Physics2DComponent.hpp"
@@ -18,11 +18,33 @@
 namespace Snowglobe
 {
 
-ShapesShooter2DTest::ShapesShooter2DTest(Engine::Engine& engine, Core::FileSystem& fileSystem)
-    : RuntimeTest(engine, fileSystem, "SpaceShooter2DTest"), _shapeFactory(_renderSystem), _bulletDist(-1.0f, 1.0f),
-      _bulletRangeDist(0.1f, 0.6f)
+void EnemieSpawnerSystem::Update()
 {
-    auto systemManager = engine.GetSystemManager();
+    float deltaTime = Core::EngineTime::GetDeltaEngineFrameTime();
+    if (_spawnTimer <= 0)
+    {
+        SpawnEnemie();
+        _spawnTimer = _spawnReloadDuration;
+    }
+
+    _spawnTimer -= deltaTime;
+}
+void EnemieSpawnerSystem::SpawnEnemie()
+{
+    ShapeDescription desc;
+    desc.Position = glm::vec3(_enemySpawnX(gen), _enemySpawnY(gen), 0);
+    desc.Velocity = glm::normalize(glm::vec2(_negativeOnePositiveOne(gen), _negativeOnePositiveOne(gen))) *
+                    static_cast<float>(_enemySpeed(gen));
+    desc.SideCount = static_cast<int>(_enemySides(gen));
+    desc.DestroyTags = {Tags::Bullets(), Tags::Player()};
+    desc.Color = glm::vec3(0.46f, 0.06f, 0.12f);
+    auto enemy = ShapesShooter2DTest::CreateShape(desc, Tags::Enemies());
+    enemy->AddComponent<ScoreComponent>(desc.SideCount * 10);
+}
+
+void ShapesShooter2DTest::Init()
+{
+    auto systemManager = _engine->GetSystemManager();
 
     systemManager->TryAddSystem(
         [&](const std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager) {
@@ -198,37 +220,12 @@ ShapesShooter2DTest::ShapesShooter2DTest(Engine::Engine& engine, Core::FileSyste
 
     systemManager->TryAddSystem<EnemieSpawnerSystem>(Core::ECS::DefaultLifetime, _uiSystem);
 
-    systemManager->TryAddSystem([&](const std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager) { this->Run(); }, Core::ECS::PrePhysics, Core::ECS::DefaultLifetime, "ShapesShooter2DTest");
+    systemManager->TryAddSystem(
+        [&](const std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager) { this->Run(); }, Core::ECS::PrePhysics,
+        Core::ECS::DefaultLifetime, "ShapesShooter2DTest");
 
     gen.seed(rd());
-}
 
-void EnemieSpawnerSystem::Update()
-{
-    float deltaTime = Core::EngineTime::GetDeltaEngineFrameTime();
-    if (_spawnTimer <= 0)
-    {
-        SpawnEnemie();
-        _spawnTimer = _spawnReloadDuration;
-    }
-
-    _spawnTimer -= deltaTime;
-}
-void EnemieSpawnerSystem::SpawnEnemie()
-{
-    ShapeDescription desc;
-    desc.Position = glm::vec3(_enemySpawnX(gen), _enemySpawnY(gen), 0);
-    desc.Velocity = glm::normalize(glm::vec2(_negativeOnePositiveOne(gen), _negativeOnePositiveOne(gen))) *
-                    static_cast<float>(_enemySpeed(gen));
-    desc.SideCount = static_cast<int>(_enemySides(gen));
-    desc.DestroyTags = {Tags::Bullets(), Tags::Player()};
-    desc.Color = glm::vec3(0.46f, 0.06f, 0.12f);
-    auto enemy = ShapesShooter2DTest::CreateShape(desc, Tags::Enemies());
-    enemy->AddComponent<ScoreComponent>(desc.SideCount * 10);
-}
-
-void ShapesShooter2DTest::Init()
-{
     SpawnPlayer();
     SetupLevelBounds();
     SetupBackground();
@@ -263,7 +260,7 @@ void ShapesShooter2DTest::Run()
 std::shared_ptr<Core::ECS::Entity> ShapesShooter2DTest::CreateShape(const ShapeDescription& description,
                                                                     Core::ECS::Tag tag)
 {
-    auto manager = Engine::Engine::GetInstance().GetEntityManager();
+    auto manager = DI->Resolve<Engine::Engine>()->GetEntityManager();
 
     auto nshape = manager->CreateEntity(tag);
     nshape->AddComponent<Core::TransformComponent>(description.Position, glm::vec3(0.0f), description.Scale);
@@ -285,7 +282,7 @@ std::shared_ptr<Core::ECS::Entity> ShapesShooter2DTest::CreateBullet(uint32_t si
                                                                      float speed)
 {
     static const std::vector bulletTags = {Tags::Default(), Tags::Player(), Tags::Enemies(), Tags::EnemiesGhost()};
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
 
     auto bullet = manager->CreateEntity(Tags::Bullets());
     bullet->AddComponent<Core::TransformComponent>(glm::vec3(position + direction * 0.35f, 0), glm::vec3(0.0f),
@@ -368,7 +365,7 @@ void ShapesShooter2DTest::ShootSpecial()
 }
 void ShapesShooter2DTest::SetupLevelBounds()
 {
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
     auto materialG = _renderSystem->CreateMaterialInstance<Render::BasicShapeMaterial>();
     materialG.Properties()->color = glm::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 
@@ -429,7 +426,7 @@ void ShapesShooter2DTest::SetupBackground()
     };
     auto planeVB = _renderSystem->AllocateVertexBufferPtr(quad);
 
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
     auto backgroundEntity = manager->CreateEntity();
     backgroundEntity->SetName("Background");
     auto backgroundMesh = _renderSystem->CreateMeshProxy(*planeVB, "BackgroundMesh");

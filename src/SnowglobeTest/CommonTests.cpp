@@ -30,8 +30,7 @@ void BaseShapeFactoryTests::Init()
     _planeMesh->SetMaterial(yellowMaterial.GetMaterialBase());
     _diskMesh->SetMaterial(_gradientMaterial.GetMaterialBase());
 
-    auto e = _engine.GetEntityManager();
-    auto nshape = e->CreateEntity();
+    auto nshape = _engine->GetEntityManager()->CreateEntity();
     nshape->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(1.0f));
     nshape->AddComponent<Snowglobe::Render::NEdgeShape2DComponent>(3);
     
@@ -158,7 +157,7 @@ void Phyiscs2DTests::Init()
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialG.Properties()->color = glm::vec4(0.1f, 1.0f, 0.1f, 1.0f);
 
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
 
     auto ballL = manager->CreateEntity();
     auto ballLMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(0.0f), glm::vec3(1.0f));
@@ -244,6 +243,13 @@ void Phyiscs2DTests::Run()
 
 void CameraTests::Init()
 {
+    auto manager = _engine->GetEntityManager();
+    _cubes.emplace_back(manager->CreateEntity());
+    _cubes.emplace_back(manager->CreateEntity());
+    _cubes.emplace_back(manager->CreateEntity());
+    _cubes.emplace_back(manager->CreateEntity());
+    _cubes.emplace_back(manager->CreateEntity());
+
     auto containerTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container.jpg"));
     
     auto texture = _renderSystem->CreateTexture2D(*containerTexture, {
@@ -357,7 +363,7 @@ void Assigment1Tests::Init()
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialG.Properties()->color = glm::vec4(0.4f, 0.7f, 0.4f, 1.0f);
 
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
 
     for (auto& desc : _descriptor.Objects)
     {
@@ -515,7 +521,7 @@ void LightTests::Init()
     // lightMaterial.Properties()->texture = diffuseTexture2D;
     lightMaterial.Properties()->color = glm::vec4(1.0f);
 
-    auto manager = _engine.GetEntityManager();
+    auto manager = _engine->GetEntityManager();
     auto pointLight = manager->CreateEntity(Snowglobe::Tags::Lights());
     pointLight->SetName("PointLight" );
     auto pointLightMesh = _renderSystem->CreateMeshProxy(*cubeVB, "PointLightMesh");

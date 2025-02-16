@@ -18,8 +18,7 @@
 class BaseShapeFactoryTests : public RuntimeTest
 {
     public:
-        BaseShapeFactoryTests(Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "BaseShapeFactoryTests"),
+        BaseShapeFactoryTests() : RuntimeTest("BaseShapeFactoryTests"),
             _shapeFactory(_renderSystem),
             _gradientMaterial(_renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>())
             {}
@@ -45,9 +44,7 @@ class BaseShapeFactoryTests : public RuntimeTest
 class UITest : public RuntimeTest
 {
     public:
-        UITest(
-            Snowglobe::Engine::Engine& engine, 
-            Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "UITest") {}
+        UITest() : RuntimeTest("UITest") {}
         void Init() override;
         void Run() override;
 
@@ -74,9 +71,7 @@ private:
 class TextureTests : public RuntimeTest
 {
     public:
-        TextureTests(
-            Snowglobe::Engine::Engine& engine, 
-            Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "TextureTests") {}
+        TextureTests() : RuntimeTest("TextureTests") {}
         void Init() override;
         void Run() override;
 };
@@ -84,9 +79,7 @@ class TextureTests : public RuntimeTest
 class Phyiscs2DTests : public RuntimeTest
 {
 public:
-    Phyiscs2DTests(
-        Snowglobe::Engine::Engine& engine, 
-        Snowglobe::Core::FileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
+    Phyiscs2DTests() : RuntimeTest("Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
     void Init() override;
     void Run() override;
 
@@ -97,16 +90,9 @@ private:
 class CameraTests : public RuntimeTest
 {
 public:
-    CameraTests(
-        Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
+    CameraTests() :
+            RuntimeTest("CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
     {
-        auto manager = _engine.GetEntityManager();
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
     }
     
     void Init() override;
@@ -149,7 +135,7 @@ public:
     Assigment1Tests(
         Snowglobe::Engine::Engine& engine, 
         Snowglobe::Core::FileSystem& fileSystem,
-        SceneDescriptor& descriptor) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
+        SceneDescriptor& descriptor) : RuntimeTest("Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
     void Init() override;
     void Run() override;
     
@@ -164,9 +150,8 @@ private:
 class LightTests : public RuntimeTest
 {
 public:
-    LightTests(
-        Snowglobe::Engine::Engine& engine, Snowglobe::Core::FileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
+    LightTests() :
+            RuntimeTest("LightTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
     {}
     
     void Init() override;

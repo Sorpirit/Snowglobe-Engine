@@ -1,50 +1,40 @@
-#include <iostream>
 #include <functional>
-#include <string>
+#include <iostream>
 #include <memory>
+#include <string>
 
 #include "ECS/Tag.hpp"
-#include <FileSystem.hpp>
 #include <Engine.hpp>
-#include <Window.hpp>
+#include <FileSystem.hpp>
 #include <InputReader.hpp>
 #include <RenderSystem.hpp>
+#include <Window.hpp>
 
 #include "CommonTests.hpp"
 
 #include "ECS/Entity.hpp"
 #include "ECS/EntityManager.hpp"
 
-#include "TransformComponent.hpp"
-#include "Physics2DComponent.hpp"
+#include "../RenderOpenGL/OpenGLRenderSystem.hpp"
 #include "Collider2DComponent.hpp"
+#include "DependencyManager.hpp"
 #include "LifeLinkComponent.hpp"
 #include "LifetimeComponent.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
+#include "Physics2DComponent.hpp"
 #include "ShapesShooter2DTest.hpp"
-#include "../RenderOpenGL/OpenGLRenderSystem.hpp"
+#include "TransformComponent.hpp"
 
-typedef Snowglobe::Core::ECS::MappedTupleEntityData
-<
-Snowglobe::Core::TransformComponent,
-Snowglobe::Engine::Physics2DComponent,
-Snowglobe::Engine::Collider2DComponent,
-Snowglobe::Engine::MeshComponent,
-Snowglobe::Engine::BaseComponentMaterial,
-Snowglobe::RenderOpenGL::DirectionalLightComponent,
-Snowglobe::RenderOpenGL::PointLightComponent,
-Snowglobe::RenderOpenGL::SpotLightComponent,
-Snowglobe::Render::NEdgeShape2DComponent,
-Snowglobe::Engine::LifetimeComponent,
-Snowglobe::PawnInputComponent,
-Snowglobe::FadeOutLifetime,
-Snowglobe::ExplodeOnDeath,
-Snowglobe::DestroyOnCollision,
-Snowglobe::MouseControllerComponent,
-Snowglobe::RotationAnimationComponent,
-Snowglobe::ScoreComponent
-> SampleMapEntityData;
+typedef Snowglobe::Core::ECS::MappedTupleEntityData<
+    Snowglobe::Core::TransformComponent, Snowglobe::Engine::Physics2DComponent, Snowglobe::Engine::Collider2DComponent,
+    Snowglobe::Engine::MeshComponent, Snowglobe::Engine::BaseComponentMaterial,
+    Snowglobe::RenderOpenGL::DirectionalLightComponent, Snowglobe::RenderOpenGL::PointLightComponent,
+    Snowglobe::RenderOpenGL::SpotLightComponent, Snowglobe::Render::NEdgeShape2DComponent,
+    Snowglobe::Engine::LifetimeComponent, Snowglobe::PawnInputComponent, Snowglobe::FadeOutLifetime,
+    Snowglobe::ExplodeOnDeath, Snowglobe::DestroyOnCollision, Snowglobe::MouseControllerComponent,
+    Snowglobe::RotationAnimationComponent, Snowglobe::ScoreComponent>
+    SampleMapEntityData;
 
 typedef Snowglobe::Core::ECS::EntityManager<SampleMapEntityData> SampleEntityManager;
 
@@ -52,10 +42,11 @@ typedef Snowglobe::Core::ECS::EntityManager<SampleMapEntityData> SampleEntityMan
 const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
-int main()
+void SetupFileSystem()
 {
-    auto& fileSystem = Snowglobe::Core::FileSystem::GetInstance();
-    //Resolve project path
+    auto fileSystem = DI->RegisterSingle<Snowglobe::Core::FileSystem>();
+
+    // Resolve project path
     auto project_path = std::filesystem::current_path();
     bool foundProjectPath = false;
     while (project_path.has_parent_path() && project_path != project_path.root_path())
@@ -67,49 +58,62 @@ int main()
         }
         project_path = project_path.parent_path();
     }
-    
+
     // If we didn't find the project path, just use the current path
     if (!foundProjectPath)
     {
         project_path = std::filesystem::current_path();
     }
-    
-    fileSystem.AddMount(project_path / "src/RenderOpenGL/Shaders");
-    fileSystem.AddMount(project_path / "src/SnowglobeTest/Assets");
 
-    Snowglobe::Core::EngineProfile profile = { "Snowglobe", Snowglobe::Core::EngineRenderEngine::OpenGL };
-    Snowglobe::Render::WindowParams windowParams = { "Snowglobe", SCR_WIDTH, SCR_HEIGHT, false, false, true};
+    fileSystem->AddMount(project_path / "src/RenderOpenGL/Shaders");
+    fileSystem->AddMount(project_path / "src/SnowglobeTest/Assets");
+}
 
-    auto& engine = Snowglobe::Engine::Engine::GetInstance();
+void RegisterTests()
+{
+    RuntimeTest::RegisterTest<Snowglobe::ShapesShooter2DTest>();
+    RuntimeTest::RegisterTest<LightTests>();
+    RuntimeTest::RegisterTest<Phyiscs2DTests>();
+}
+
+int main(int argc, char* argv[])
+{
+    SetupFileSystem();
+
+    Snowglobe::Core::EngineProfile profile = {"Snowglobe", Snowglobe::Core::EngineRenderEngine::OpenGL};
+    Snowglobe::Render::WindowParams windowParams = {"Snowglobe", SCR_WIDTH, SCR_HEIGHT, false, false, true};
+
+    auto engine = DI->RegisterSingle<Snowglobe::Engine::Engine>();
     auto manager = std::make_shared<SampleEntityManager>();
-    engine.Setup(profile, windowParams, manager);
-    
+    engine->Setup(profile, windowParams, manager);
+
     Snowglobe::Render::RenderSystem* renderSystem = nullptr;
-    if(!engine.GetSystemManager()->QuerySystem<Snowglobe::Render::RenderSystem>(renderSystem))
+    if (!engine->GetSystemManager()->QuerySystem<Snowglobe::Render::RenderSystem>(renderSystem))
     {
         std::cout << "Failed to get render system" << std::endl;
         return -1;
     }
 
-    auto mainWindow = renderSystem->GetMainWindow();
+    RegisterTests();
+    std::string testName = "SnowglobeTest";
+    for (int i = 0; i < argc; ++i)
+    {
+        if (std::string(argv[i]) == "--test" && (i + 1) < argc)
+        {
+            testName = std::string(argv[i + 1]);
+        }
+    }
 
-    // BaseShapeFactoryTests test(engine, fileSystem);
-    // UITest test(engine, fileSystem);
-    // TextureTests test(engine, fileSystem);
-    // Phyiscs2DTests test(engine, fileSystem);
-    // CameraTests test(engine, fileSystem);
-    // Assigment1Tests test(engine, fileSystem, sceneConfig);
-    // LightTests test(engine, fileSystem);
-    Snowglobe::ShapesShooter2DTest test(engine, fileSystem);
-    
+    auto& test = RuntimeTest::GetTest(testName);
     test.Init();
 
-    while(mainWindow->IsOpen())
+    auto mainWindow = renderSystem->GetMainWindow();
+    while (mainWindow->IsOpen())
     {
         mainWindow->PollEvents();
-        engine.Run();
+        engine->Run();
         mainWindow->Present();
     }
-    
+
     return 0;
 }

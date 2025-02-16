@@ -3,11 +3,11 @@
 #include <random>
 
 #include "BasicShapeFactory.hpp"
+#include "ECS/Tag.hpp"
 #include "Engine.hpp"
 #include "FileSystem.hpp"
 #include "RuntimeTest.hpp"
 #include "TweenerSystem.hpp"
-#include "ECS/Tag.hpp"
 
 REGISTER_TAG(Player)
 REGISTER_TAG(Enemies)
@@ -16,56 +16,59 @@ REGISTER_TAG(Bullets)
 
 namespace Snowglobe
 {
-    
+
 class PawnInputComponent : public Core::ECS::Component
 {
-public:
+  public:
     glm::vec2 Input = glm::vec2(0.0f);
 };
 class DestroyOnCollision : public Core::ECS::Component
 {
-public:
+  public:
     DestroyOnCollision() = default;
-    DestroyOnCollision(const std::vector<Core::ECS::Tag>& tags)
-        : Tags(tags)
-    {}
+    DestroyOnCollision(const std::vector<Core::ECS::Tag>& tags) : Tags(tags) {}
 
     std::vector<Core::ECS::Tag> Tags;
 };
-class ExplodeOnDeath : public Core::ECS::Component { };
-class FadeOutLifetime : public Core::ECS::Component { };
-class MouseControllerComponent : public Core::ECS::Component { };
-class RotationAnimationComponent : public Core::ECS::Component 
+class ExplodeOnDeath : public Core::ECS::Component
 {
-public:
+};
+class FadeOutLifetime : public Core::ECS::Component
+{
+};
+class MouseControllerComponent : public Core::ECS::Component
+{
+};
+class RotationAnimationComponent : public Core::ECS::Component
+{
+  public:
     RotationAnimationComponent() = default;
-    RotationAnimationComponent(float rotationSpeed) : RotationSpeed(rotationSpeed) { }
+    RotationAnimationComponent(float rotationSpeed) : RotationSpeed(rotationSpeed) {}
 
     float RotationSpeed = 1.0f;
 };
 class ScoreComponent : public Core::ECS::Component
 {
-public:
+  public:
     ScoreComponent() = default;
-    ScoreComponent(int score)
-        : Score(score)
-    {
-    }
+    ScoreComponent(int score) : Score(score) {}
 
     int Score = 10;
 };
 
 class EnemieSpawnerSystem : public Core::ECS::ISystem
 {
-public:
-    EnemieSpawnerSystem(Render::UISystem* uiSystem) : _uiSystem(uiSystem), 
-        _negativeOnePositiveOne(-1.0f, 1.0f), _enemySides(3, 11), _enemySpeed(0.5f, 2.0f), _enemySpawnX(-4.0f, 4.0f), _enemySpawnY(-2.0f, 2.0f)
+  public:
+    EnemieSpawnerSystem(Render::UISystem* uiSystem)
+        : _uiSystem(uiSystem), _negativeOnePositiveOne(-1.0f, 1.0f), _enemySides(3, 11), _enemySpeed(0.5f, 2.0f),
+          _enemySpawnX(-4.0f, 4.0f), _enemySpawnY(-2.0f, 2.0f)
     {
         gen.seed(rd());
     }
 
     void Update() override;
-private:
+
+  private:
     void SpawnEnemie();
 
     float _spawnTimer = 1.0f;
@@ -83,7 +86,7 @@ private:
 };
 
 const std::vector All = {Tags::Default(), Tags::Player(), Tags::Enemies(), Tags::Bullets(), Tags::EnemiesGhost()};
-    
+
 struct ShapeDescription
 {
     int SideCount = 3;
@@ -97,17 +100,23 @@ struct ShapeDescription
     bool ShouldExplode = true;
     std::vector<Core::ECS::Tag> DestroyTags = All;
 };
-    
+
 class ShapesShooter2DTest : public RuntimeTest
 {
-public:
-    ShapesShooter2DTest(Engine::Engine& engine, Core::FileSystem& fileSystem);
+  public:
+    ShapesShooter2DTest()
+        : RuntimeTest("SpaceShooter2DTest"), _shapeFactory(_renderSystem), _bulletDist(-1.0f, 1.0f),
+          _bulletRangeDist(0.1f, 0.6f)
+    {
+    }
 
     void Init() override;
     void Run() override;
 
-    static std::shared_ptr<Core::ECS::Entity> CreateShape(const ShapeDescription& description, Core::ECS::Tag tag = Tags::Default());
-private:
+    static std::shared_ptr<Core::ECS::Entity> CreateShape(const ShapeDescription& description,
+                                                          Core::ECS::Tag tag = Tags::Default());
+
+  private:
     std::weak_ptr<Core::ECS::Entity> _player;
     std::weak_ptr<Core::ECS::Entity> _debug;
     float _shootTimer = 0.0f;
@@ -124,8 +133,9 @@ private:
     std::mt19937 gen;
     std::uniform_real_distribution<> _bulletDist;
     std::uniform_real_distribution<> _bulletRangeDist;
-    
-    std::shared_ptr<Core::ECS::Entity> CreateBullet(uint32_t sides, glm::vec3 color, glm::vec2 position, glm::vec2 direction, float speed);
+
+    std::shared_ptr<Core::ECS::Entity> CreateBullet(uint32_t sides, glm::vec3 color, glm::vec2 position,
+                                                    glm::vec2 direction, float speed);
 
     void SpawnPlayer();
     void Shoot();
@@ -134,4 +144,4 @@ private:
     void SetupBackground();
 };
 
-} 
+} // namespace Snowglobe

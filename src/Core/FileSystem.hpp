@@ -1,5 +1,7 @@
 #pragma once
 
+#include "DependencyManager.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -30,12 +32,7 @@ struct SnowFileHandle
 class FileSystem
 {
   public:
-    static FileSystem& GetInstance()
-    {
-        static FileSystem _instance;
-        return _instance;
-    }
-
+    FileSystem() = default;
     void AddMount(const char* path);
     void AddMount(const std::string& path);
     void AddMount(const std::filesystem::path& path);
@@ -48,14 +45,13 @@ class FileSystem
     static std::shared_ptr<FileTexture> LoadTexture(const SnowFileHandle& handle);
 
   private:
-    FileSystem() = default;
 
     std::unordered_set<std::filesystem::path> _mounts;
 };
 
 inline void SnowFileHandle::Initialize(const std::filesystem::path& path)
 {
-    _isValid = FileSystem::GetInstance().TryResolvePath(path, _path);
+    _isValid = DI->Resolve<FileSystem>()->TryResolvePath(path, _path);
 }
 
 inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::filesystem::path& fullPath) const
