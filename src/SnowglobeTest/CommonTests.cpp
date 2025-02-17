@@ -1,7 +1,9 @@
 #include "CommonTests.hpp"
 
-#include <iostream>
+#include "AssimpImporter.hpp"
+
 #include <functional>
+#include <iostream>
 
 #include <RenderSystem.hpp>
 
@@ -592,6 +594,16 @@ void LightTests::Init()
     
     _renderSystem->GetCamera().SetMode(Snowglobe::Render::CameraMode::Perspective);
     _isOrthographic = false;
+
+    Snowglobe::Engine::AssimpImporter importer;
+    // auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/backpack/backpack.obj"));
+    auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/sponza/sponza.obj"));
+    //auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/San_Miguel/san-miguel-low-poly.obj"));
+
+    auto backpack = manager->CreateEntity();
+    backpack->SetName("Backpack");
+    backpack->AddComponent<Snowglobe::Core::TransformComponent>(glm::vec3(0, -1, 0), glm::vec3(0.0f), glm::vec3(0.5f));
+    backpack->AddComponent<Snowglobe::Engine::ModelComponent>(meshList);
 }
 
 void LightTests::Run()

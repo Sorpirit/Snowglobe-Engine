@@ -21,7 +21,7 @@ public:
     void Bind(uint32_t pipelineID) override;
 
 private:
-    CachedUniformLocations<6> _uniformLocations;
+    CachedUniformLocations<7> _uniformLocations;
 };
 
 }

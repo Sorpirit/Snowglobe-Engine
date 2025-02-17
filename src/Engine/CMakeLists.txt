@@ -19,3 +19,13 @@ target_link_libraries(Engine
     Snowglobe::RenderOpenGL
     imgui
 )
+
+#assimp
+target_link_libraries(Engine PRIVATE
+        debug ${CMAKE_SOURCE_DIR}/libraries/bin/assimp/debug/assimp-vc143-mtd.lib
+        optimized ${CMAKE_SOURCE_DIR}/libraries/bin/assimp/release/assimp-vc143-mt.lib)
+
+#assimp dependency
+target_link_libraries(Engine PRIVATE
+        debug ${CMAKE_SOURCE_DIR}/libraries/bin/assimp/debug/zlibstaticd.lib
+        optimized ${CMAKE_SOURCE_DIR}/libraries/bin/assimp/release/zlibstatic.lib)

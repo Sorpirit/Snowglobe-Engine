@@ -41,6 +41,7 @@ struct SpotLight {
 struct Material {  
     sampler2D diffuseTexture;
     sampler2D specularTexture;
+    sampler2D aoTexture;
     sampler2D emissiveTexture;
     vec4 baseColor;
     int specularPower;
@@ -70,6 +71,7 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
 
     vec3 diffuseColor = (material.baseColor * texture(material.diffuseTexture, TexCoord)).rgb;
     vec3 specularColor = texture(material.specularTexture, TexCoord).rgb;
+    vec3 ambientIntensity = texture(material.aoTexture, TexCoord).rgb;
 
     // Directional
     {
@@ -86,7 +88,7 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
         vec3 specularLight = specular * directionalLight.color;
 
         //Combine
-        vec3 ambientLight = directionalLight.ambientIntensity * directionalLight.color;
+        vec3 ambientLight = directionalLight.ambientIntensity * directionalLight.color * ambientIntensity;
         fragColor += vec3((ambientLight + diffuseLight) * diffuseColor + specularLight * specularColor);
     }
 
@@ -107,7 +109,7 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
         vec3 halfDir = normalize(lightDir + viewDir); // Blinn-Phong
         float specular = pow(max(dot(halfDir, normal), 0.0) * ((lambert > 0) ? 1 : 0), material.specularPower);
         
-        vec3 ambientLight = pointLights[i].ambientIntensity * pointLights[i].color;
+        vec3 ambientLight = pointLights[i].ambientIntensity * pointLights[i].color * ambientIntensity;
         vec3 diffuseLight = lambert * pointLights[i].color;
         vec3 specularLight = specular * pointLights[i].color;
         fragColor += vec3((ambientLight + diffuseLight) * diffuseColor + specularLight * specularColor) * attenuation;
@@ -122,7 +124,7 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
             continue;
 
         float attenuation = 1.0 / (spotLights[i].attenuationCoefficients.x + spotLights[i].attenuationCoefficients.y * distance + spotLights[i].attenuationCoefficients.z * distance * distance);
-        vec3 ambientLight = spotLights[i].ambientIntensity * spotLights[i].color;
+        vec3 ambientLight = spotLights[i].ambientIntensity * spotLights[i].color * ambientIntensity;
         
         vec3 lightDir = normalize(lightDistance);
         float theta = dot(lightDir, normalize(-spotLights[i].direction));
@@ -157,5 +159,5 @@ void main()
     vec3 litColor = LightingPass(normal, viewDir);
     
     vec4 emissiveColor = texture(material.emissiveTexture, TexCoord);
-    FragColor = emissiveColor + vec4(litColor, 1.0);
+    FragColor = vec4(litColor, 1.0);
 }

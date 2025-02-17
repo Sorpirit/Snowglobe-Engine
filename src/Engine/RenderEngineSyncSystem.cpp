@@ -15,13 +15,26 @@ void RenderEngineSyncSystem::Update()
             continue;
 
         Core::TransformComponent* transform = nullptr;
-        MeshComponent* mesh = nullptr;
-        if (!entity->QueryComponents(transform, mesh))
+        if (!entity->QueryComponent(transform))
             continue;
 
-        mesh->GetMeshProxy()->SetPosition(transform->Position);
-        mesh->GetMeshProxy()->SetRotation(transform->Rotation);
-        mesh->GetMeshProxy()->SetScale(transform->Scale);
+        MeshComponent* mesh = nullptr;
+        ModelComponent* model = nullptr;
+        if (entity->QueryComponent(mesh))
+        {
+            mesh->GetMeshProxy()->SetPosition(transform->Position);
+            mesh->GetMeshProxy()->SetRotation(transform->Rotation);
+            mesh->GetMeshProxy()->SetScale(transform->Scale);
+        }
+        else if (entity->QueryComponent(model))
+        {
+            for (auto mesh : model->GetMeshProxyLists())
+            {
+                mesh->SetPosition(transform->Position);
+                mesh->SetRotation(transform->Rotation);
+                mesh->SetScale(transform->Scale);
+            }
+        }
     }
 }
     

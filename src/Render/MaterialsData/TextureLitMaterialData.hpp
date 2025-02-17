@@ -9,6 +9,7 @@ namespace Snowglobe::Render::MaterialsData
     {
         Texture2DPtr diffuseTexture;
         Texture2DPtr specularTexture;
+        Texture2DPtr aoTexture;
         Texture2DPtr emissiveTexture;
         glm::vec4 baseColor = glm::vec4(1.0f);
         int specularPower = 32;

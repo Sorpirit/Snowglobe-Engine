@@ -17,7 +17,17 @@ public:
     Render::MeshProxy* GetMeshProxy() const { return _meshProxy; }
 private:
     Render::MeshProxy* _meshProxy = nullptr;
+};
 
+class ModelComponent : public Core::ECS::Component
+{
+public:
+    ModelComponent() = default;
+    ModelComponent(std::vector<Render::MeshProxy*> meshes) : _meshes(meshes) {}
+
+    std::vector<Render::MeshProxy*>& GetMeshProxyLists() { return _meshes; }
+private:
+    std::vector<Render::MeshProxy*> _meshes;
 };
 
 class BaseComponentMaterial : public Core::ECS::Component

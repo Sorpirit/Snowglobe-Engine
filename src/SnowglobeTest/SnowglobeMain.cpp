@@ -28,7 +28,7 @@
 
 typedef Snowglobe::Core::ECS::MappedTupleEntityData<
     Snowglobe::Core::TransformComponent, Snowglobe::Engine::Physics2DComponent, Snowglobe::Engine::Collider2DComponent,
-    Snowglobe::Engine::MeshComponent, Snowglobe::Engine::BaseComponentMaterial,
+    Snowglobe::Engine::MeshComponent, Snowglobe::Engine::ModelComponent, Snowglobe::Engine::BaseComponentMaterial,
     Snowglobe::RenderOpenGL::DirectionalLightComponent, Snowglobe::RenderOpenGL::PointLightComponent,
     Snowglobe::RenderOpenGL::SpotLightComponent, Snowglobe::Render::NEdgeShape2DComponent,
     Snowglobe::Engine::LifetimeComponent, Snowglobe::PawnInputComponent, Snowglobe::FadeOutLifetime,

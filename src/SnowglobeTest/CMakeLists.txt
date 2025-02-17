@@ -17,6 +17,6 @@ target_link_libraries(SnowglobeTest
     PRIVATE
     glm
     Snowglobe::Core
-    Snowglobe::Engine
     Snowglobe::Render
+    Snowglobe::Engine
 )
