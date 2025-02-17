@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     }
 
     RegisterTests();
-    std::string testName = "SnowglobeTest";
+    std::string testName = "SpaceShooter2DTest";
     for (int i = 0; i < argc; ++i)
     {
         if (std::string(argv[i]) == "--test" && (i + 1) < argc)
