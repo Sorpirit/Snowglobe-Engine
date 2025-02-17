@@ -169,12 +169,15 @@ void ComponentEditorSystem::DrawInspectorUI()
 void ComponentEditorSystem::PuaseAllSystems(bool pause)
 {
     _allSystemsPuased = pause;
-    for (auto& systemPair : _engine->GetSystemManager()->GetTypedSystems())
+    for (auto& systems : _engine->GetSystemManager()->GetSortedSystems())
     {
-        if (systemPair.second->IsPermanent())
-            continue;
+        for (auto& system : systems)
+        {
+            if (system->IsPermanent())
+                continue;
 
-        systemPair.second->SetActive(!pause);
+            system->SetActive(!pause);
+        }
     }
 }
 
