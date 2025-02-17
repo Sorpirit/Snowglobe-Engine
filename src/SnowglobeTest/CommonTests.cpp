@@ -19,6 +19,8 @@
 
 void BaseShapeFactoryTests::Init()
 {
+    RuntimeTest::Init();
+
     _triangleMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Triangle, glm::vec3(-3.0f, 0.0f, 0.0f), glm::vec3(1.0f));
     _planeMesh =  _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Plane, glm::vec3(0.0f), glm::vec3(1.0f));
     _diskMesh = _shapeFactory.CreateShape(Snowglobe::Render::BasicShape::Disk, glm::vec3(3.0f, 0.0f, 0.0f), glm::vec3(1.0f));
@@ -65,6 +67,7 @@ void BaseShapeFactoryTests::Run()
 
 void UITest::Init()
 {
+    RuntimeTest::Init();
 }
 
 void UITest::Run()
@@ -113,6 +116,7 @@ void UITest::Run()
 
 void TextureTests::Init()
 {
+    RuntimeTest::Init();
     auto tileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/wall.jpg"));
     auto containerTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container.jpg"));
     auto awesomeTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/awesomeface.png"));
@@ -150,6 +154,7 @@ void TextureTests::Run()
 
 void Phyiscs2DTests::Init()
 {
+    RuntimeTest::Init();
     auto materialL = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
     materialL.Properties()->color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     auto materialR = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
@@ -243,6 +248,7 @@ void Phyiscs2DTests::Run()
 
 void CameraTests::Init()
 {
+    RuntimeTest::Init();
     auto manager = _engine->GetEntityManager();
     _cubes.emplace_back(manager->CreateEntity());
     _cubes.emplace_back(manager->CreateEntity());
@@ -358,6 +364,7 @@ void CameraTests::AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vert
 
 void Assigment1Tests::Init()
 {
+    RuntimeTest::Init();
     _uiSystem->SetDefaultFont(Snowglobe::Core::SnowFileHandle(_descriptor.Font));
     
     auto materialG = _renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>();
@@ -472,6 +479,7 @@ Assigment1Tests::SceneDescriptor Assigment1Tests::LoadScene(Snowglobe::Core::Fil
 
 void LightTests::Init()
 {
+    RuntimeTest::Init() ;
     auto containerFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container.jpg"));
     auto diffuseFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container2.png"));
     auto specularFileTexture = Snowglobe::Core::FileSystem::LoadTexture(Snowglobe::Core::SnowFileHandle("Textures/container2_specular.png"));

@@ -44,6 +44,7 @@ void EnemieSpawnerSystem::SpawnEnemie()
 
 void ShapesShooter2DTest::Init()
 {
+    RuntimeTest::Init();
     auto systemManager = _engine->GetSystemManager();
 
     systemManager->TryAddSystem(
@@ -219,10 +220,6 @@ void ShapesShooter2DTest::Init()
         Core::ECS::PrePhysics, Core::ECS::DefaultLifetime, "ScoreSystem");
 
     systemManager->TryAddSystem<EnemieSpawnerSystem>(Core::ECS::DefaultLifetime, _uiSystem);
-
-    systemManager->TryAddSystem(
-        [&](const std::shared_ptr<Core::ECS::EntityManagerBase>& entityManager) { this->Run(); }, Core::ECS::PrePhysics,
-        Core::ECS::DefaultLifetime, "ShapesShooter2DTest");
 
     gen.seed(rd());
 

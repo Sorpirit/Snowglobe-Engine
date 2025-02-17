@@ -28,9 +28,15 @@ class RuntimeTest
         _window = _renderSystem->GetMainWindow();
         _uiSystem = _renderSystem->GetUISystem();
         _input = &_window->GetInput();
+
+
     }
 
-    virtual void Init() = 0;
+    virtual void Init()
+    {
+        _engine->GetSystemManager()->TryAddSystem(
+        [&](const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>&) { Run(); }, Snowglobe::Core::ECS::PrePhysics, Snowglobe::Core::ECS::DefaultLifetime, "RuntimeTest");
+    }
     virtual void Run() = 0;
 
     const std::string& GetTestName() const { return _testName; }
