@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <functional>
 
 #define GLFW_INCLUDE_NONE
@@ -15,16 +14,16 @@ namespace Snowglobe::Render::GLFW
     {
     public:
         WindowGLFW(const WindowParams &params);
-        ~WindowGLFW();
+        ~WindowGLFW() override;
 
-        virtual void SetResizeCallback(const std::function<void(int, int)>& callback) override;
-        virtual void SetCloseCallback(const std::function<void()>& callback) override;
-        virtual void Present() override;
-        virtual void Focus() override;
-        virtual void PollEvents() override;
-        virtual void Close() override;
-        virtual bool IsOpen() override;
-        virtual SnowCore::InputReader& GetInput() override { return _input; }
+        void SetResizeCallback(const std::function<void(int, int)>& callback) override;
+        void SetCloseCallback(const std::function<void()>& callback) override;
+        void Present() override;
+        void Focus() override;
+        void PollEvents() override;
+        void Close() override;
+        bool IsOpen() override;
+        Core::InputReader& GetInput() override { return _input; }
 
         GLFWwindow* GetWindow() const { return _window; }
         InputGLFW& GetInputGLFW() { return _input; }
@@ -35,9 +34,9 @@ namespace Snowglobe::Render::GLFW
         std::function<void(int, int)> _resizeCallback;
         std::function<void()> _closeCallback;
 
-        void WindowResizeCallback(GLFWwindow* windowImpl, int width, int height);
+        void WindowResizeCallback(GLFWwindow* windowImpl, int width, int height) const;
 
         static void WindowResizeCallbackStatic(GLFWwindow* window, int width, int height);
     };
     
-} // namespace Snowglobe::Render::GLFW
+}

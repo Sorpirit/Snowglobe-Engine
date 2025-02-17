@@ -9,12 +9,12 @@ namespace Snowglobe::RenderOpenGL
     class VertexLayoutDescriptor
     {
         public:
-            VertexLayoutDescriptor(std::type_index) : _vertexType(_vertexType) {}
+            VertexLayoutDescriptor(std::type_index vertexType) : _vertexType(vertexType) {}
 
             virtual inline void SetupAtributePointers() const = 0;
             virtual inline uint32_t GetStride() const = 0;
 
-            inline std::type_index GetVertexType() const { return _vertexType; }
+            std::type_index GetVertexType() const { return _vertexType; }
 
         protected:
             std::type_index _vertexType;

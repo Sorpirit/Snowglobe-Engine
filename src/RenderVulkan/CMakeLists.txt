@@ -20,6 +20,6 @@ target_link_libraries(RenderVulkan
     glm
     stb
     imgui
-    Snowglobe::SnowCore
+    Snowglobe::Core
     Snowglobe::Render
 )

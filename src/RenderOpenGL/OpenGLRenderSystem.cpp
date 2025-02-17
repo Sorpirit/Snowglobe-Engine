@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <memory>
+#include <variant>
 #include <vector>
 
 #include "EngineTime.hpp"
@@ -18,17 +19,35 @@
 
 #include "Materials/BasicShapeMaterialImpl.hpp"
 #include "Materials/TextureShapeMaterialImpl.hpp"
+#include "Materials/TextureLitMaterialImpl.hpp"
 
 #include "TextureManager.hpp"
+#include "TransformComponent.hpp"
+
+#include "TemplateRenderPass.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
+    template <typename MaterialImpl, typename MaterialData>
+    void OpenGLRenderSystem::RegisterMaterialManager()
+    {
+        _materialManages.insert({typeid(MaterialData), Materials::TemplateMaterialManager<MaterialImpl, MaterialData>::GetInstance()});
+    }
+
+    template <typename MaterialImpl, typename InstanceVertexLayoutDescriptor>
+    void OpenGLRenderSystem::RegisterTemplateRenderPass(const Core::SnowFileHandle& vertexShader, const Core::SnowFileHandle& fragmentShader, bool useLighting)
+    {
+        auto pass = std::make_unique<TemplateRenderPass<MaterialImpl, InstanceVertexLayoutDescriptor>>(vertexShader, fragmentShader, useLighting);
+        _renderPasses.insert({pass->GetSignature(), std::move(pass)});
+    }
+
     OpenGLRenderSystem* OpenGLRenderSystem::_instance = nullptr;
 
-    OpenGLRenderSystem::OpenGLRenderSystem(SnowCore::ECS::EntityManagerBase& entityManager) :
-        RenderSystem(entityManager), _shaderCompiler(std::make_unique<ShaderCompiler>())
+    OpenGLRenderSystem::OpenGLRenderSystem() : _shaderCompiler(std::make_unique<ShaderCompiler>())
     {
         _instance = this;
+
+        _updateOrder = Core::ECS::UpdateOrder::Render;
 
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -43,14 +62,46 @@ namespace Snowglobe::RenderOpenGL
 
     void OpenGLRenderSystem::Update()
     {
-        SnowCore::EngineTime::GetInstance()->RenderTick();
+        Core::EngineTime::GetInstance()->RenderTick();
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         _camera.Update();
-        
+        _lightParameters.Reset();
+        for (auto lightEntity : _entityManager->GetEntitiesWithTag(Tags::Lights()))
+        {
+            Core::TransformComponent* transform = nullptr;
+            if (!lightEntity->QueryComponent(transform))
+                continue;
+
+            DirectionalLightComponent* directional;
+            if (lightEntity->QueryComponent(directional))
+            {
+                auto& directionalRef = _lightParameters.GetDirectionalLight();
+                directionalRef = directional->Light;
+                directionalRef.LightDirection = -transform->GetUp();
+            }
+
+            PointLightComponent* pointLight;
+            if (lightEntity->QueryComponent(pointLight))
+            {
+                auto& pointLightRef = _lightParameters.NextPointLight();
+                pointLightRef = pointLight->Light;
+                pointLightRef.LightPosition = transform->Position;
+            }
+
+            SpotLightComponent* spotLight;
+            if (lightEntity->QueryComponent(spotLight))
+            {
+                auto& spotLightRef = _lightParameters.NextSpotLight();
+                spotLightRef = spotLight->Light;
+                spotLightRef.LightPosition = transform->Position;
+                spotLightRef.LightDirection = -transform->GetUp();
+            }
+        }
+
         for(auto& mesh : _meshes)
         {
             if (mesh.GetMaterial() == nullptr || mesh.GetVertexBuffer() == nullptr || !mesh.IsVisible())
@@ -66,6 +117,10 @@ namespace Snowglobe::RenderOpenGL
 
             renderPass->second->Execute(mesh);
         }
+
+        _shape2DSystem.Update();
+
+        _uiSystem->EndRendering();
     }
 
     void OpenGLRenderSystem::InitializeWindow(const Render::WindowParams& params)
@@ -74,10 +129,10 @@ namespace Snowglobe::RenderOpenGL
 
         //_camera = Render::Camera(Render::CameraMode::Orthographic, 45.0f, 1.0f, 0.1f, 100.0f);
         _camera.SetFov(45.0f);
-        _camera.SetWidth(params.width);
-        _camera.SetHeight(params.height);
+        _camera.SetWidth(params.Width);
+        _camera.SetHeight(params.Height);
         _camera.SetOrthographicSize(5);
-        _camera.SetPosition(glm::vec3(0.0f, 0.0f, -3.0f));
+        _camera.SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         _camera.SetMode(Render::CameraMode::Orthographic);
 
         _mainWindow->SetResizeCallback([this](int width, int height)
@@ -97,15 +152,23 @@ namespace Snowglobe::RenderOpenGL
     {
         _vertexLayoutDescriptors.insert({typeid(Render::PositionVertex), PositionVertexLayoutDescriptor::GetInstance()});
         _vertexLayoutDescriptors.insert({typeid(Render::PositionUVVertex), PositionUVVertexLayoutDescriptor::GetInstance()});
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalUVVertex), PositionNormalUVVertexLayoutDescriptor::GetInstance()});
+        _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
+        _shape2DSystem.Init(_entityManager);
+        
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
+        RegisterMaterialManager<Materials::TextureLitMaterialImpl, Render::MaterialsData::TextureLitMaterialData>();
 
         RegisterTemplateRenderPass<Materials::BasicShapeMaterialImpl, PositionVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("color.vert"), SnowCore::SnowFileHandle("color.frag"));
+            Core::SnowFileHandle("color.vert"), Core::SnowFileHandle("color.frag"));
 
         RegisterTemplateRenderPass<Materials::TextureShapeMaterialImpl, PositionUVVertexLayoutDescriptor>(
-            SnowCore::SnowFileHandle("texture.vert"), SnowCore::SnowFileHandle("texture.frag"));
+            Core::SnowFileHandle("textureUnlit.vert"), Core::SnowFileHandle("textureUnlit.frag"));
+
+        RegisterTemplateRenderPass<Materials::TextureLitMaterialImpl, PositionNormalUVVertexLayoutDescriptor>(
+            Core::SnowFileHandle("textureLit.vert"), Core::SnowFileHandle("textureLit.frag"), true);
 
     }
 
@@ -113,7 +176,7 @@ namespace Snowglobe::RenderOpenGL
         const std::string& debugName)
     {
         _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, debugName);
-        _nextMeshId = { _nextMeshId.id + 1 };
+        _nextMeshId = { _nextMeshId.GetId() + 1 };
         return &_meshes.back();
     }
 
@@ -122,7 +185,7 @@ namespace Snowglobe::RenderOpenGL
                                                            const std::string& debugName)
     {
         _meshes.emplace_back(_nextMeshId, (const VertexBufferPtrOpenGL&) vertexBuffer, (const IndexBufferPtrOpenGL&) indexBuffer, debugName);
-        _nextMeshId = { _nextMeshId.id + 1 };
+        _nextMeshId = { _nextMeshId.GetId() + 1 };
         return &_meshes.back();
     }
 
@@ -133,7 +196,7 @@ namespace Snowglobe::RenderOpenGL
         return &_indexBuffers.back();
     }
 
-    Render::Texture2DPtr OpenGLRenderSystem::CreateTexture2D(const SnowCore::FileTexture &texture,
+    Render::Texture2DPtr OpenGLRenderSystem::CreateTexture2D(const Core::FileTexture &texture,
                                                              const Render::Texture2DDescriptor &desc,
                                                              const std::string &debugName)
     {

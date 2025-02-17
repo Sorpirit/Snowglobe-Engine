@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 #include <glad/gl.h>
-#include "SnowFileSystem.hpp"
+#include "FileSystem.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -17,14 +17,24 @@ ShaderCompiler::~ShaderCompiler()
 
 }
 
-unsigned int ShaderCompiler::GetOrCompileShader(const SnowCore::SnowFileHandle& shader)
+unsigned int ShaderCompiler::GetOrCompileShader(const Core::SnowFileHandle& shader)
 {
-    auto shaderSource = SnowCore::SnowFileSystem::GetInstance().ReadTextFile(shader);
-    if(shaderSource == nullptr)
+    if (!shader.IsValid())
     {
+        std::cerr << "Shader path invalid: " << shader.GetFullPath() << '\n';
+        return UINT_MAX;
+    }
+    
+    std::stringstream shaderSourceBuffer;
+    if(!Core::FileSystem::TryReadTextFile(shader, shaderSourceBuffer))
+    {
+        std::cerr << "Unable to read shader at: " << shader.GetFullPath() << '\n';
         return UINT_MAX;
     }
 
+    std::string shaderSource = shaderSourceBuffer.str();
+    const char* sourcePointer = shaderSource.c_str();
+    
     int shaderType = GetShaderType(shader);
 
     if(shaderType == 0)
@@ -33,7 +43,7 @@ unsigned int ShaderCompiler::GetOrCompileShader(const SnowCore::SnowFileHandle& 
     }
 
     unsigned int shaderId = glCreateShader(shaderType);
-    glShaderSource(shaderId, 1, &shaderSource, nullptr);
+    glShaderSource(shaderId, 1, &sourcePointer, nullptr);
     glCompileShader(shaderId);
 
     int success;
@@ -95,13 +105,13 @@ unsigned int ShaderCompiler::GetOrCratePipeline(const PipelineSetupParams& param
     return pipelineId;
 }
 
-int ShaderCompiler::GetShaderType(const SnowCore::SnowFileHandle &shader)
+int ShaderCompiler::GetShaderType(const Core::SnowFileHandle &shader)
 {
-    auto extension = shader.path.extension().string();
+    auto extension = shader.GetFullPath().extension().string();
 
     if(extension.empty())
     {
-        std::cout << "No extension found at" << shader.path << std::endl;
+        std::cout << "No extension found at" << shader.GetFullPath() << std::endl;
         return 0;
     }
 
@@ -130,7 +140,7 @@ int ShaderCompiler::GetShaderType(const SnowCore::SnowFileHandle &shader)
         return GL_COMPUTE_SHADER;
     }
 
-    std::cout << "Unknown shader type at" << shader.path << std::endl;
+    std::cout << "Unknown shader type at" << shader.GetFullPath() << std::endl;
     return 0;
 }
 

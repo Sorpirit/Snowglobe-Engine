@@ -3,14 +3,13 @@
 #include <glm/glm.hpp>
 
 #include "RenderSystem.hpp"
-#include "RenderProxy.hpp"
 #include "VertexBufferPtr.hpp"
 #include "IndexBufferPtr.hpp"
 #include "MeshProxy.hpp"
 
 namespace Snowglobe::Render
 {
-    enum class BasicShape
+    enum class BasicShape : uint8_t
     {
         Triangle,
         Plane,
@@ -19,7 +18,7 @@ namespace Snowglobe::Render
 
     struct BasicShapeMaterial
     {
-        glm::vec3 color = glm::vec3(1.0f);
+        glm::vec4 color = glm::vec4(1.0f);
     };
 
     class BasicShapeFactory

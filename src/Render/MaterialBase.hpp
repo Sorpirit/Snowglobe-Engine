@@ -5,6 +5,7 @@ namespace Snowglobe::Render
     class MaterialBase
     {
     public:
+        virtual ~MaterialBase() = default;
         virtual void* GetMaterialDataPtr() const = 0;
     };
 

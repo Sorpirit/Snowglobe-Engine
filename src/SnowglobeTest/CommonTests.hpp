@@ -18,8 +18,7 @@
 class BaseShapeFactoryTests : public RuntimeTest
 {
     public:
-        BaseShapeFactoryTests(Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "BaseShapeFactoryTests"),
+        BaseShapeFactoryTests() : RuntimeTest("BaseShapeFactoryTests"),
             _shapeFactory(_renderSystem),
             _gradientMaterial(_renderSystem->CreateMaterialInstance<Snowglobe::Render::BasicShapeMaterial>())
             {}
@@ -45,9 +44,7 @@ class BaseShapeFactoryTests : public RuntimeTest
 class UITest : public RuntimeTest
 {
     public:
-        UITest(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "UITest") {}
+        UITest() : RuntimeTest("UITest") {}
         void Init() override;
         void Run() override;
 
@@ -63,7 +60,7 @@ private:
         glm::vec3 Color;
     };
 
-    int _selectedEntity = 0;
+    size_t _selectedEntity = 0;
     std::vector<DemoEntity> _entities = {
         {"Foo", glm::vec3(1, -2, 3), glm::vec2(4, -3), 1.0f, true, glm::vec3(1, 0, 0)},
         {"Bar", glm::vec3(4, 5, -6), glm::vec2(0, 0), 4.0f, false, glm::vec3(0, 1, 0)},
@@ -74,9 +71,7 @@ private:
 class TextureTests : public RuntimeTest
 {
     public:
-        TextureTests(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "TextureTests") {}
+        TextureTests() : RuntimeTest("TextureTests") {}
         void Init() override;
         void Run() override;
 };
@@ -84,9 +79,7 @@ class TextureTests : public RuntimeTest
 class Phyiscs2DTests : public RuntimeTest
 {
 public:
-    Phyiscs2DTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem) : RuntimeTest(engine, fileSystem, "Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
+    Phyiscs2DTests() : RuntimeTest("Phyiscs2DTests"), _shapeFactory(_renderSystem) {}
     void Init() override;
     void Run() override;
 
@@ -97,16 +90,9 @@ private:
 class CameraTests : public RuntimeTest
 {
 public:
-    CameraTests(
-        Snowglobe::SnowEngine::SnowEngine& engine, Snowglobe::SnowCore::SnowFileSystem& fileSystem) :
-            RuntimeTest(engine, fileSystem, "CameraTests"), _shapeFactory(_renderSystem), _spectator(_renderSystem->GetCamera(), _window->GetInput())
+    CameraTests() :
+            RuntimeTest("CameraTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
     {
-        auto manager = _engine.GetEntityManager();
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
-        _cubes.emplace_back(manager->CreateEntity());
     }
     
     void Init() override;
@@ -115,10 +101,10 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     bool _isOrthographic = false;
 
-    Snowglobe::SnowEngine::SpectatorCamera _spectator;
+    Snowglobe::Engine::SpectatorCamera _spectator;
 
-    std::vector<std::shared_ptr<Snowglobe::SnowCore::ECS::Entity>> _cubes;
-    std::vector<std::shared_ptr<Snowglobe::SnowEngine::MeshComponent>>_cubeMeshC;
+    std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;
 
     void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
 };
@@ -147,15 +133,47 @@ public:
     };
 
     Assigment1Tests(
-        Snowglobe::SnowEngine::SnowEngine& engine, 
-        Snowglobe::SnowCore::SnowFileSystem& fileSystem,
-        SceneDescriptor& descriptor) : RuntimeTest(engine, fileSystem, "Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
+        Snowglobe::Engine::Engine& engine, 
+        Snowglobe::Core::FileSystem& fileSystem,
+        SceneDescriptor& descriptor) : RuntimeTest("Assigment1Tests"), _shapeFactory(_renderSystem), _descriptor(descriptor) {}
     void Init() override;
     void Run() override;
     
-    static SceneDescriptor LoadScene(Snowglobe::SnowCore::SnowFileSystem& fileSystem, const Snowglobe::SnowCore::SnowFileHandle& sceneFile);
+    static SceneDescriptor LoadScene(Snowglobe::Core::FileSystem& fileSystem, const Snowglobe::Core::SnowFileHandle& sceneFile);
     
 private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     SceneDescriptor& _descriptor;
+};
+
+
+class LightTests : public RuntimeTest
+{
+public:
+    LightTests() :
+            RuntimeTest("LightTests"), _shapeFactory(_renderSystem), _spectator(&_renderSystem->GetCamera(), &_window->GetInput())
+    {}
+    
+    void Init() override;
+    void Run() override;
+private:
+    Snowglobe::Render::BasicShapeFactory _shapeFactory;
+    bool _isOrthographic = false;
+
+    Snowglobe::Engine::SpectatorCamera _spectator;
+
+    std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
+    std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;
+
+    void AddQuad(std::vector<Snowglobe::Render::PositionUVVertex>& vertices, glm::mat4x4 transform);
+    void AddQuad(std::vector<Snowglobe::Render::PositionNormalUVVertex>& vertices, glm::mat4x4 transform);
+    void AddSphere(std::vector<Snowglobe::Render::PositionNormalUVVertex>& vertices, glm::mat4x4 transform);
+    
+    struct SceneCube
+    {
+        glm::vec3 Position;
+        glm::vec3 Rotation;
+        glm::vec3 Scale;
+        glm::vec4 Color;
+    };
 };

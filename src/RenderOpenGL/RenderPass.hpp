@@ -12,7 +12,7 @@ namespace Snowglobe::RenderOpenGL
         std::type_index materialType;
         std::type_index vertexType;
 
-        RenderPassSignature(const MeshOpenGL& mesh) : materialType(typeid(*(mesh.GetMaterial()))), vertexType(typeid(*mesh.GetVertexBuffer()->GetLayoutDescriptor())) {}
+        RenderPassSignature(const MeshOpenGL& mesh) : materialType(mesh.GetMaterialType()), vertexType(mesh.GetVertexBufferType()) {}
         RenderPassSignature(std::type_index materialType, std::type_index vertexType) : materialType(materialType), vertexType(vertexType) {}
 
         bool operator==(const RenderPassSignature& otherId) const
@@ -25,6 +25,7 @@ namespace Snowglobe::RenderOpenGL
     class RenderPass
     {
     public:
+        virtual ~RenderPass() = default;
         RenderPass(const RenderPassSignature& signature) : _signature(signature) {}
 
         virtual void Execute(MeshOpenGL& mesh) = 0;

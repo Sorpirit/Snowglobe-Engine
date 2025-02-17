@@ -1,44 +1,72 @@
-#pragma once 
+#pragma once
 
-#include <string>
 #include <iostream>
+#include <string>
 #include <vector>
 
-#include <SnowEngine.hpp>
-#include <SnowFileSystem.hpp>
+#include <Engine.hpp>
+#include <FileSystem.hpp>
 #include <RenderSystem.hpp>
-#include <Window.hpp>
 #include <UISystem.hpp>
+#include <Window.hpp>
+#include <DependencyManager.hpp>
 
 class RuntimeTest
 {
-    public:
-        RuntimeTest(
-            Snowglobe::SnowEngine::SnowEngine& engine, 
-            Snowglobe::SnowCore::SnowFileSystem& fileSystem,
-            const std::string& testName) : _testName(testName), _engine(engine), _fileSystem(fileSystem) 
-        {
-            if(!engine.QuerySystem<Snowglobe::Render::RenderSystem>(_renderSystem))
-            {
-                std::cout << "Failed to get render system" << std::endl;
-            }
+  public:
+    virtual ~RuntimeTest() = default;
 
-            _window = _renderSystem->GetMainWindow();
-            _uiSystem = _renderSystem->GetUISystem();
+    RuntimeTest(const std::string& testName)
+        : _testName(testName), _engine(DI->Resolve<Snowglobe::Engine::Engine>()),
+          _fileSystem(DI->Resolve<Snowglobe::Core::FileSystem>())
+    {
+        if (!_engine->GetSystemManager()->QuerySystem<Snowglobe::Render::RenderSystem>(_renderSystem))
+        {
+            std::cout << "Failed to get render system" << std::endl;
         }
 
-        virtual void Init() = 0;
-        virtual void Run() = 0;
+        _window = _renderSystem->GetMainWindow();
+        _uiSystem = _renderSystem->GetUISystem();
+        _input = &_window->GetInput();
 
-        const std::string& GetTestName() const { return _testName; }
-    
-    protected:
-        std::string _testName;
 
-        Snowglobe::SnowEngine::SnowEngine& _engine;
-        Snowglobe::SnowCore::SnowFileSystem& _fileSystem;
-        Snowglobe::Render::RenderSystem* _renderSystem;
-        Snowglobe::Render::Window* _window;
-        Snowglobe::Render::UISystem* _uiSystem;
+    }
+
+    virtual void Init()
+    {
+        _engine->GetSystemManager()->TryAddSystem(
+        [&](const std::shared_ptr<Snowglobe::Core::ECS::EntityManagerBase>&) { Run(); }, Snowglobe::Core::ECS::PrePhysics, Snowglobe::Core::ECS::DefaultLifetime, "RuntimeTest");
+    }
+    virtual void Run() = 0;
+
+    const std::string& GetTestName() const { return _testName; }
+
+    static std::unordered_map<std::string, std::unique_ptr<RuntimeTest>>& GetRegisteredTests()
+    {
+        static std::unordered_map<std::string, std::unique_ptr<RuntimeTest>> registeredTests;
+        return registeredTests;
+    }
+
+    template <typename T> static void RegisterTest()
+    {
+        auto& map = GetRegisteredTests();
+        auto test = std::make_unique<T>();
+        map[test->GetTestName()] = std::move(test);
+    }
+
+    static RuntimeTest& GetTest(const std::string& name)
+    {
+        auto& map = GetRegisteredTests();
+        return *map[name].get();
+    }
+
+  protected:
+    std::string _testName;
+
+    std::shared_ptr<Snowglobe::Engine::Engine> _engine;
+    std::shared_ptr<Snowglobe::Core::FileSystem> _fileSystem;
+    Snowglobe::Render::RenderSystem* _renderSystem;
+    Snowglobe::Render::Window* _window;
+    Snowglobe::Core::InputReader* _input;
+    Snowglobe::Render::UISystem* _uiSystem;
 };
-

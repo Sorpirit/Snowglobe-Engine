@@ -5,7 +5,7 @@
 namespace Snowglobe::RenderOpenGL
 {
     VertexBufferPtrOpenGL::VertexBufferPtrOpenGL(const VertexLayoutDescriptor* layoutDescriptor, size_t vertexCount, const void* bufferPtr, const std::string& debugName) 
-        : _layoutDescriptor(layoutDescriptor), _vertexCount(vertexCount), _debugName(debugName)
+        : _vertexCount(vertexCount), _debugName(debugName), _layoutDescriptor(layoutDescriptor)
     {
         glGenBuffers(1, &_bufferPtr);
         UploadData(vertexCount, bufferPtr);

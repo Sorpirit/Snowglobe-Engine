@@ -1,13 +1,12 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 #include <string>
 
 #include <glm/glm.hpp>
 
 #include <ECS/ISystem.hpp>
-#include <SnowFileSystem.hpp>
+#include <FileSystem.hpp>
 
 namespace Snowglobe::Render
 {
@@ -32,7 +31,7 @@ namespace Snowglobe::Render
         bool _isOpen = true;
     };
 
-    enum Alignment
+    enum Alignment : uint8_t
     {
         // vertical:horizontal 00:00
         // center:center 01:01
@@ -47,7 +46,7 @@ namespace Snowglobe::Render
         VerticalBottom   = 1 << 3
     };
 
-    enum Slider
+    enum Slider : uint16_t 
     {
         None            = 0,
         Logarithmic     = 1 << 5,
@@ -59,10 +58,11 @@ namespace Snowglobe::Render
         AlwaysClamp     = ClampOnInput | ClampZeroRange
     };
 
-    class UISystem : public SnowCore::ECS::ISystem
+    class UISystem : public Core::ECS::ISystem
     {
     public:
-        UISystem(SnowCore::ECS::EntityManagerBase& entityManager) : ISystem(entityManager)  {}
+        UISystem() : ISystem(true) {}
+        virtual void EndRendering() = 0;
 
         virtual UIPanel OpenUIPanel(const std::string& title) = 0;
         virtual void Close(UIPanel* panel) = 0;
@@ -95,17 +95,28 @@ namespace Snowglobe::Render
         virtual void Slider(const std::string& label, glm::vec2* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
         virtual void Slider(const std::string& label, glm::vec3* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
         virtual void Slider(const std::string& label, glm::vec4* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, int* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec2* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec3* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
-        virtual void Slider(const std::string& label, glm::ivec4* value, float min, float max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, int* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec2* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec3* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
+        virtual void Slider(const std::string& label, glm::ivec4* value, int min, int max, const std::string& format = "%d", int flags = Slider::None) = 0;
         virtual void SliderAngle(const std::string& label, float* value, float min, float max, const std::string& format = "%.3f", int flags = Slider::None) = 0;
 
         virtual void Color(const std::string& label, glm::vec3* value, int flags = 0) = 0;
         virtual void Color(const std::string& label, glm::vec4* value, int flags = 0) = 0;
 
-        virtual void Combo(const std::string& label, int* current, const std::string items[], int itemsCount, int flags = 0) = 0;
-        virtual void Combo(const std::string& label, int* current, const std::vector<std::string>& items, int flags = 0) = 0;
+        virtual void Combo(const std::string& label, size_t* current, const std::string items[], size_t itemsCount, int flags = 0) = 0;
+        virtual void Combo(const std::string& label, size_t* current, const std::vector<std::string>& items, int flags = 0) = 0;
+
+        virtual bool BeginTreeNode(const std::string& label, int flags = 0) = 0;
+        virtual void EndTreeNode() = 0;
+
+        virtual bool BeginTabBar(const std::string& label, int flags = 0) = 0;
+        virtual void EndTabBar() = 0;
+
+        virtual bool BeginTabBarItem(const std::string& label, int flags = 0) = 0;
+        virtual void EndTabBarItem() = 0;
+
+        virtual void Separator(int flags = 0) = 0;
 
         virtual void SameLine() = 0;
         virtual void ToolTip(const std::string& text) = 0;
@@ -113,7 +124,7 @@ namespace Snowglobe::Render
         virtual bool Button(const std::string& label) = 0;
         
         virtual void AddWorldText(const glm::vec3& position, const std::string& text, const glm::vec3& color = {1.0f, 1.0f, 0.0f}, int alignment = 0) = 0;
-        virtual void SetDefaultFont(SnowCore::SnowFileHandle fontFileHandle) = 0;
+        virtual void SetDefaultFont(Core::SnowFileHandle fontFileHandle) = 0;
     };
     
 } // namespace Snowglobe::Render

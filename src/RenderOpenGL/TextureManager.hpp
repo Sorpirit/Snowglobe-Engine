@@ -20,13 +20,25 @@ namespace Snowglobe::RenderOpenGL
         TextureManager();
         ~TextureManager();
 
-        Render::Texture2DPtr CreateTexture2D(const SnowCore::FileTexture& texture, const Render::Texture2DDescriptor& desc, const std::string& debugName = "Texture2D");
+        Render::Texture2DPtr CreateTexture2D(const Core::FileTexture& texture, const Render::Texture2DDescriptor& desc, const std::string& debugName = "Texture2D");
 
-        Texture2D& GetTexture(Render::Texture2DPtr texturePtr) { return _textures[texturePtr]; }
+        Texture2D& GetTexture(Render::Texture2DPtr texturePtr)
+        {
+            auto it = _textures.find(texturePtr);
+            if (it == _textures.end())
+            {
+                return _textures[_whiteRGB];
+            }
+
+            return it->second;
+        }
 
     private:
         uint32_t _nextTextureId = 0;
         std::unordered_map<Render::Texture2DPtr, Texture2D> _textures;
+
+        Render::Texture2DPtr _whiteRGB;
+        Render::Texture2DPtr _whiteRGBA;
     };
     
 } // namespace Snowglobe::RenderOpenGL

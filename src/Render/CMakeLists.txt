@@ -13,7 +13,7 @@ target_link_libraries(Render
     glm
     stb
     glfw
-    Snowglobe::SnowCore
+    Snowglobe::Core
 )
 
 file(GLOB RENDER_SOURCE *.cpp)

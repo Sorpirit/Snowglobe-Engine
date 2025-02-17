@@ -12,7 +12,7 @@ namespace Snowglobe::RenderOpenGL
         void Bind(const Render::Camera& camera, uint32_t pipelineId);
         
     private:
-        CachedUniformLocations<1> _uniformLocations;
+        CachedUniformLocations<2> _uniformLocations;
     };
     
 } // namespace Snowglobe::RenderOpenGL

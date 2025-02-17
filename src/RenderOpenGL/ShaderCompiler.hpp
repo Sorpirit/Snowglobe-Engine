@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SnowFileSystem.hpp"
+#include "FileSystem.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -27,10 +27,10 @@ namespace Snowglobe::RenderOpenGL
         ShaderCompiler();
         ~ShaderCompiler();
 
-        unsigned int GetOrCompileShader(const SnowCore::SnowFileHandle& shader);
+        unsigned int GetOrCompileShader(const Core::SnowFileHandle& shader);
         unsigned int GetOrCratePipeline(const PipelineSetupParams& params);
     private:
-        int GetShaderType(const SnowCore::SnowFileHandle& shader);
+        static int GetShaderType(const Core::SnowFileHandle& shader);
         PipelineType GetPipelineType(const PipelineSetupParams& params);
     };
     

@@ -13,10 +13,10 @@ namespace Snowglobe::RenderOpenGL
         Texture2D() = default;
 
         Texture2D(Render::TextureWrap uvWrap, Render::TextureFilter minFilter, Render::TextureFilter magFilter, bool generateMipmaps = true) :
-            _uWrap(uvWrap), _vWrap(uvWrap), _minFilter(minFilter), _magFilter(magFilter), _generateMipmaps(generateMipmaps) {};
+            _generateMipmaps(generateMipmaps), _uWrap(uvWrap), _vWrap(uvWrap), _minFilter(minFilter), _magFilter(magFilter) {};
 
         Texture2D(Render::TextureWrap uWrap, Render::TextureWrap vWrap, Render::TextureFilter minFilter, Render::TextureFilter magFilter, bool generateMipmaps = true) :
-            _uWrap(uWrap), _vWrap(vWrap), _minFilter(minFilter), _magFilter(magFilter), _generateMipmaps(generateMipmaps) {};
+            _generateMipmaps(generateMipmaps), _uWrap(uWrap), _vWrap(vWrap), _minFilter(minFilter), _magFilter(magFilter) {};
 
         ~Texture2D();
 
