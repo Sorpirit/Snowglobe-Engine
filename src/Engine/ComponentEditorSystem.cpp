@@ -117,6 +117,12 @@ void ComponentEditorSystem::DrawInspectorUI()
 {
     auto& entities = _entityManager->GetAllEntities();
 
+    if (entities.size() < 1)
+    {
+        _uiSystem->Text("No entities");
+        return;
+    }
+
     if (_selectedEntity >= entities.size())
         _selectedEntity = entities.size() - 1;
 
