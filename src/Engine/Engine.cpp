@@ -11,6 +11,7 @@
 #include "LifetimeSystem.hpp"
 #include "PhysicsEngine2DSystem.hpp"
 #include "RenderEngineSyncSystem.hpp"
+#include "SpriteAnimationSystem.hpp"
 
 namespace Snowglobe::Engine
 {
@@ -64,6 +65,7 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
 {
     _entityManager = std::move(entityManager);
     _systemManager = std::make_shared<Core::ECS::SystemManager>(_entityManager);
+    _lifetimeSystem.Init(_entityManager, _systemManager);
 
     switch (profile.preferredRenderEngine)
     {
@@ -104,6 +106,7 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
     _systemManager->TryAddSystem<RenderEngineSyncSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();
+    _systemManager->TryAddSystem<Render::SpriteAnimationSystem>();
     _systemManager->TryAddSystem<ComponentEditorSystem>(Core::ECS::DefaultLifetime, uiSystem,
                                                         &renderSystem->GetMainWindow()->GetInput(), this);
 

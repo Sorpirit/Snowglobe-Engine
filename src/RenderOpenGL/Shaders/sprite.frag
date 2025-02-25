@@ -9,6 +9,8 @@ struct SceneParameters
 struct Material {  
     sampler2D mainTexture;
     vec4 color;
+    vec2 textureOffset;
+    vec2 textureScale;
 };
 
 out vec4 FragColor;

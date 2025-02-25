@@ -24,6 +24,7 @@
 #include "NEdgeShape2DComponent.hpp"
 #include "Physics2DComponent.hpp"
 #include "ShapesShooter2DTest.hpp"
+#include "SpriteAnimationSystem.hpp"
 #include "SpriteRenderComponent.hpp"
 #include "Tests/SceneSerializationTest.hpp"
 #include "Tests/Sprite2DTest.hpp"
@@ -33,7 +34,8 @@ typedef Snowglobe::Core::ECS::MappedTupleEntityData<
     Snowglobe::Core::TransformComponent, Snowglobe::Engine::Physics2DComponent, Snowglobe::Engine::Collider2DComponent,
     Snowglobe::Engine::MeshComponent, Snowglobe::Engine::ModelComponent, Snowglobe::Engine::BaseComponentMaterial,
     Snowglobe::RenderOpenGL::DirectionalLightComponent, Snowglobe::RenderOpenGL::PointLightComponent,
-    Snowglobe::RenderOpenGL::SpotLightComponent, Snowglobe::Render::NEdgeShape2DComponent, Snowglobe::Render::SpriteRenderComponent,
+    Snowglobe::RenderOpenGL::SpotLightComponent, Snowglobe::Render::NEdgeShape2DComponent,
+    Snowglobe::Render::SpriteRenderComponent, Snowglobe::Render::SpriteAnimationComponent,
     Snowglobe::Engine::LifetimeComponent, Snowglobe::PawnInputComponent, Snowglobe::FadeOutLifetime,
     Snowglobe::ExplodeOnDeath, Snowglobe::DestroyOnCollision, Snowglobe::MouseControllerComponent,
     Snowglobe::RotationAnimationComponent, Snowglobe::ScoreComponent>

@@ -26,6 +26,7 @@
 #include "FileTexture.hpp"
 #include "LightsManager.hpp"
 #include "Shape2DSystem.hpp"
+#include "SpriteRenderer.hpp"
 
 #include "Texture2DPtr.hpp"
 
@@ -89,6 +90,7 @@ namespace Snowglobe::RenderOpenGL {
         LightsManager _lightParameters;
 
         Shape2DSystem _shape2DSystem;
+        SpriteRenderer _spriteRenderer;
 
         std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass> > _renderPasses;
 

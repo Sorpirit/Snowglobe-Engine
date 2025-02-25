@@ -15,9 +15,9 @@ void SpriteRenderer::Init(std::shared_ptr<Core::ECS::EntityManagerBase> entityMa
 
     auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
     // auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Sprite.vert"));
-    auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("textureUnlit.vert"));
+    auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("sprite.vert"));
     // auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Sprite.frag"));
-    auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("textureUnlit.frag"));
+    auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("sprite.frag"));
 
     PipelineSetupParams params = {vertexShader, fragmentShader};
     _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
@@ -46,6 +46,8 @@ void SpriteRenderer::Update()
 
         _material.GetMaterialData().texture = sprite->Sprite;
         _material.GetMaterialData().color = glm::vec4(sprite->Color, 1);
+        _material.GetMaterialData().textureOffset = sprite->TileOffset;
+        _material.GetMaterialData().textureScale = sprite->TileSizeUnit();
         _material.Bind(_shaderProgram);
 
         _quadMesh->Draw();

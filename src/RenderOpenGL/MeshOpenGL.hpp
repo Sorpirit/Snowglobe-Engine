@@ -38,6 +38,7 @@ namespace Snowglobe::RenderOpenGL
         std::type_index GetVertexBufferType() const { return _vertexType; }
 
         void Bind(uint32_t pipelineId);
+        void BindEntity(uint32_t pipelineId) { _entity.Bind(pipelineId); }
         void Draw() const;
         void Unbind() const;
 

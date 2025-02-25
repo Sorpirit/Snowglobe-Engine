@@ -2,7 +2,7 @@
 #include "ECS/EntityManager.hpp"
 #include "ECS/ISystem.hpp"
 #include "Materials/BasicShapeMaterialImpl.hpp"
-#include "Materials/TextureShapeMaterialImpl.hpp"
+#include "Materials/SpriteMaterial.hpp"
 #include "MeshOpenGL.hpp"
 #include "SceneParameters.hpp"
 
@@ -21,7 +21,7 @@ private:
     void GenerateVertexBuffers();
 
     MeshOpenGL* _quadMesh;
-    Materials::TextureShapeMaterialImpl _material = {"SpriteMaterial"};
+    Materials::SpriteMaterial _material = {"SpriteMaterial"};
     SceneParameters _sceneParameters;
     uint32_t _shaderProgram;
 };

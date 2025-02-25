@@ -119,6 +119,7 @@ namespace Snowglobe::RenderOpenGL
         }
 
         _shape2DSystem.Update();
+        _spriteRenderer.Update();
 
         _uiSystem->EndRendering();
     }
@@ -156,6 +157,7 @@ namespace Snowglobe::RenderOpenGL
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
         _shape2DSystem.Init(_entityManager);
+        _spriteRenderer.Init(_entityManager);
         
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
