@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Serialization/SerializationAPI.hpp"
+
 #include <glm/glm.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -40,3 +42,11 @@ class TransformComponent : public ECS::Component
 };
 
 } // namespace Snowglobe::Core
+
+template <>
+inline void CustomProp<Snowglobe::Core::TransformComponent>(Snowglobe::Core::Serialization::SerializationAPI* api, Snowglobe::Core::TransformComponent* value, uint32_t metaFlags)
+{
+    api->Property("Position", value->Position, metaFlags);
+    api->Property("Rotation", value->Rotation, metaFlags);
+    api->Property("Scale", value->Scale, metaFlags);
+}

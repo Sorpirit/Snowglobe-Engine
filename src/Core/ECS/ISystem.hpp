@@ -51,6 +51,8 @@ public:
     AnonymousSystem(std::string debugName, FAnonymousUpdate func) : _debugName(debugName), _func(func) {}
 
     void Update() override { _func(_entityManager); }
+
+    const std::string& GetDebugName() const { return _debugName; }
 private:
     std::string _debugName;
     FAnonymousUpdate _func;

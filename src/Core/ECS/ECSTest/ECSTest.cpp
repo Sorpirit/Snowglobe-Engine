@@ -2,78 +2,9 @@
 
 #include "ECS/LifetimeSystem.hpp"
 #include "ECS/SystemManager.hpp"
-#include "SerializationAPI.hpp"
-#include "JsonSerialization.hpp"
 
 using namespace Snowglobe::Core::ECS::ECSTest;
 using namespace Snowglobe::Core;
-
-struct BasicData {
-    int A;
-    float B;
-    std::string C;
-};
-
-struct ComplexData {
-    uint32_t D;
-    BasicData Data;
-};
-
-struct DataStructures {
-    std::vector<int> UVec;
-    std::vector<ComplexData> ComplexData;
-};
-
-template<>
-inline void SerializationAPI::Property<BasicData>(BasicData& varRef) {
-    Property("A", varRef.A);
-    Property("B", varRef.B);
-    Property("C", varRef.C);
-}
-
-template<>
-inline void SerializationAPI::Property<ComplexData>(ComplexData& varRef) {
-    Property("D", varRef.D);
-    Property("Data", varRef.Data);
-}
-
-template<>
-inline void SerializationAPI::Property<DataStructures>(DataStructures& varRef) {
-    Property("UVec", varRef.UVec);
-    Property("ComplexData", varRef.ComplexData);
-}
-
-void TestSerializer()
-{
-    std::string input = R"(
-      {
-        "UVec": [ 24, 42, 12, 11, 22, 33],
-        "ComplexData": [
-            {
-                "D": 10,
-                "Data": {"A": 110, "B": 1110.1 }
-            }
-        ]
-      }
-    )";
-
-    nlohmann::json result;
-    SAXHandler sax(result);
-
-    bool parse_result = nlohmann::json::sax_parse(input, &sax);
-    if (!parse_result)
-    {
-        std::cerr << "parsing unsuccessful!" << std::endl;
-        return;
-    }
-
-    DataStructures d;
-    JsonReader jreader(result);
-    JsonWriter jwriter;
-    jreader.Deserialize(d);
-    jwriter.Serialize(d);
-    std::cout << jwriter.GetResult().dump(4) << std::endl;
-}
 
 void TestEntityManager()
 {
@@ -189,7 +120,6 @@ void TestSystemManager()
 
 int main()
 {
-    TestSerializer();
     TestEntityManager();
     TestSystemManager();
 }

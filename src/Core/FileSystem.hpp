@@ -9,6 +9,7 @@
 #include <unordered_set>
 
 #include "FileTexture.hpp"
+#include "Serialization/SerializationAPI.hpp"
 
 namespace Snowglobe::Core
 {
@@ -16,17 +17,18 @@ struct SnowFileHandle
 {
   public:
     bool IsValid() const { return _isValid; }
-    std::filesystem::path GetFullPath() const { return _path; }
+    std::filesystem::path GetFullPath() const { return _fullPath; }
+    std::filesystem::path GetPath() const { return _initialPath; }
 
-    SnowFileHandle(const std::filesystem::path& path) : _path(path) { Initialize(path); }
-    SnowFileHandle(const std::string& path) : _path(path) { Initialize(path); }
-    SnowFileHandle(const char* path) : _path(path) { Initialize(path); }
-
-  private:
-    std::filesystem::path _path;
-    bool _isValid;
+    SnowFileHandle(const std::filesystem::path& path) : _initialPath(path) { Initialize(path); }
+    SnowFileHandle(const std::string& path) : _initialPath(path) { Initialize(path); }
+    SnowFileHandle(const char* path) : _initialPath(path) { Initialize(path); }
 
     void Initialize(const std::filesystem::path& path);
+  private:
+    std::filesystem::path _initialPath;
+    std::filesystem::path _fullPath;
+    bool _isValid;
 };
 
 class FileSystem
@@ -51,7 +53,8 @@ class FileSystem
 
 inline void SnowFileHandle::Initialize(const std::filesystem::path& path)
 {
-    _isValid = DI->Resolve<FileSystem>()->TryResolvePath(path, _path);
+    _initialPath = path;
+    _isValid = DI->Resolve<FileSystem>()->TryResolvePath(_initialPath, _fullPath);
 }
 
 inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::filesystem::path& fullPath) const
@@ -70,3 +73,12 @@ inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::f
 }
 
 } // namespace Snowglobe::Core
+
+template <>
+inline void CustomProp<Snowglobe::Core::SnowFileHandle>(Snowglobe::Core::Serialization::SerializationAPI* api,
+                                                        Snowglobe::Core::SnowFileHandle* value, uint32_t metaFlags)
+{
+    std::string path = value->GetPath().string();
+    api->BaseProperty("path", path);
+    value->Initialize(path);
+}
