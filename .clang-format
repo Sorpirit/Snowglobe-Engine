@@ -1,0 +1,12 @@
+#https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+#---
+BasedOnStyle: Microsoft
+#---
+Language: Cpp
+DerivePointerAlignment: false
+PointerAlignment: Left
+AllowShortFunctionsOnASingleLine: All
+Standard: c++20
+TabWidth: 4
+UseTab: Never
+#---
