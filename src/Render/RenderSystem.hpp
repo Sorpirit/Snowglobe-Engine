@@ -15,12 +15,13 @@
 #include "MeshProxy.hpp"
 
 #include "FileTexture.hpp"
+#include "GizmosAPI.hpp"
 
-#include "VertexBufferPtr.hpp"
 #include "IndexBufferPtr.hpp"
-#include "Texture2DPtr.hpp"
 #include "MaterialBase.hpp"
+#include "Texture2DPtr.hpp"
 #include "UISystem.hpp"
+#include "VertexBufferPtr.hpp"
 
 namespace Snowglobe::Render
 {
@@ -55,6 +56,7 @@ namespace Snowglobe::Render
         Window* GetMainWindow() const { return _mainWindow.get(); }
         Camera& GetCamera() { return _camera; }
         UISystem* GetUISystem() const { return _uiSystem; }
+        virtual GizmosAPI* GetGizmos() = 0;
 
         void SetUISystem(UISystem* uiSystem) { _uiSystem = uiSystem; }
     

@@ -120,6 +120,7 @@ namespace Snowglobe::RenderOpenGL
 
         _shape2DSystem.Update();
         _spriteRenderer.Update();
+        _gizmos.Draw();
 
         _uiSystem->EndRendering();
     }
@@ -158,6 +159,7 @@ namespace Snowglobe::RenderOpenGL
 
         _shape2DSystem.Init(_entityManager);
         _spriteRenderer.Init(_entityManager);
+        _gizmos.Init();
         
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
@@ -171,7 +173,6 @@ namespace Snowglobe::RenderOpenGL
 
         RegisterTemplateRenderPass<Materials::TextureLitMaterialImpl, PositionNormalUVVertexLayoutDescriptor>(
             Core::SnowFileHandle("textureLit.vert"), Core::SnowFileHandle("textureLit.frag"), true);
-
     }
 
     Render::MeshProxy* OpenGLRenderSystem::CreateMeshProxy(const Render::VertexBufferPtr& vertexBuffer,

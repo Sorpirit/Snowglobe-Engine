@@ -12,6 +12,7 @@
 #include "PhysicsEngine2DSystem.hpp"
 #include "RenderEngineSyncSystem.hpp"
 #include "SpriteAnimationSystem.hpp"
+#include "WorldGridDebugDraw.hpp"
 
 namespace Snowglobe::Engine
 {
@@ -103,6 +104,8 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
     renderSystem->SetUISystem(uiSystem);
 
     _systemManager->TryAddSystem<PhysicsEngine2DSystem>();
+    _systemManager->TryAddSystem<PhysicsEngine2DDebugGizmos>();
+    _systemManager->TryAddSystem<WorldGridDebugDraw>();
     _systemManager->TryAddSystem<RenderEngineSyncSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();

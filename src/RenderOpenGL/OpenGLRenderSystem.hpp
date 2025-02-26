@@ -24,6 +24,7 @@
 #include "RenderPass.hpp"
 
 #include "FileTexture.hpp"
+#include "GizmoManager.hpp"
 #include "LightsManager.hpp"
 #include "Shape2DSystem.hpp"
 #include "SpriteRenderer.hpp"
@@ -63,9 +64,11 @@ namespace Snowglobe::RenderOpenGL {
         Render::Texture2DPtr CreateTexture2D(const Core::FileTexture &texture, const Render::Texture2DDescriptor &desc,
                                              const std::string &debugName = "Texture2D") override;
 
-        LightsManager &GetLightParameters() { return _lightParameters; }
+        LightsManager& GetLightParameters() { return _lightParameters; }
 
-    protected:
+        Render::GizmosAPI* GetGizmos() override { return &_gizmos; }
+
+      protected:
         Render::VertexBufferPtr *AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount,
                                                              const void *bufferPtr,
                                                              const std::string &debugName) override;
@@ -91,6 +94,7 @@ namespace Snowglobe::RenderOpenGL {
 
         Shape2DSystem _shape2DSystem;
         SpriteRenderer _spriteRenderer;
+        GizmoManager _gizmos;
 
         std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass> > _renderPasses;
 
