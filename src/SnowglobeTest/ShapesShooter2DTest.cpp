@@ -6,7 +6,6 @@
 #include "Collider2DComponent.hpp"
 #include "DependencyManager.hpp"
 #include "EngineTime.hpp"
-#include "LifeLinkComponent.hpp"
 #include "LifetimeComponent.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"

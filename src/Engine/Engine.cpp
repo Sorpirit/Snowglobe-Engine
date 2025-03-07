@@ -108,14 +108,9 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
     _systemManager->TryAddSystem<WorldGridDebugDraw>();
     _systemManager->TryAddSystem<RenderEngineSyncSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();
-    _systemManager->TryAddSystem<LifetimeSystem>();
     _systemManager->TryAddSystem<Render::SpriteAnimationSystem>();
     _systemManager->TryAddSystem<ComponentEditorSystem>(Core::ECS::DefaultLifetime, uiSystem,
                                                         &renderSystem->GetMainWindow()->GetInput(), this);
-
-    // Currently not used or broken todo fix or remove
-    // _systemManager->TryAddSystem<LifeLinkSystem>();
-    // _systemManager->TryAddSystem<TweenerSystem>();
 
     ComponentEditorSystem* componentEditorSystem = nullptr;
     if (!_systemManager->QuerySystem<ComponentEditorSystem>(componentEditorSystem))

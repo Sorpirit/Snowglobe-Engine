@@ -63,7 +63,7 @@ inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::f
 {
     for (const auto& mount : _mounts)
     {
-        std::filesystem::path tmpFullPath = mount / path;
+        std::filesystem::path const tmpFullPath = mount / path;
         if (exists(tmpFullPath))
         {
             fullPath = tmpFullPath;
