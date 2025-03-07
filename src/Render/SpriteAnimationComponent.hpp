@@ -19,7 +19,7 @@ public:
 
 
 template <>
-inline void CustomProp<Snowglobe::Render::SpriteAnimationComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
+inline void CustomProperty<Snowglobe::Render::SpriteAnimationComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
                                                                Snowglobe::Render::SpriteAnimationComponent* value, uint32_t metaFlags)
 {
     api->BaseProperty("AnimationSpeed", value->AnimationSpeed, metaFlags);

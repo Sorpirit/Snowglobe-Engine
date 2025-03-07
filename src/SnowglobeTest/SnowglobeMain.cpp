@@ -16,6 +16,8 @@
 #include "ECS/EntityManager.hpp"
 
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
+#include "Assets/PrefabAssetData.hpp"
+#include "Assets/SceneAssetData.hpp"
 #include "Collider2DComponent.hpp"
 #include "DependencyManager.hpp"
 #include "LifeLinkComponent.hpp"
@@ -28,7 +30,11 @@
 #include "SpriteRenderComponent.hpp"
 #include "Tests/SceneSerializationTest.hpp"
 #include "Tests/Sprite2DTest.hpp"
+#include "TextureAssetData.hpp"
 #include "TransformComponent.hpp"
+#include "TextureAssetDataReader.hpp"
+#include "Assets/SceneAssetData.hpp"
+#include "Assets/PrefabAssetData.hpp"
 
 typedef Snowglobe::Core::ECS::MappedTupleEntityData<
     Snowglobe::Core::TransformComponent, Snowglobe::Engine::Physics2DComponent, Snowglobe::Engine::Collider2DComponent,
@@ -70,8 +76,18 @@ void SetupFileSystem()
         project_path = std::filesystem::current_path();
     }
 
-    fileSystem->AddMount(project_path / "src/RenderOpenGL/Shaders");
     fileSystem->AddMount(project_path / "src/SnowglobeTest/Assets");
+    fileSystem->AddMount(project_path / "src/RenderOpenGL/Shaders");
+}
+
+void SetupAssetManager()
+{
+    auto assetManager = DI->RegisterSingle<Snowglobe::Core::AssetManager>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Render::TextureAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Core::SceneAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Core::PrefabAssetData>();
+
+    assetManager->ProcessAll("");
 }
 
 void RegisterTests()
@@ -100,6 +116,8 @@ int main(int argc, char* argv[])
         std::cout << "Failed to get render system" << std::endl;
         return -1;
     }
+
+    SetupAssetManager();
 
     RegisterTests();
     std::string testName = "SpaceShooter2DTest";

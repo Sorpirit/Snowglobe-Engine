@@ -1,5 +1,7 @@
 #pragma once
 
+#include "glm/vec2.hpp"
+
 #include <filesystem>
 
 namespace Snowglobe::Core
@@ -13,6 +15,7 @@ class FileTexture
 
     uint8_t* GetData() const;
 
+    glm::ivec2 Size() const { return {_width, _height}; }
     uint32_t GetWidth() const { return _width; }
     uint32_t GetHeight() const { return _height; }
     uint32_t GetChannels() const { return _channels; }

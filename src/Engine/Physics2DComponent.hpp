@@ -27,7 +27,7 @@ public:
 }
 
 template <>
-inline void CustomProp<Snowglobe::Engine::Physics2DComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
+inline void CustomProperty<Snowglobe::Engine::Physics2DComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
                                                                Snowglobe::Engine::Physics2DComponent* value, uint32_t metaFlags)
 {
     api->Property("Velocity", value->Velocity);

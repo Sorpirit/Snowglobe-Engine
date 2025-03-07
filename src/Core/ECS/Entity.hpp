@@ -193,6 +193,7 @@ class Entity
     /// @brief Gets entity's debug name
     const std::string& GetName() const { return _name; }
 
+    const EntityData& GetData() const { return *_components;}
   private:
     bool _isActive = true;
     bool _isDestroyed = false;

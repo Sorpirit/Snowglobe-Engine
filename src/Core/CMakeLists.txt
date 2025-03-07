@@ -19,3 +19,4 @@ target_link_libraries(Core
 
 add_subdirectory(ECS)
 add_subdirectory(Serialization)
+add_subdirectory(Assets)

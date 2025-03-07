@@ -12,18 +12,11 @@ void Sprite2DTest::Init()
     auto manager = _engine->GetEntityManager();
     auto entity = manager->CreateEntity();
     entity->AddComponent<Core::TransformComponent>();
-    entity->AddComponent<Render::SpriteRenderComponent>();
-
-    Render::SpriteRenderComponent* spritePtr = nullptr;
-    if (entity->QueryComponent(spritePtr))
-    {
-        spritePtr->File = Core::SnowFileHandle("Textures/awesomeface.png");
-        auto fsprite = _fileSystem->LoadTexture(spritePtr->File);
-        auto textureDesc = Snowglobe::Render::Texture2DDescriptor{
-            Snowglobe::Render::TextureWrap::Repeat, Snowglobe::Render::TextureWrap::Repeat,
-            Snowglobe::Render::TextureFilter::Nearest, Snowglobe::Render::TextureFilter::Nearest};
-        spritePtr->Sprite = _renderSystem->CreateTexture2D(*fsprite, textureDesc);
-    }
+    auto sprite = entity->AddOrGetComponent<Render::SpriteRenderComponent>();
+    auto assets = DI->Resolve<Core::AssetManager>();
+    sprite->SpriteAsset.Set(assets->Get<Render::TextureAssetData>("grass.png"));
+    sprite->Color = glm::vec3(1.0f, 1.0f, 1.0f);
+    sprite->TileSize = sprite->Size();
 }
 
 void Sprite2DTest::Run() {}

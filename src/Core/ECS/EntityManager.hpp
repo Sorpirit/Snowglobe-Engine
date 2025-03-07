@@ -11,7 +11,8 @@
 
 template <> struct std::hash<std::pair<Snowglobe::Core::ECS::Lifetime, Snowglobe::Core::ECS::Tag>>
 {
-    std::size_t operator()(const std::pair<Snowglobe::Core::ECS::Lifetime, Snowglobe::Core::ECS::Tag>& pair) const noexcept
+    std::size_t operator()(
+        const std::pair<Snowglobe::Core::ECS::Lifetime, Snowglobe::Core::ECS::Tag>& pair) const noexcept
     {
         size_t lifetimeSeed = std::hash<Snowglobe::Core::ECS::Lifetime>{}(pair.first);
         size_t tagSeed = std::hash<Snowglobe::Core::ECS::Tag>{}(pair.second);
@@ -31,11 +32,15 @@ class EntityManagerBase
 
     /// @brief Create a new entity with the attached lifetime and given tag.
     /// @return Shared pointer to the created entity. All the entities are stored in the EntityManager.
-    virtual std::shared_ptr<Entity> CreateEntity(Lifetime lifetime, Tag tag = Tags::Default()) = 0;
+    virtual std::shared_ptr<Entity> CreateEntity(Tag tag = Tags::Default(), Lifetime lifetime = DefaultLifetime) = 0;
 
-    /// @brief Create a new entity with the attached lifetime and given tag.
+    /// @brief Create instance based on the provided entity with the attached lifetime and given tag.
     /// @return Shared pointer to the created entity. All the entities are stored in the EntityManager.
-    virtual std::shared_ptr<Entity> CreateEntity(Tag tag = Tags::Default()) = 0;
+    virtual std::shared_ptr<Entity> CreateEntity(Entity& baseEntity, Lifetime lifetime = DefaultLifetime) = 0;
+
+    /// @brief Create a new entity that is not stored in the EntityManager.
+    /// @return Direct value of the created entity.
+    virtual std::shared_ptr<Entity> CreateEntityDetached(Tag tag = Tags::Default()) = 0;
 
     /// @brief Get all entities with the given tag.
     /// @return Vector of shared pointers to the entities with the given tag.
@@ -63,7 +68,7 @@ class EntityManagerBase
 template <class TEntityData> class EntityManager final : public EntityManagerBase
 {
   public:
-    std::shared_ptr<Entity> CreateEntity(Lifetime lifetime, Tag tag = Tags::Default()) override
+    std::shared_ptr<Entity> CreateEntity(Tag tag = Tags::Default(), Lifetime lifetime = DefaultLifetime) override
     {
         auto entityData = std::make_unique<TEntityData>();
         auto entity = std::make_shared<Entity>(std::move(entityData), _nextId, tag, lifetime,
@@ -73,14 +78,33 @@ template <class TEntityData> class EntityManager final : public EntityManagerBas
         return entity;
     }
 
-    std::shared_ptr<Entity> CreateEntity(Tag tag = Tags::Default()) override
+    std::shared_ptr<Entity> CreateEntity(Entity& baseEntity, Lifetime lifetime) override
     {
-        return CreateEntity(DefaultLifetime, tag);
+        auto entityData = std::make_unique<TEntityData>();
+        entityData->CopyFrom(baseEntity.GetData());
+        auto entity = std::make_shared<Entity>(std::move(entityData), _nextId, baseEntity.GetTag(), DefaultLifetime,
+                                               "Entity_" + std::to_string(_nextId));
+        _nextId++;
+        return entity;
+    }
+
+    std::shared_ptr<Entity> CreateEntityDetached(Tag tag) override
+    {
+        auto entityData = std::make_unique<TEntityData>();
+        auto entity = std::make_shared<Entity>(std::move(entityData), _nextId, tag, DefaultLifetime, "Entity_" + std::to_string(_nextId));
+        _nextId++;
+        return std::move(entity);
     }
 
     std::vector<std::shared_ptr<Entity>>& GetEntitiesWithTag(Tag tag) override { return _entityTagMap[tag]; }
-    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetime(Lifetime lifetime) override { return _entityLifetimeMap[lifetime]; }
-    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetimeAndTag(Lifetime lifetime, Tag tag) override { return _entityLifetimeTagMap[std::make_pair(lifetime, tag)]; }
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetime(Lifetime lifetime) override
+    {
+        return _entityLifetimeMap[lifetime];
+    }
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetimeAndTag(Lifetime lifetime, Tag tag) override
+    {
+        return _entityLifetimeTagMap[std::make_pair(lifetime, tag)];
+    }
     std::vector<std::shared_ptr<Entity>>& GetAllEntities() override { return _entities; }
 
     void Update() override
@@ -133,21 +157,44 @@ template <class TEntityData> class EntityManager final : public EntityManagerBas
 
 class SceneEntityManager final : public EntityManagerBase
 {
- public:
-    SceneEntityManager(std::shared_ptr<EntityManagerBase> manager, Lifetime defaultLifetime) : _manager(std::move(manager)), _defaultLifetime(defaultLifetime) {}
+  public:
+    SceneEntityManager(std::shared_ptr<EntityManagerBase> manager, Lifetime defaultLifetime)
+        : _manager(std::move(manager)), _defaultLifetime(defaultLifetime)
+    {
+    }
 
-    std::shared_ptr<Entity> CreateEntity(Lifetime lifetime, Tag tag = Tags::Default()) override { return _manager->CreateEntity(lifetime, tag); }
-    std::shared_ptr<Entity> CreateEntity(Tag tag = Tags::Default()) override { return _manager->CreateEntity(_defaultLifetime, tag); }
+    std::shared_ptr<Entity> CreateEntity(Tag tag, Lifetime lifetime) override
+    {
+        return _manager->CreateEntity(tag, lifetime == DefaultLifetime ? _defaultLifetime : lifetime);
+    }
+    std::shared_ptr<Entity> CreateEntity(Entity& baseEntity, Lifetime lifetime) override
+    {
+        return _manager->CreateEntity(baseEntity, lifetime == DefaultLifetime ? _defaultLifetime : lifetime);
+    }
+    std::shared_ptr<Entity> CreateEntityDetached(Tag tag) override { return _manager->CreateEntityDetached(tag); }
 
-    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithTag(Tag tag) override { return _manager->GetEntitiesWithLifetimeAndTag(_defaultLifetime, tag); }
-    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetime(Lifetime lifetime) override { return _manager->GetEntitiesWithLifetime(lifetime); }
-    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetimeAndTag(Lifetime lifetime, Tag tag) override { return _manager->GetEntitiesWithLifetimeAndTag(lifetime, tag);  }
-    std::vector<std::shared_ptr<Entity>>& GetAllEntities() override { return _manager->GetEntitiesWithLifetime(_defaultLifetime); }
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithTag(Tag tag) override
+    {
+        return _manager->GetEntitiesWithLifetimeAndTag(_defaultLifetime, tag);
+    }
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetime(Lifetime lifetime) override
+    {
+        return _manager->GetEntitiesWithLifetime(lifetime);
+    }
+    std::vector<std::shared_ptr<Entity>>& GetEntitiesWithLifetimeAndTag(Lifetime lifetime, Tag tag) override
+    {
+        return _manager->GetEntitiesWithLifetimeAndTag(lifetime, tag);
+    }
+    std::vector<std::shared_ptr<Entity>>& GetAllEntities() override
+    {
+        return _manager->GetEntitiesWithLifetime(_defaultLifetime);
+    }
 
     void Update() override { _manager->Update(); }
 
     Lifetime GetLifetime() const { return _defaultLifetime; }
- private:
+
+  private:
     std::shared_ptr<EntityManagerBase> _manager;
     Lifetime _defaultLifetime = Lifetime{0};
 };

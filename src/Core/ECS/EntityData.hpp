@@ -33,6 +33,7 @@ class EntityData
     /// @brief Iterate over all components in the entity data and call the provided function with each component.
     virtual void ForEachComponent(const std::function<void(Component&)>& func) = 0;
 
+    virtual void CopyFrom(const EntityData& source) = 0;
   private:
     virtual Component& GetComponent(std::type_index type) = 0;
 };
@@ -57,6 +58,14 @@ template <class... TComponents> class MappedTupleEntityData : public EntityData
         {
             func(*component);
         }
+    }
+
+    void CopyFrom(const EntityData& source) override
+    {
+        _componentsMap.clear();
+        const MappedTupleEntityData& typedSource = static_cast<const MappedTupleEntityData&>(source);
+        _componentsTuple = typedSource._componentsTuple;
+        InitializeComponentMap();
     }
 
   private:

@@ -44,7 +44,7 @@ class TransformComponent : public ECS::Component
 } // namespace Snowglobe::Core
 
 template <>
-inline void CustomProp<Snowglobe::Core::TransformComponent>(Snowglobe::Core::Serialization::SerializationAPI* api, Snowglobe::Core::TransformComponent* value, uint32_t metaFlags)
+inline void CustomProperty<Snowglobe::Core::TransformComponent>(Snowglobe::Core::Serialization::SerializationAPI* api, Snowglobe::Core::TransformComponent* value, uint32_t metaFlags)
 {
     api->Property("Position", value->Position, metaFlags);
     api->Property("Rotation", value->Rotation, metaFlags);

@@ -2,6 +2,9 @@
 
 namespace Snowglobe::Core::ECS
 {
+class Component;
+template<class T>
+concept ComponentBased = std::is_base_of<Component, T>::value;
 
 /// @brief Base class for all components. Naming convention is NameComponent.
 /// Component should contain only data and no logic(apart from described here: OnAttach, OnDetach, OnActivate,

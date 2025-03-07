@@ -15,9 +15,6 @@ class SceneSerializationTest : public RuntimeTest
     void Run() override;
 
   private:
-    void SaveScene();
-    void LoadScene();
-
     Engine::SpectatorCamera _spectator;
 
     bool _saved = false;

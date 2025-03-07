@@ -1,17 +1,24 @@
 #pragma once
 #include "glm/glm.hpp"
 #include <cstdint>
-#include <string>
 #include <iostream>
-#include <typeinfo>
+#include <string>
 #include <typeindex>
+#include <typeinfo>
 
 namespace Snowglobe::Core::Serialization
 {
-
 class SerializationAPI;
+}
+
+template <typename T> void CustomProperty(Snowglobe::Core::Serialization::SerializationAPI* api, T* value, uint32_t metaFlags);
+template <typename T> void CustomPropertySerialization(Snowglobe::Core::Serialization::SerializationAPI* api, T* value, uint32_t metaFlags);
+template <typename T> void CustomPropertyDeserialization(Snowglobe::Core::Serialization::SerializationAPI* api, T* value, uint32_t metaFlags);
+
+namespace Snowglobe::Core::Serialization
+{
 template <typename CComponent, typename SSerializer>
-concept CustomProperty = requires(SSerializer serializer, CComponent* component) {
+concept CustomPropertySerializer = requires(SSerializer serializer, CComponent* component) {
     {
         serializer.Property(std::declval<SerializationAPI*>(), component, std::declval<uint32_t>())
     } -> std::convertible_to<void>;
@@ -20,17 +27,9 @@ concept CustomProperty = requires(SSerializer serializer, CComponent* component)
 class SerializationAPI
 {
   public:
-    template <typename T> void Property(T& value, uint32_t metaFlags = 0)
+    template <typename T, bool Dynamic = false> void Property(T& value, uint32_t metaFlags = 0)
     {
-        const std::type_index& baseType = typeid(T);
-        const std::type_index& dynamicType = typeid(value);
-        std::cout << baseType.name() << std::endl;
-        std::cout << dynamicType.name() << std::endl;
-        if (baseType == dynamicType)
-        {
-            PropertyInternal(typeid(T).name(), static_cast<void*>(&value), metaFlags);
-        }
-        else
+        if (Dynamic)
         {
             std::string type = typeid(value).name();
             BaseProperty("Type", type);
@@ -40,18 +39,37 @@ class SerializationAPI
             PropertyInternal(type, &value, metaFlags);
             PopObject();
         }
+        else
+        {
+            // const std::type_index& baseType = typeid(T);
+            // const std::type_index& dynamicType = typeid(value);
+            // assert(baseType == dynamicType && "Property type mismatch");
+            PropertyInternal(typeid(T).name(), static_cast<void*>(&value), metaFlags);
+        }
     }
 
-    void Property(const std::string& name, auto& value, uint32_t metaFlags = 0)
+    template <typename T, bool Dynamic = false> void Property(const std::string& name, T& value, uint32_t metaFlags = 0)
     {
         if (!TryPushObject(name))
             return;
 
-        Property(value, metaFlags);
+        Property<T, Dynamic>(value, metaFlags);
         PopObject();
     }
 
-    template <typename T> void Property(const std::string& name, std::vector<T>& value, uint32_t metaFlags = 0)
+    template <typename T, bool Dynamic = false> void Property(const std::string& name, T& value, T& defaultValue, uint32_t metaFlags = 0)
+    {
+        if (!TryPushObject(name))
+        {
+            value = defaultValue; //think about it
+            return;
+        }
+
+        Property<T, Dynamic>(value, metaFlags);
+        PopObject();
+    }
+
+    template <typename T, bool Dynamic = false> void Property(const std::string& name, std::vector<T*>& value, uint32_t metaFlags = 0)
     {
         uint32_t size = static_cast<uint32_t>(value.size());
         if (!TryPushArray(name, size))
@@ -60,30 +78,14 @@ class SerializationAPI
         for (uint32_t i = 0; i < size; i++)
         {
             PushArrayItemAt(i);
-            Property(value[i], metaFlags);
+            Property<T, Dynamic>(*value[i], metaFlags);
             PopObject();
         }
 
         PopObject();
     }
 
-    template <typename T> void Property(const std::string& name, std::vector<T*>& value, uint32_t metaFlags = 0)
-    {
-        uint32_t size = static_cast<uint32_t>(value.size());
-        if (!TryPushArray(name, size))
-            return;
-
-        for (uint32_t i = 0; i < size; i++)
-        {
-            PushArrayItemAt(i);
-            Property(*value[i], metaFlags);
-            PopObject();
-        }
-
-        PopObject();
-    }
-
-    template <typename T>
+    template <typename T, bool Dynamic = false>
     void Property(const std::string& name, std::vector<std::shared_ptr<T>>& value, uint32_t metaFlags = 0)
     {
         uint32_t size = static_cast<uint32_t>(value.size());
@@ -93,7 +95,7 @@ class SerializationAPI
         for (uint32_t i = 0; i < size; i++)
         {
             PushArrayItemAt(i);
-            Property(*value[i], metaFlags);
+            Property<T, Dynamic>(*value[i], metaFlags);
             PopObject();
         }
 
@@ -106,7 +108,7 @@ class SerializationAPI
     virtual void BaseProperty(const std::string& name, std::string& value, uint32_t metaFlags = 0) = 0;
     virtual void BaseProperty(const std::string& name, bool& value, uint32_t metaFlags = 0) = 0;
 
-    template <typename CComponent, CustomProperty<CComponent> T> void RegisterCustomProperty(T* ptr)
+    template <typename CComponent, CustomPropertySerializer<CComponent> T> void RegisterCustomProperty(T* ptr)
     {
         _properties[typeid(CComponent).name()] = [&](SerializationAPI* api, void* value, uint32_t metaFlags) {
             ptr->Property(api, static_cast<CComponent*>(value), metaFlags);
@@ -118,6 +120,30 @@ class SerializationAPI
     {
         _properties[typeid(CComponent).name()] = [=](SerializationAPI* api, void* value, uint32_t metaFlags) {
             func(api, static_cast<CComponent*>(value), metaFlags);
+        };
+    }
+
+    template <typename CComponent>
+    void RegisterCustomProperty()
+    {
+        _properties[typeid(CComponent).name()] = [=](SerializationAPI* api, void* value, uint32_t metaFlags) {
+            CustomProperty<CComponent>(api, static_cast<CComponent*>(value), metaFlags);
+        };
+    }
+
+    template <typename CComponent>
+    void RegisterCustomPropertySerialization()
+    {
+        _properties[typeid(CComponent).name()] = [=](SerializationAPI* api, void* value, uint32_t metaFlags) {
+            CustomPropertySerialization<CComponent>(api, static_cast<CComponent*>(value), metaFlags);
+        };
+    }
+
+    template <typename CComponent>
+    void RegisterCustomPropertyDeserialization()
+    {
+        _properties[typeid(CComponent).name()] = [=](SerializationAPI* api, void* value, uint32_t metaFlags) {
+            CustomPropertyDeserialization<CComponent>(api, static_cast<CComponent*>(value), metaFlags);
         };
     }
 
@@ -145,41 +171,39 @@ class SerializationAPI
 
 } // namespace Snowglobe::Core::Serialization
 
-template <typename T> void CustomProp(Snowglobe::Core::Serialization::SerializationAPI* api, T* value, uint32_t metaFlags);
-
 template <>
-inline void CustomProp<int>(Snowglobe::Core::Serialization::SerializationAPI* api, int* value, uint32_t metaFlags)
+inline void CustomProperty<int>(Snowglobe::Core::Serialization::SerializationAPI* api, int* value, uint32_t metaFlags)
 {
     api->BaseProperty("", *value, metaFlags);
 }
 
 template <>
-inline void CustomProp<float>(Snowglobe::Core::Serialization::SerializationAPI* api, float* value, uint32_t metaFlags)
+inline void CustomProperty<float>(Snowglobe::Core::Serialization::SerializationAPI* api, float* value, uint32_t metaFlags)
 {
     api->BaseProperty("", *value, metaFlags);
 }
 
 template <>
-inline void CustomProp<uint32_t>(Snowglobe::Core::Serialization::SerializationAPI* api, uint32_t* value, uint32_t metaFlags)
+inline void CustomProperty<uint32_t>(Snowglobe::Core::Serialization::SerializationAPI* api, uint32_t* value, uint32_t metaFlags)
 {
     api->BaseProperty("", *value, metaFlags);
 }
 
 template <>
-inline void CustomProp<std::string>(Snowglobe::Core::Serialization::SerializationAPI* api, std::string* value, uint32_t metaFlags)
+inline void CustomProperty<std::string>(Snowglobe::Core::Serialization::SerializationAPI* api, std::string* value, uint32_t metaFlags)
 {
     api->BaseProperty("", *value, metaFlags);
 }
 
 template <>
-inline void CustomProp<glm::vec2>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec2* value, uint32_t metaFlags)
+inline void CustomProperty<glm::vec2>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec2* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
 }
 
 template <>
-inline void CustomProp<glm::vec3>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec3* value, uint32_t metaFlags)
+inline void CustomProperty<glm::vec3>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec3* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
@@ -187,7 +211,7 @@ inline void CustomProp<glm::vec3>(Snowglobe::Core::Serialization::SerializationA
 }
 
 template <>
-inline void CustomProp<glm::vec4>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec4* value, uint32_t metaFlags)
+inline void CustomProperty<glm::vec4>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::vec4* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
@@ -196,14 +220,14 @@ inline void CustomProp<glm::vec4>(Snowglobe::Core::Serialization::SerializationA
 }
 
 template <>
-inline void CustomProp<glm::ivec2>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec2* value, uint32_t metaFlags)
+inline void CustomProperty<glm::ivec2>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec2* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
 }
 
 template <>
-inline void CustomProp<glm::ivec3>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec3* value, uint32_t metaFlags)
+inline void CustomProperty<glm::ivec3>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec3* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
@@ -211,7 +235,7 @@ inline void CustomProp<glm::ivec3>(Snowglobe::Core::Serialization::Serialization
 }
 
 template <>
-inline void CustomProp<glm::ivec4>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec4* value, uint32_t metaFlags)
+inline void CustomProperty<glm::ivec4>(Snowglobe::Core::Serialization::SerializationAPI* api, glm::ivec4* value, uint32_t metaFlags)
 {
     api->BaseProperty("x", value->x, metaFlags);
     api->BaseProperty("y", value->y, metaFlags);
