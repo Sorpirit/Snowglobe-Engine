@@ -28,13 +28,12 @@
 #include "ShapesShooter2DTest.hpp"
 #include "SpriteAnimationSystem.hpp"
 #include "SpriteRenderComponent.hpp"
+#include "Tests/ModelLoading.hpp"
 #include "Tests/SceneSerializationTest.hpp"
 #include "Tests/Sprite2DTest.hpp"
 #include "TextureAssetData.hpp"
-#include "TransformComponent.hpp"
 #include "TextureAssetDataReader.hpp"
-#include "Assets/SceneAssetData.hpp"
-#include "Assets/PrefabAssetData.hpp"
+#include "TransformComponent.hpp"
 
 typedef Snowglobe::Core::ECS::MappedTupleEntityData<
     Snowglobe::Core::TransformComponent, Snowglobe::Engine::Physics2DComponent, Snowglobe::Engine::Collider2DComponent,
@@ -76,7 +75,7 @@ void SetupFileSystem()
         project_path = std::filesystem::current_path();
     }
 
-    fileSystem->AddMount(project_path / "src/SnowglobeTest/Assets");
+    fileSystem->AddMount(project_path / "assets");
     fileSystem->AddMount(project_path / "src/RenderOpenGL/Shaders");
 }
 
@@ -87,7 +86,7 @@ void SetupAssetManager()
     assetManager->RegisterAssetProcessor<Snowglobe::Core::SceneAssetData>();
     assetManager->RegisterAssetProcessor<Snowglobe::Core::PrefabAssetData>();
 
-    assetManager->ProcessAll("");
+    // assetManager->ProcessAll("");
 }
 
 void RegisterTests()
@@ -97,6 +96,7 @@ void RegisterTests()
     RuntimeTest::RegisterTest<Phyiscs2DTests>();
     RuntimeTest::RegisterTest<Snowglobe::SceneSerializationTest>();
     RuntimeTest::RegisterTest<Snowglobe::Sprite2DTest>();
+    RuntimeTest::RegisterTest<Snowglobe::ModelLoading>();
 }
 
 int main(int argc, char* argv[])
