@@ -42,7 +42,7 @@ void SpriteRenderer::Update()
         _quadMesh->SetScale(transform->Scale);
         _quadMesh->BindEntity(_shaderProgram);
 
-        _material.GetMaterialData().texture = sprite->SpriteAsset.GetData().RenderTexture;
+        _material.GetMaterialData().texture = sprite->SpriteAsset.HasData() ? sprite->SpriteAsset.GetData().RenderTexture : Render::Texture2DPtr{};
         _material.GetMaterialData().color = glm::vec4(sprite->Color, 1);
         _material.GetMaterialData().textureOffset = sprite->TileOffset;
         _material.GetMaterialData().textureScale = sprite->TileSizeUnit();

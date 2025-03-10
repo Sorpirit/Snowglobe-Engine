@@ -6,7 +6,7 @@ cmake-build-*/
 conan-cache/
 
 # Big Assets
-assets/
+/assets/
 
 # Large binraries
 libraries/bin/

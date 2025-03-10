@@ -13,15 +13,17 @@ struct PrefabAssetData
 };
 } // namespace Snowglobe::Core
 
-inline void ProcessPrefabAssetData(Snowglobe::Core::AssetManager* manger, std::filesystem::path& assetPath)
-{
-    auto detached = DI->Resolve<Snowglobe::Engine::Engine>()->GetEntityManager()->CreateEntityDetached();
-    // TODO:
-    // Deserialize entity into the detached
-    manger->RegisterAsset(assetPath.filename().string(), Snowglobe::Core::PrefabAssetData{std::move(detached)});
-}
-
 template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Snowglobe::Core::AssetManager* manager)
 {
-    manager->RegisterAssetProcessor(".prefab", ProcessPrefabAssetData);
+    std::weak_ptr const engine = DI->Resolve<Snowglobe::Engine::Engine>();
+    manager->RegisterAssetProcessor(".prefab",
+        [engine](Snowglobe::Core::AssetManager* manger, std::filesystem::path& assetPath) {
+            if (auto engineRef = engine.lock())
+            {
+                auto detached = engineRef->GetEntityManager()->CreateEntityDetached();
+                // TODO:
+                // Deserialize entity into the detached
+                manger->RegisterAsset(assetPath.filename().string(), Snowglobe::Core::PrefabAssetData{std::move(detached)});
+            }
+    });
 }

@@ -52,7 +52,10 @@ class AssetManager
     {
         auto it = _assetsMap.find(tag);
         if (it == _assetsMap.end())
+        {
             assert(0 && "Unknown asset");
+            return nullptr;
+        }
 
         return static_cast<Asset<T>*>(it->second.get());
     }
@@ -61,18 +64,25 @@ class AssetManager
     {
         auto it = _assetsMap.find(tag);
         if (it == _assetsMap.end())
-            assert(0 && "Unknown asset");
+        {
+            assert(assetRef->Optional() && "Cannot find asset with tag");
+            return;
+        }
 
-        assetRef->Set(static_cast<Asset<T>*>(it->second));
+        assert(it->second->GetAssetType() != assetRef->GetAssetType() && "Asset type missmatch");
+        assetRef->Set(*static_cast<Asset<T>*>(it->second));
     }
 
     void ResolveBaseRef(const std::string& tag, AssetBase* assetRef)
     {
         auto it = _assetsMap.find(tag);
         if (it == _assetsMap.end())
+        {
             assert(0 && "Unknown asset");
+            return;
+        }
 
-        assetRef->Set(it->second.get());
+        assetRef->Set(*it->second.get());
     }
 
   private:

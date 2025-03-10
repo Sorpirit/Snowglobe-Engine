@@ -85,7 +85,7 @@ void SetupAssetManager()
     assetManager->RegisterAssetProcessor<Snowglobe::Core::SceneAssetData>();
     assetManager->RegisterAssetProcessor<Snowglobe::Core::PrefabAssetData>();
 
-    // assetManager->ProcessAll("");
+    assetManager->ProcessAll("");
 }
 
 void RegisterTests()

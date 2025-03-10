@@ -9,7 +9,7 @@ class SpriteRenderComponent : public Core::ECS::Component
 public:
     SpriteRenderComponent() = default;
 
-    Core::Asset<TextureAssetData> SpriteAsset;
+    Core::AssetOptional<TextureAssetData> SpriteAsset;
     glm::vec3 Color = glm::vec3(1.0f);
 
     //Sprite sheet values

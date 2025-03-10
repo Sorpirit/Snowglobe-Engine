@@ -14,7 +14,7 @@ void Sprite2DTest::Init()
     entity->AddComponent<Core::TransformComponent>();
     auto sprite = entity->AddOrGetComponent<Render::SpriteRenderComponent>();
     auto assets = DI->Resolve<Core::AssetManager>();
-    sprite->SpriteAsset.Set(assets->Get<Render::TextureAssetData>("grass.png"));
+    sprite->SpriteAsset.Set(*assets->Get<Render::TextureAssetData>("grass.png"));
     sprite->Color = glm::vec3(1.0f, 1.0f, 1.0f);
     sprite->TileSize = sprite->Size();
 }
