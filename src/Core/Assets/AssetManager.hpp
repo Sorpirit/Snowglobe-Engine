@@ -12,7 +12,7 @@ void SetupAssetProcessor(Snowglobe::Core::AssetManager* manager);
 
 namespace Snowglobe::Core
 {
-typedef std::function<void (AssetManager*, std::filesystem::path&)> AssetProcessorFunc;
+typedef std::function<void (AssetManager*, const std::filesystem::path&)> AssetProcessorFunc;
 
 class AssetManager
 {
@@ -27,10 +27,12 @@ class AssetManager
     {
         assert(!_assetProcessors.contains(extension) && "Asset processor for the exetension already registered");
         _assetProcessors[extension] = std::move(func);
+        _assetProcessorOrder.push_back(extension);
     }
     void UnregisterAssetProcessor(const std::string& extension)
     {
         _assetProcessors.erase(extension);
+        _assetProcessorOrder.erase(std::remove(_assetProcessorOrder.begin(), _assetProcessorOrder.end(), extension), _assetProcessorOrder.end());
     }
 
     template <typename T>
@@ -90,6 +92,7 @@ class AssetManager
     std::unordered_map<std::string, std::unique_ptr<AssetBase>> _assetsMap;
     std::unordered_map<std::type_index, std::vector<AssetBase*>> _assetsTypedMap;
     std::unordered_map<std::string, AssetProcessorFunc> _assetProcessors;
+    std::vector<std::string> _assetProcessorOrder;
 };
 
 } // namespace Snowglobe::Engine

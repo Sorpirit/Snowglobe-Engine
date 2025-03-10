@@ -83,7 +83,8 @@ template <class TEntityData> class EntityManager final : public EntityManagerBas
         auto entityData = std::make_unique<TEntityData>();
         entityData->CopyFrom(baseEntity.GetData());
         auto entity = std::make_shared<Entity>(std::move(entityData), _nextId, baseEntity.GetTag(), DefaultLifetime,
-                                               "Entity_" + std::to_string(_nextId));
+                                               baseEntity.GetName() + std::to_string(_nextId));
+        _toAddEntities.push_back(entity);
         _nextId++;
         return entity;
     }

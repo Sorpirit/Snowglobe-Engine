@@ -8,10 +8,15 @@
 namespace Snowglobe::Engine
 {
 
-class SceneFactory
+class EntityFactory
 {
   public:
-    SceneFactory(const std::shared_ptr<Core::ECS::EntityManagerBase>& entity_manager) : _entityManager(entity_manager)
+    EntityFactory(const std::shared_ptr<Core::ECS::EntityManagerBase>& entity_manager) : _entityManager(entity_manager)
+    {
+    }
+    EntityFactory(const std::shared_ptr<Core::ECS::EntityManagerBase>& entity_manager,
+                  const std::shared_ptr<Core::ECS::Entity>& current_entity)
+        : _entityManager(entity_manager), _currentEntity(current_entity)
     {
     }
 
@@ -31,7 +36,7 @@ class SceneFactory
 } // namespace Snowglobe::Engine
 
 template <>
-Snowglobe::Core::ECS::Entity* Snowglobe::Engine::SceneFactory::Deserialize<Snowglobe::Core::ECS::Entity>(
+inline Snowglobe::Core::ECS::Entity* Snowglobe::Engine::EntityFactory::Deserialize<Snowglobe::Core::ECS::Entity>(
     Core::Serialization::Deserializer* s)
 {
     std::string name;
@@ -47,7 +52,7 @@ Snowglobe::Core::ECS::Entity* Snowglobe::Engine::SceneFactory::Deserialize<Snowg
 }
 
 template <>
-void CustomPropertySerialization<Snowglobe::Core::ECS::Entity>(Snowglobe::Core::Serialization::SerializationAPI* api,
+inline void CustomPropertySerialization<Snowglobe::Core::ECS::Entity>(Snowglobe::Core::Serialization::SerializationAPI* api,
                                                                Snowglobe::Core::ECS::Entity* value, uint32_t metaFlags)
 {
     std::string name = value->GetName();

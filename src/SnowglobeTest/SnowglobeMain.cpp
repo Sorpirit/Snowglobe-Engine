@@ -28,6 +28,7 @@
 #include "SpriteAnimationSystem.hpp"
 #include "SpriteRenderComponent.hpp"
 #include "Tests/ModelLoading.hpp"
+#include "Tests/PrefabTest.hpp"
 #include "Tests/SceneSerializationTest.hpp"
 #include "Tests/Sprite2DTest.hpp"
 #include "TextureAssetData.hpp"
@@ -96,6 +97,7 @@ void RegisterTests()
     RuntimeTest::RegisterTest<Snowglobe::SceneSerializationTest>();
     RuntimeTest::RegisterTest<Snowglobe::Sprite2DTest>();
     RuntimeTest::RegisterTest<Snowglobe::ModelLoading>();
+    RuntimeTest::RegisterTest<Snowglobe::PrefabTest>();
 }
 
 int main(int argc, char* argv[])

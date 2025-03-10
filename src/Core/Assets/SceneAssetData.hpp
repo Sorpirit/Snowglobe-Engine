@@ -13,7 +13,7 @@ struct SceneAssetData
 template <> inline void SetupAssetProcessor<Snowglobe::Core::SceneAssetData>(Snowglobe::Core::AssetManager* manager)
 {
     manager->RegisterAssetProcessor(".scene",
-        [](Snowglobe::Core::AssetManager* manger, std::filesystem::path& assetPath) {
+        [](Snowglobe::Core::AssetManager* manger, const std::filesystem::path& assetPath) {
         manger->RegisterAsset(assetPath.filename().string(), Snowglobe::Core::SceneAssetData{assetPath});
     });
 }

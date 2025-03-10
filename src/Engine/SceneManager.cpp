@@ -5,14 +5,13 @@
 #include "ECS/Entity.hpp"
 #include "ECS/EntityManager.hpp"
 #include "Engine.hpp"
+#include "EntityFactory.hpp"
 #include "FileSystem.hpp"
 #include "Physics2DComponent.hpp"
-#include "SceneFactory.hpp"
 #include "Serialization/JsonSerialization.hpp"
 #include "SpriteAnimationComponent.hpp"
 #include "SpriteRenderComponent.hpp"
 #include "TransformComponent.hpp"
-
 
 #include <iostream>
 #include <ostream>
@@ -34,7 +33,7 @@ void SceneManager::LoadScene(std::string tag)
     auto manager = engine->GetEntityManager();
     _currentSceneLifetime = engine->GetLifetimeSystem().Register(tag);
     auto sceneManager = std::make_shared<Core::ECS::SceneEntityManager>(manager, _currentSceneLifetime);
-    SceneFactory factory(sceneManager);
+    EntityFactory factory(sceneManager);
 
     Core::Serialization::JsonReader jreader(sceneData);
     jreader.RegisterCustomProperty<Core::TransformComponent>();
@@ -50,12 +49,12 @@ void SceneManager::LoadScene(std::string tag)
     jreader.RegisterCustomProperty<glm::ivec4>();
     jreader.RegisterCustomProperty<Core::SnowFileHandle>();
     jreader.RegisterCustomPropertyDeserialization<Core::AssetBase>();
-    jreader.RegisterCustomDeserializer<Core::ECS::Entity, SceneFactory>(&factory);
-    jreader.RegisterCustomDeserializer<Core::TransformComponent, SceneFactory>(&factory);
-    jreader.RegisterCustomDeserializer<Render::SpriteRenderComponent, SceneFactory>(&factory);
-    jreader.RegisterCustomDeserializer<Render::SpriteAnimationComponent, SceneFactory>(&factory);
-    jreader.RegisterCustomDeserializer<Physics2DComponent, SceneFactory>(&factory);
-    jreader.RegisterCustomDeserializer<Collider2DComponent, SceneFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Core::ECS::Entity, EntityFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Core::TransformComponent, EntityFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Render::SpriteRenderComponent, EntityFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Render::SpriteAnimationComponent, EntityFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Physics2DComponent, EntityFactory>(&factory);
+    jreader.RegisterCustomDeserializer<Collider2DComponent, EntityFactory>(&factory);
 
     jreader.DeserializeArray<Core::ECS::Entity>("Entities");
 }
