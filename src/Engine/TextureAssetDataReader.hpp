@@ -86,3 +86,33 @@ template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Sn
         }
     });
 }
+
+template <> inline void SetupAssetProcessor<Snowglobe::Render::SpriteAssetData>(Snowglobe::Core::AssetManager* manager)
+{
+    using namespace Snowglobe;
+    using namespace Snowglobe::Engine;
+
+    std::weak_ptr const engine = DI->Resolve<Snowglobe::Engine::Engine>();
+    std::shared_ptr const fileSystem = DI->Resolve<Core::FileSystem>();
+    manager->RegisterAssetProcessor(".sprite", [engine, fileSystem](Core::AssetManager* manger,
+                                                       const std::filesystem::path& assetPath) {
+        if (auto engineRef = engine.lock())
+        {
+            nlohmann::json prefabData;
+            std::stringstream ss;
+            fileSystem->TryReadTextFile(assetPath, ss);
+            ss >> prefabData;
+
+
+            Render::SpriteAssetData sprite{};
+            manger->ResolveRef(prefabData["TextureAsset"]["Tag"], &sprite.TextureAsset);
+            sprite.TileSize = {prefabData["TileSize"]["x"], prefabData["TileSize"]["y"]};
+            sprite.TileCount = {prefabData["TileCount"]["x"], prefabData["TileCount"]["y"]};
+            sprite.SpriteTotalCount = prefabData["SpriteTotalCount"];
+            sprite.SpriteScale = {prefabData["SpriteScale"]["x"], prefabData["SpriteScale"]["y"]};
+            sprite.CurrentSpriteCoord = {prefabData["CurrentSpriteCoord"]["x"], prefabData["CurrentSpriteCoord"]["y"]};
+
+            manger->RegisterAsset(assetPath.filename().string(), sprite);
+        }
+    });
+}

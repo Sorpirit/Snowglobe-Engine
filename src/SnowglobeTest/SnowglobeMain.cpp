@@ -83,6 +83,7 @@ void SetupAssetManager()
 {
     auto assetManager = DI->RegisterSingle<Snowglobe::Core::AssetManager>();
     assetManager->RegisterAssetProcessor<Snowglobe::Render::TextureAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Render::SpriteAssetData>();
     assetManager->RegisterAssetProcessor<Snowglobe::Core::SceneAssetData>();
     assetManager->RegisterAssetProcessor<Snowglobe::Core::PrefabAssetData>();
 

@@ -71,8 +71,8 @@ class AssetManager
             return;
         }
 
-        assert(it->second->GetAssetType() != assetRef->GetAssetType() && "Asset type missmatch");
-        assetRef->Set(*static_cast<Asset<T>*>(it->second));
+        assert(it->second->GetAssetType() == assetRef->GetAssetType() && "Asset type missmatch");
+        assetRef->Set(*static_cast<Asset<T>*>(it->second.get()));
     }
 
     void ResolveBaseRef(const std::string& tag, AssetBase* assetRef)

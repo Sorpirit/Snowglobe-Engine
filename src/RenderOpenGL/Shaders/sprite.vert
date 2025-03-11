@@ -30,7 +30,6 @@ out vec2 TexCoord;
 
 void main()
 {
-    // gl_Position = sceneParameters.projection * sceneParameters.view * rentity.model * vec4(aPos, 1.0);
     gl_Position = sceneParameters.viewProjection * rentity.model * vec4(aPos, 1.0);
     TexCoord = (material.textureOffset + aTexCoord) * material.textureScale;
 }
