@@ -20,12 +20,40 @@ class SpriteAnimationSystem : public Core::ECS::ISystem
             if (!entity->QueryComponents(sprite, animation))
                 continue;
 
+            auto& spriteData = sprite->SpriteAsset.GetData();
+
+            if (animation->AnimationIndexChanged())
+            {
+                animation->ResetAnimationChangedFlag();
+                animation->Clip = animation->AnimationClips[animation->GetAnimationIndex()];
+            }
+
+            if (!animation->Clip.Started)
+            {
+                spriteData.SetSpriteCoord(animation->Clip.StartPosition);
+                animation->Clip.Started = true;
+                continue;
+            }
+
+            if (animation->Clip.Finished)
+                continue;
+
             animation->AnimationTickTimer -= deltaTime * animation->AnimationSpeed;
             if (animation->AnimationTickTimer > 0)
                 continue;
 
-            animation->AnimationTickTimer = animation->AnimationFrameRate;
-            sprite->SpriteAsset.GetData().SetNextSprite();
+            animation->AnimationTickTimer = animation->Clip.AnimationDuration;
+            if (animation->Clip.EndPosition == spriteData.CurrentSpriteCoord)
+            {
+                if (animation->Clip.Loop)
+                    spriteData.SetSpriteCoord(animation->Clip.StartPosition);
+                else
+                    animation->Clip.Finished = true;
+
+                continue;
+            }
+
+            spriteData.SetNextSprite();
         }
     }
 };
