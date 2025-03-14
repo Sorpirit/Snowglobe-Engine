@@ -4,60 +4,18 @@
 #include "OpenGLRenderSystem.hpp"
 #include "RenderSystem.hpp"
 // #include "VulkanRenderingSystem.hpp"
-#include "ComponentEditor.hpp"
-#include "ComponentEditorSystem.hpp"
+#include "Editor/EngineInspectorSystem.hpp"
+#include "Editor/SpectatorCameraSystem.hpp"
+#include "Editor/WorldGridDebugDraw.hpp"
 #include "EngineTime.hpp"
 #include "Imgui/ImguiSystem.hpp"
 #include "LifetimeSystem.hpp"
 #include "PhysicsEngine2DSystem.hpp"
 #include "RenderEngineSyncSystem.hpp"
 #include "SpriteAnimationSystem.hpp"
-#include "WorldGridDebugDraw.hpp"
 
 namespace Snowglobe::Engine
 {
-class DirectionalLightComponentEditor : public TemplateComponentEditor<RenderOpenGL::DirectionalLightComponent>
-{
-  public:
-    DirectionalLightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
-
-    void DrawUITemplate(RenderOpenGL::DirectionalLightComponent* component) override
-    {
-        _uiSystem->Text("DirectionalLightComponent");
-        _uiSystem->Color("Color", &component->Light.LightColor);
-        _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
-    }
-};
-
-class PointLightComponentComponentEditor : public TemplateComponentEditor<RenderOpenGL::PointLightComponent>
-{
-  public:
-    PointLightComponentComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
-
-    void DrawUITemplate(RenderOpenGL::PointLightComponent* component) override
-    {
-        _uiSystem->Text("DirectionalLightComponent");
-        _uiSystem->Color("Color", &component->Light.LightColor);
-        _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
-        _uiSystem->Slider("AttenuationCoefficients", &component->Light.AttenuationCoefficients, 0.0f, 1.0f);
-        _uiSystem->Slider("MaxDistance", &component->Light.MaxDistance, 0.05f, 100.0f);
-    }
-};
-
-class SpotLightComponentEditor : public TemplateComponentEditor<RenderOpenGL::SpotLightComponent>
-{
-  public:
-    SpotLightComponentEditor(Render::UISystem* uiSystem) : TemplateComponentEditor(uiSystem) {}
-
-    void DrawUITemplate(RenderOpenGL::SpotLightComponent* component) override
-    {
-        _uiSystem->Text("DirectionalLightComponent");
-        _uiSystem->Color("Color", &component->Light.LightColor);
-        _uiSystem->Slider("AmbientIntensity", &component->Light.AmbientIntensity, 0.0f, 1.0f);
-        _uiSystem->SliderAngle("InnerCutoffAngle", &component->Light.InnerCutoffAngle, 0.0f, 360.0f);
-        _uiSystem->SliderAngle("OuterCutoffAngle", &component->Light.OuterCutoffAngle, 0.0f, 360.0f);
-    }
-};
 
 Engine::~Engine() {}
 
@@ -109,26 +67,17 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
     _systemManager->TryAddSystem<RenderEngineSyncSystem>();
     _systemManager->TryAddSystem<LifetimeSystem>();
     _systemManager->TryAddSystem<Render::SpriteAnimationSystem>();
-    _systemManager->TryAddSystem<ComponentEditorSystem>(Core::ECS::DefaultLifetime, uiSystem,
+    _systemManager->TryAddSystem<EngineInspectorSystem>(Core::ECS::DefaultLifetime, uiSystem,
                                                         &renderSystem->GetMainWindow()->GetInput(), this);
+    _systemManager->TryAddSystem<SpectatorCameraSystem>(Core::ECS::DefaultLifetime, &renderSystem->GetCamera(),
+                                                        &renderSystem->GetMainWindow()->GetInput());
 
-    ComponentEditorSystem* componentEditorSystem = nullptr;
-    if (!_systemManager->QuerySystem<ComponentEditorSystem>(componentEditorSystem))
+    EngineInspectorSystem* componentEditorSystem = nullptr;
+    if (!_systemManager->QuerySystem<EngineInspectorSystem>(componentEditorSystem))
     {
         std::cout << "Failed to get Component Editor system" << '\n';
         return;
     }
-
-    componentEditorSystem->RegisterVisualiser<TransformComponentEditor>();
-    componentEditorSystem->RegisterVisualiser<Physics2DComponentEditor>();
-    componentEditorSystem->RegisterVisualiser<Collider2DComponentEditor>();
-    componentEditorSystem->RegisterVisualiser<BaseComponentMaterialEditor>();
-    componentEditorSystem->RegisterVisualiser<NEdgeShape2DComponentEditor>();
-
-    // OpenGL Only
-    componentEditorSystem->RegisterVisualiser<DirectionalLightComponentEditor>();
-    componentEditorSystem->RegisterVisualiser<PointLightComponentComponentEditor>();
-    componentEditorSystem->RegisterVisualiser<SpotLightComponentEditor>();
 
     renderSystem->InitializeRenderScene();
 }

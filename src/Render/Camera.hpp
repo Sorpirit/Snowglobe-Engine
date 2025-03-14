@@ -6,7 +6,7 @@
 
 namespace Snowglobe::Render
 {
-    enum CameraMode : uint8_t
+    enum class CameraMode : uint8_t
     {
         Orthographic,
         Perspective

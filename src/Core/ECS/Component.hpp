@@ -34,6 +34,8 @@ class Component
     /// @brief Called when component is deactivated. Every time entity is deactivated OnDeactivate will be called.
     void OnDeactivate() { _isActive = false; }
 
+    void SetActive(bool isActive) { _isActive = isActive; }
+
     /// @brief Activates delayed removal process. Component will be removed only on the next EntityManager Update.
     /// Should be called only from the Entity.
     void OnRemove() { _needsToBeRemoved = true; }

@@ -9,11 +9,11 @@
 
 #include "ECS/Entity.hpp"
 
-#include "PhysicsEngine2DSystem.hpp"
+#include "../Engine/Editor/SpectatorCameraSystem.hpp"
 #include "BasicShapeFactory.hpp"
 #include "CommonVertexLayouts.hpp"
 #include "MeshComponent.hpp"
-#include "SpectatorCamera.hpp"
+#include "PhysicsEngine2DSystem.hpp"
 
 class BaseShapeFactoryTests : public RuntimeTest
 {
@@ -101,7 +101,7 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     bool _isOrthographic = false;
 
-    Snowglobe::Engine::SpectatorCamera _spectator;
+    Snowglobe::Engine::SpectatorCameraSystem _spectator;
 
     std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
     std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;
@@ -160,7 +160,7 @@ private:
     Snowglobe::Render::BasicShapeFactory _shapeFactory;
     bool _isOrthographic = false;
 
-    Snowglobe::Engine::SpectatorCamera _spectator;
+    Snowglobe::Engine::SpectatorCameraSystem _spectator;
 
     std::vector<std::shared_ptr<Snowglobe::Core::ECS::Entity>> _cubes;
     std::vector<std::shared_ptr<Snowglobe::Engine::MeshComponent>>_cubeMeshC;

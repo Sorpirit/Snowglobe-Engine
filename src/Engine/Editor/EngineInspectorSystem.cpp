@@ -1,4 +1,6 @@
-#include "ComponentEditorSystem.hpp"
+#include "EngineInspectorSystem.hpp"
+
+#include "CommonVisualizers.hpp"
 #include "Engine.hpp"
 
 #include <string>
@@ -6,7 +8,13 @@
 namespace Snowglobe::Engine
 {
 
-void ComponentEditorSystem::Update()
+EngineInspectorSystem::EngineInspectorSystem(Render::UISystem* uiSystem, Core::InputReader* input, Engine* engine)
+    : ISystem(true), _uiSystem(uiSystem), _inputReader(input), _engine(engine)
+{
+    CommonVisualizers::RegisterVisualizers(this);
+}
+
+void EngineInspectorSystem::Update()
 {
     if (_inputReader->IsKeyPressed(Core::Key::P))
     {
@@ -14,34 +22,26 @@ void ComponentEditorSystem::Update()
     }
 
     auto window = _uiSystem->OpenUIPanel("EngineProperties");
-
-    if (_uiSystem->BeginTabBar("EnginePropertiesTabBar"))
+    if (_uiSystem->BeginTreeNode("Systems"))
     {
-        if (_uiSystem->BeginTabBarItem("Systems"))
-        {
-            _uiSystem->Text("Systems");
-            DrawSystemUI();
-            _uiSystem->EndTabBarItem();
-        }
+        DrawSystemUI();
+        _uiSystem->EndTreeNode();
+    }
 
-        if (_uiSystem->BeginTabBarItem("Scene"))
-        {
-            _uiSystem->Text("Scene");
-            DrawSceneUI();
-            _uiSystem->EndTabBarItem();
-        }
+    if (_uiSystem->BeginTreeNode("Scene"))
+    {
+        DrawSceneUI();
+        _uiSystem->EndTreeNode();
+    }
 
-        if (_uiSystem->BeginTabBarItem("Inspector"))
-        {
-            DrawInspectorUI();
-            _uiSystem->EndTabBarItem();
-        }
-
-        _uiSystem->EndTabBar();
+    if (_uiSystem->BeginTreeNode("Inspector"))
+    {
+        DrawInspectorUI();
+        _uiSystem->EndTreeNode();
     }
 }
 
-void ComponentEditorSystem::DrawSystemUI()
+void EngineInspectorSystem::DrawSystemUI()
 {
     bool isActive = true;
 
@@ -53,25 +53,29 @@ void ComponentEditorSystem::DrawSystemUI()
 
     for (auto& systemPair : _engine->GetSystemManager()->GetTypedSystems())
     {
-        // skip "class Snowglobe::"
-        const int skipChars = 17;
-        if (_uiSystem->BeginTreeNode((systemPair.first.name() + skipChars)))
+        const auto& name = GetOrCreateSimplifiedName(systemPair.first);
+        bool isOpen = _uiSystem->BeginTreeNode(name);
+        if (!systemPair.second->IsPermanent())
         {
-            if (!systemPair.second->IsPermanent())
-            {
-                isActive = systemPair.second->IsActive();
-                if (_uiSystem->Checkbox("IsActive", &isActive))
-                {
-                    systemPair.second->SetActive(isActive);
-                }
-            }
+            bool isActive = systemPair.second->IsActive();
+            _uiSystem->SameLine();
+            if (_uiSystem->Checkbox("IsActive##" + name, &isActive))
+                systemPair.second->SetActive(isActive);
+        }
+
+
+        if (isOpen)
+        {
+            auto visualiser = _customSystemVisualisers.find(systemPair.first);
+            if (visualiser != _customSystemVisualisers.end())
+                visualiser->second(_uiSystem, systemPair.second.get());
 
             _uiSystem->EndTreeNode();
         }
     }
 }
 
-void ComponentEditorSystem::DrawSceneUI()
+void EngineInspectorSystem::DrawSceneUI()
 {
     if (_uiSystem->BeginTreeNode("All Entites"))
     {
@@ -113,7 +117,7 @@ void ComponentEditorSystem::DrawSceneUI()
     }
 }
 
-void ComponentEditorSystem::DrawInspectorUI()
+void EngineInspectorSystem::DrawInspectorUI()
 {
     auto& entities = _entityManager->GetAllEntities();
 
@@ -164,15 +168,27 @@ void ComponentEditorSystem::DrawInspectorUI()
     selectedEntity->ListAttachedComponents(components);
     for (auto& component : components)
     {
-        auto visualiser = _visualisers.find(typeid(*component));
-        if (visualiser != _visualisers.end())
+        const auto& componentType = typeid(*component);
+        const auto& name = GetOrCreateSimplifiedName(componentType);
+        bool isOpen = _uiSystem->BeginTreeNode(name, static_cast<int>(Render::TreeNode::DefaultOpen));
+        bool isActive = component->IsActive();
+        _uiSystem->SameLine();
+        if (_uiSystem->Checkbox("IsActive##" + name, &isActive))
+            component->SetActive(isActive);
+
+        if (isOpen)
         {
-            visualiser->second->DrawUI(component);
+            auto visualiser = _customComponentVisualisers.find(componentType);
+            if (visualiser != _customComponentVisualisers.end())
+            {
+                visualiser->second(_uiSystem, component);
+            }
+            _uiSystem->EndTreeNode();
         }
     }
 }
 
-void ComponentEditorSystem::PuaseAllSystems(bool pause)
+void EngineInspectorSystem::PuaseAllSystems(bool pause)
 {
     _allSystemsPuased = pause;
     for (auto& systems : _engine->GetSystemManager()->GetSortedSystems())

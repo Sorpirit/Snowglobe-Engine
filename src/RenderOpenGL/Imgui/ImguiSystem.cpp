@@ -68,14 +68,14 @@ namespace Snowglobe::RenderOpenGL::Imgui
                     glm::vec2 screenPos = camera.WorldToScreen(text.position);
                     auto textSize = ImGui::CalcTextSize(text.text.c_str());
 
-                    if (text.alignment & Render::Alignment::HorizontalCenter)
+                    if ((text.alignment & Render::Alignment::HorizontalCenter) > Render::Alignment::Default)
                         screenPos.x -= textSize.x / 2.0f;
-                    else if (text.alignment & Render::Alignment::HorizontalRight)
+                    else if ((text.alignment & Render::Alignment::HorizontalRight) > Render::Alignment::Default)
                         screenPos.x -= textSize.x;
 
-                    if (text.alignment & Render::Alignment::VerticalCenter)
+                    if ((text.alignment & Render::Alignment::VerticalCenter) > Render::Alignment::Default)
                         screenPos.y -= textSize.y / 2.0f;
-                    else if (text.alignment & Render::Alignment::VerticalBottom)
+                    else if ((text.alignment & Render::Alignment::VerticalBottom) > Render::Alignment::Default)
                         screenPos.y -= textSize.y;
 
                     if (_defaultFont)
@@ -243,7 +243,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
 
     bool ImguiSystem::BeginTreeNode(const std::string& label, int flags)
     {
-        return ImGui::TreeNode(label.c_str());
+        return ImGui::TreeNodeEx(label.c_str(), flags);
     }
 
     void ImguiSystem::EndTreeNode()

@@ -1,8 +1,7 @@
 #pragma once
-#include "../../../thirdparty/tracy/import/src/json.hpp"
-#include "../../Core/Serialization/SerializationAPI.hpp"
 #include "../RuntimeTest.hpp"
-#include "SpectatorCamera.hpp"
+#include "Editor/SpectatorCameraSystem.hpp"
+#include <nlohmann/json.hpp>
 
 namespace Snowglobe
 {
@@ -15,7 +14,7 @@ class SceneSerializationTest : public RuntimeTest
     void Run() override;
 
   private:
-    Engine::SpectatorCamera _spectator;
+    Engine::SpectatorCameraSystem _spectator;
 
     bool _saved = false;
     nlohmann::json _sceneJson;

@@ -1,7 +1,7 @@
 #include "WorldGridDebugDraw.hpp"
 
-#include "RenderSystem.hpp"
 #include "Engine.hpp"
+#include "RenderSystem.hpp"
 
 namespace Snowglobe::Engine
 {

@@ -33,7 +33,6 @@ template <> inline void SetupAssetProcessor<Snowglobe::Render::TextureAssetData>
 template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Snowglobe::Core::AssetManager* manager)
 {
     using namespace Snowglobe;
-    using namespace Snowglobe::Engine;
 
     std::weak_ptr const engine = DI->Resolve<Snowglobe::Engine::Engine>();
     std::shared_ptr const fileSystem = DI->Resolve<Core::FileSystem>();
@@ -53,14 +52,14 @@ template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Sn
             auto manager = engineRef->GetEntityManager();
             auto detached = manager->CreateEntityDetached(tag);
             detached->SetName(name);
-            EntityFactory factory(manager, detached);
+            Engine::EntityFactory factory(manager, detached);
 
             Core::Serialization::JsonReader jreader(prefabData);
 
             Core::CoreTypesSerialization::RegisterCustomTypes(jreader);
             Core::CoreTypesSerialization::RegisterCustomTypesDeserialization(jreader);
             Render::RenderTypesSerialization::RegisterCustomTypes(jreader);
-            EngineTypesSerialization::RegisterCustomTypes(jreader);
+            Engine::EngineTypesSerialization::RegisterCustomTypes(jreader);
             factory.RegisterDeserializers(jreader);
 
             jreader.DeserializeArray("Components");
@@ -73,9 +72,8 @@ template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Sn
 template <> inline void SetupAssetProcessor<Snowglobe::Render::SpriteAssetData>(Snowglobe::Core::AssetManager* manager)
 {
     using namespace Snowglobe;
-    using namespace Snowglobe::Engine;
 
-    std::weak_ptr const engine = DI->Resolve<Snowglobe::Engine::Engine>();
+    std::weak_ptr const engine = DI->Resolve<Engine::Engine>();
     std::shared_ptr const fileSystem = DI->Resolve<Core::FileSystem>();
     manager->RegisterAssetProcessor(".sprite", [engine, fileSystem](Core::AssetManager* manger,
                                                        const std::filesystem::path& assetPath) {
