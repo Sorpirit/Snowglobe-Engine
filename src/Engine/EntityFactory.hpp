@@ -2,6 +2,7 @@
 #include "ECS/Component.hpp"
 #include "ECS/EntityManager.hpp"
 #include "Serialization/Deserialize.hpp"
+#include "SpriteAnimationComponent.hpp"
 
 #include <memory>
 
@@ -20,6 +21,20 @@ class EntityFactory
     {
     }
 
+    void RegisterDeserializers(Core::Serialization::Deserializer& des)
+    {
+        RegisterDeserializationFunc<Core::ECS::Entity>(des);
+        RegisterDeserializationFunc<Core::TransformComponent>(des);
+        RegisterDeserializationFunc<Render::SpriteRenderComponent>(des);
+        RegisterDeserializationFunc<Render::SpriteAnimationComponent>(des);
+        RegisterDeserializationFunc<Physics2DComponent>(des);
+        RegisterDeserializationFunc<Collider2DComponent>(des);
+    }
+
+  private:
+    std::shared_ptr<Core::ECS::EntityManagerBase> _entityManager;
+    std::shared_ptr<Core::ECS::Entity> _currentEntity;
+
     template <typename CComponent> CComponent* Deserialize(Core::Serialization::Deserializer* des);
 
     template <Core::ECS::ComponentBased CComponent> CComponent* Deserialize(Core::Serialization::Deserializer* des)
@@ -29,9 +44,13 @@ class EntityFactory
         return comp;
     }
 
-  private:
-    std::shared_ptr<Core::ECS::EntityManagerBase> _entityManager;
-    std::shared_ptr<Core::ECS::Entity> _currentEntity;
+    template <typename T> void RegisterDeserializationFunc(Core::Serialization::Deserializer& deserializer)
+    {
+        deserializer.RegisterCustomDeserializer<T>([&](Core::Serialization::Deserializer* deserializer) -> T& {
+            auto t = this->Deserialize<T>(deserializer);
+            return *t;
+        });
+    }
 };
 } // namespace Snowglobe::Engine
 
@@ -41,25 +60,12 @@ inline Snowglobe::Core::ECS::Entity* Snowglobe::Engine::EntityFactory::Deseriali
 {
     std::string name;
     std::string tagName;
-    s->BaseProperty("Name", name);
-    s->BaseProperty("Tag", tagName);
+    s->Property("Name", name);
+    s->Property("Tag", tagName);
     Core::ECS::Tag tag = Core::ECS::TagManager::GetInstance().GetTag(tagName);
 
     _currentEntity = _entityManager->CreateEntity(tag);
     _currentEntity->SetName(name);
     s->DeserializeArray("Components");
     return _currentEntity.get();
-}
-
-template <>
-inline void CustomPropertySerialization<Snowglobe::Core::ECS::Entity>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                               Snowglobe::Core::ECS::Entity* value, uint32_t metaFlags)
-{
-    std::string name = value->GetName();
-    std::string tagName = value->GetTag().GetName();
-    api->BaseProperty("Name", name);
-    api->BaseProperty("Tag", tagName);
-    std::vector<Snowglobe::Core::ECS::Component*> components;
-    value->ListAttachedComponents(components);
-    api->Property<std::vector<Snowglobe::Core::ECS::Component*>, true>("Components", components);
 }

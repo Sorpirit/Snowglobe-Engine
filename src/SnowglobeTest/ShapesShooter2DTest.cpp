@@ -305,7 +305,7 @@ void ShapesShooter2DTest::SpawnPlayer()
     Engine::Physics2DComponent* physics;
     if (player->QueryComponent(physics))
     {
-        physics->Bouncines = 0.1f;
+        physics->Bounciness = 0.1f;
     }
 
     _player = player;

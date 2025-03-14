@@ -76,11 +76,3 @@ inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::f
 
 } // namespace Snowglobe::Core
 
-template <>
-inline void CustomProperty<Snowglobe::Core::SnowFileHandle>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                        Snowglobe::Core::SnowFileHandle* value, uint32_t metaFlags)
-{
-    std::string path = value->GetPath().string();
-    api->BaseProperty("path", path);
-    value->Initialize(path);
-}

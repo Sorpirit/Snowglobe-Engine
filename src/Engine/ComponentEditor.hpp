@@ -70,7 +70,7 @@ public:
         _uiSystem->Drag("AngularVelocity", &component->AngularVelocity, 0.1f);
         _uiSystem->Drag("Mass", &component->Mass, 0.1f, 0.001f, 100.0f);
         _uiSystem->Drag("Drag", &component->Drag, 0.01f, 0.0f, 1.0f);
-        _uiSystem->Slider("Bouncines", &component->Bouncines, 0.01f, 1.0f);
+        _uiSystem->Slider("Bouncines", &component->Bounciness, 0.01f, 1.0f);
     }
 };
 

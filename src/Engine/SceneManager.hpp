@@ -14,9 +14,9 @@ namespace Snowglobe::Engine
 class SceneManager
 {
 public:
-    void LoadScene(std::string tag);
-    void SaveScene(std::string tag);
-    void UnloadScene(std::string tag);
+    void LoadScene(const std::string& tag);
+    void SaveScene(const std::string& tag);
+    void UnloadScene(const std::string& tag);
 private:
     Core::ECS::Lifetime _currentSceneLifetime = Core::ECS::DefaultLifetime;
 };

@@ -57,24 +57,3 @@ public:
     Core::AssetOptional<SpriteAssetData> SpriteAsset;
 };
 }
-
-//
-// template <>
-// inline void CustomProperty<Snowglobe::Render::SpriteAssetData>(Snowglobe::Core::Serialization::SerializationAPI* api,
-//                                                                Snowglobe::Render::SpriteAssetData* value, uint32_t metaFlags)
-// {
-//     api->Property("TextureAsset", value->TextureAsset.ToBase());
-//     api->Property("TileSize", value->TileSize);
-//     api->Property("TileCount", value->TileCount);
-//     api->Property("SpriteTotalCount", value->SpriteTotalCount);
-//     api->Property("SpriteScale", value->SpriteScale);
-//     api->Property("CurrentSpriteCoord", value->CurrentSpriteCoord);
-// }
-
-template <>
-inline void CustomProperty<Snowglobe::Render::SpriteRenderComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                               Snowglobe::Render::SpriteRenderComponent* value, uint32_t metaFlags)
-{
-    api->Property("Color", value->Color);
-    api->Property("SpriteAsset", value->SpriteAsset.ToBase());
-}

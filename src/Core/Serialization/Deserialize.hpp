@@ -5,11 +5,8 @@ namespace Snowglobe::Core::Serialization
 {
 
 class Deserializer;
-template <typename CComponent, typename DDeserializer>
-concept CustomDeserializer = requires(DDeserializer* deserializer)
-{
-    { deserializer->template Deserialize<CComponent>(std::declval<Deserializer*>()) } -> std::convertible_to<CComponent*>;
-};
+template <typename T>
+using CustomDeserializationFunc = std::function<T&(Deserializer*)>;
 
 class Deserializer : public SerializationAPI
 {
@@ -48,34 +45,25 @@ public:
         PopObject();
     }
 
-    template <typename CComponent, typename T>
-    void RegisterCustomDeserializer(T* ptr)
+    template <typename T> void RegisterCustomDeserializer(CustomDeserializationFunc<T> func)
     {
-        _deserializer[typeid(CComponent).name()] = [=](Deserializer* api)
-        {
-            auto v = ptr->template Deserialize<CComponent>(api);
-            return static_cast<void*>(v);
+        _customDeserializer[typeid(T).name()] = [=](Deserializer* api) {
+            auto& value = func(api);
+            return static_cast<void*>(&value);
         };
-    }
-
-    template <typename CComponent>
-    void RegisterCustomDeserializer(std::function<void*(Deserializer*)>& func)
-    {
-        _deserializer[typeid(CComponent).name()] = func;
     }
 private:
     void* DeserializeInternal(const std::string& type)
     {
-        auto it = _deserializer.find(type);
-        if (it == _deserializer.end())
+        auto it = _customDeserializer.find(type);
+        if (it == _customDeserializer.end())
             return nullptr;
 
-        //Think about it
-        //PropertyInternal(type, ptr);
         return it->second(this);
     }
-private:
-    std::unordered_map<std::string, std::function<void*(Deserializer*)>> _deserializer;
+
+    typedef std::function<void*(Deserializer*)> CustomDeserializationFuncWrapper;
+    std::unordered_map<std::string, CustomDeserializationFuncWrapper> _customDeserializer;
 };
 
 template <>

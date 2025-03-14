@@ -47,12 +47,3 @@ class SpriteAnimationComponent : public Core::ECS::Component
 };
 
 } // namespace Snowglobe::Render
-
-template <>
-inline void CustomProperty<Snowglobe::Render::SpriteAnimationComponent>(
-    Snowglobe::Core::Serialization::SerializationAPI* api, Snowglobe::Render::SpriteAnimationComponent* value,
-    uint32_t metaFlags)
-{
-    api->BaseProperty("AnimationSpeed", value->AnimationSpeed, metaFlags);
-    api->BaseProperty("AnimationTickTimer", value->AnimationTickTimer, metaFlags);
-}

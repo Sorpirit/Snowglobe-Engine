@@ -96,20 +96,3 @@ class AssetManager
 };
 
 } // namespace Snowglobe::Engine
-
-template <>
-inline void CustomPropertySerialization<Snowglobe::Core::AssetBase>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                               Snowglobe::Core::AssetBase* value, uint32_t metaFlags)
-{
-    std::string tag = value->GetAssetTag();
-    api->BaseProperty("Tag", tag);
-}
-
-template <>
-inline void CustomPropertyDeserialization<Snowglobe::Core::AssetBase>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                               Snowglobe::Core::AssetBase* value, uint32_t metaFlags)
-{
-    std::string tag = "";
-    api->BaseProperty("Tag", tag);
-    DI->Resolve<Snowglobe::Core::AssetManager>()->ResolveBaseRef(tag, value);
-}

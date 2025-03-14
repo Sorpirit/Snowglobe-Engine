@@ -1,8 +1,11 @@
 #pragma once
 #include "Assets/AssetManager.hpp"
+#include "CoreTypesSerialization.hpp"
 #include "Engine.hpp"
+#include "EngineTypesSerialization.hpp"
 #include "EntityFactory.hpp"
 #include "RenderSystem.hpp"
+#include "RenderTypesSerialization.hpp"
 #include "Serialization/JsonSerialization.hpp"
 #include "Texture2DPtr.hpp"
 #include "TextureAssetData.hpp"
@@ -54,31 +57,11 @@ template <> inline void SetupAssetProcessor<Snowglobe::Core::PrefabAssetData>(Sn
 
             Core::Serialization::JsonReader jreader(prefabData);
 
-            //basic types
-            jreader.RegisterCustomProperty<glm::vec2>();
-            jreader.RegisterCustomProperty<glm::vec3>();
-            jreader.RegisterCustomProperty<glm::vec4>();
-            jreader.RegisterCustomProperty<glm::ivec2>();
-            jreader.RegisterCustomProperty<glm::ivec3>();
-            jreader.RegisterCustomProperty<glm::ivec4>();
-            jreader.RegisterCustomProperty<Core::SnowFileHandle>();
-
-            //components
-            jreader.RegisterCustomProperty<Core::TransformComponent>();
-            jreader.RegisterCustomProperty<Render::SpriteRenderComponent>();
-            jreader.RegisterCustomProperty<Render::SpriteAnimationComponent>();
-            jreader.RegisterCustomProperty<Physics2DComponent>();
-            jreader.RegisterCustomProperty<Collider2DComponent>();
-
-            //assets
-            jreader.RegisterCustomPropertyDeserialization<Core::AssetBase>();
-
-            //components factory
-            jreader.RegisterCustomDeserializer<Core::TransformComponent, EntityFactory>(&factory);
-            jreader.RegisterCustomDeserializer<Render::SpriteRenderComponent, EntityFactory>(&factory);
-            jreader.RegisterCustomDeserializer<Render::SpriteAnimationComponent, EntityFactory>(&factory);
-            jreader.RegisterCustomDeserializer<Physics2DComponent, EntityFactory>(&factory);
-            jreader.RegisterCustomDeserializer<Collider2DComponent, EntityFactory>(&factory);
+            Core::CoreTypesSerialization::RegisterCustomTypes(jreader);
+            Core::CoreTypesSerialization::RegisterCustomTypesDeserialization(jreader);
+            Render::RenderTypesSerialization::RegisterCustomTypes(jreader);
+            EngineTypesSerialization::RegisterCustomTypes(jreader);
+            factory.RegisterDeserializers(jreader);
 
             jreader.DeserializeArray("Components");
 

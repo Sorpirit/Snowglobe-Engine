@@ -22,18 +22,6 @@ public:
     float Drag = 0.0f;
     float AngularDrag = 0.0f;
     float GravityScale = 1.0f;
-    float Bouncines = 1.0f;
+    float Bounciness = 1.0f;
 };
-}
-
-template <>
-inline void CustomProperty<Snowglobe::Engine::Physics2DComponent>(Snowglobe::Core::Serialization::SerializationAPI* api,
-                                                               Snowglobe::Engine::Physics2DComponent* value, uint32_t metaFlags)
-{
-    api->Property("Velocity", value->Velocity);
-    api->BaseProperty("AngularVelocity", value->AngularVelocity);
-    api->BaseProperty("Mass", value->Mass);
-    api->BaseProperty("AngularDrag", value->AngularDrag);
-    api->BaseProperty("GravityScale", value->GravityScale);
-    api->BaseProperty("Bouncines", value->Bouncines);
 }

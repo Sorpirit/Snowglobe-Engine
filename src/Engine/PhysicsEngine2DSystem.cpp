@@ -87,7 +87,7 @@ void PhysicsEngine2DSystem::Update()
                 physic1Velocity = physics1->Velocity;
                 physic1Mass = physics1->Mass;
                 physic1MassInv = physic1Mass > 0.0f ? 1.0f / physic1Mass : 0.0f;
-                physic1Bounciness = physics1->Bouncines;
+                physic1Bounciness = physics1->Bounciness;
             }
 
             if (entity2->QueryComponent(physics2))
@@ -95,7 +95,7 @@ void PhysicsEngine2DSystem::Update()
                 physic2Velocity = physics2->Velocity;
                 physic2Mass = physics2->Mass;
                 physic2MassInv = physic2Mass > 0.0f ? 1.0f / physic2Mass : 0.0f;
-                physic2Bounciness = physics2->Bouncines;
+                physic2Bounciness = physics2->Bounciness;
             }
 
             glm::vec2 relativeVelocity = physic2Velocity - physic1Velocity;

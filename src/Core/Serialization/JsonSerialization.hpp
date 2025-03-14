@@ -3,28 +3,22 @@
 
 #include <nlohmann/json.hpp>
 
-#include "SerializationAPI.hpp"
-#include "Serializer.hpp"
 #include "Deserialize.hpp"
+#include "Serializer.hpp"
 
 namespace Snowglobe::Core::Serialization
 {
 
 class SAXHandler : public nlohmann::detail::json_sax_dom_parser<nlohmann::json>
 {
-public:
-    SAXHandler(nlohmann::json& j)
-      : nlohmann::detail::json_sax_dom_parser<nlohmann::json>(j, false)
-    {}
+  public:
+    SAXHandler(nlohmann::json& j) : json_sax_dom_parser(j, false) {}
 
-    bool parse_error(std::size_t position,
-                     const std::string& last_token,
-                     const nlohmann::json::exception& ex)
+    bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::json::exception& ex)
     {
         std::cerr << "parse error at input byte " << position << "\n"
                   << ex.what() << "\n"
-                  << "last read: \"" << last_token << "\""
-                  << std::endl;
+                  << "last read: \"" << last_token << "\"" << std::endl;
         return false;
     }
 };
@@ -34,13 +28,13 @@ class JsonReader : public Deserializer
   public:
     JsonReader(nlohmann::json& j) : original(j), ptr(&original) {}
 
-    bool Contains(const std::string& varName) { return ptr->contains(varName); }
+    bool Contains(const std::string& varName) const { return ptr->contains(varName); }
 
-    void BaseProperty(const std::string& name, int& value, uint32_t metaFlags) override { ReadInternal(name, value); }
-    void BaseProperty(const std::string& name, float& value, uint32_t metaFlags) override { ReadInternal(name, value); }
-    void BaseProperty(const std::string& name, std::string& value, uint32_t metaFlags) override { ReadInternal(name, value); }
-    void BaseProperty(const std::string& name, bool& value, uint32_t metaFlags) override { ReadInternal(name, value); }
-    void BaseProperty(const std::string& name, uint32_t& value, uint32_t metaFlags) override { ReadInternal(name, value); }
+    bool BaseProperty(const std::string& name, int& value) override { return ReadInternal(name, value); }
+    bool BaseProperty(const std::string& name, float& value) override { return ReadInternal(name, value); }
+    bool BaseProperty(const std::string& name, std::string& value) override { return ReadInternal(name, value); }
+    bool BaseProperty(const std::string& name, bool& value) override { return ReadInternal(name, value); }
+    bool BaseProperty(const std::string& name, uint32_t& value) override { return ReadInternal(name, value); }
 
   protected:
     bool TryPushObject(const std::string& name) override
@@ -73,16 +67,20 @@ class JsonReader : public Deserializer
     }
 
   private:
-    void ReadInternal(const std::string varName, auto& var)
+    bool ReadInternal(const std::string varName, auto& var)
     {
         if (ptr->contains(varName))
         {
             var = ptr->at(varName);
+            return true;
         }
         else if (ptr->is_primitive())
         {
             var = *ptr;
+            return true;
         }
+
+        return false;
     }
 
     nlohmann::json original;
@@ -95,11 +93,11 @@ class JsonWriter : public Serializer
   public:
     JsonWriter() : original(nlohmann::json::object()), ptr(&original) {}
 
-    void BaseProperty(const std::string& varName, bool& var, uint32_t metaFlags) override { WriteInternal(varName, var); }
-    void BaseProperty(const std::string& varName, int& var, uint32_t metaFlags) override { WriteInternal(varName, var); }
-    void BaseProperty(const std::string& varName, uint32_t& var, uint32_t metaFlags) override { WriteInternal(varName, var); }
-    void BaseProperty(const std::string& varName, float& var, uint32_t metaFlags) override { WriteInternal(varName, var); }
-    void BaseProperty(const std::string& varName, std::string& var, uint32_t metaFlags) override { WriteInternal(varName, var); }
+    bool BaseProperty(const std::string& varName, bool& var) override { return WriteInternal(varName, var); }
+    bool BaseProperty(const std::string& varName, int& var) override { return WriteInternal(varName, var); }
+    bool BaseProperty(const std::string& varName, uint32_t& var) override { return WriteInternal(varName, var); }
+    bool BaseProperty(const std::string& varName, float& var) override { return WriteInternal(varName, var); }
+    bool BaseProperty(const std::string& varName, std::string& var) override { return WriteInternal(varName, var); }
 
     nlohmann::json& GetResult() { return original; }
 
@@ -131,20 +129,24 @@ class JsonWriter : public Serializer
     }
 
   private:
-    void WriteInternal(const std::string varName, auto& var)
+    bool WriteInternal(const std::string varName, auto& var)
     {
         if (ptr->is_array())
         {
             ptr->push_back(var);
+            return true;
         }
         else if (ptr->is_object())
         {
             (*ptr)[varName] = var;
+            return true;
         }
+
+        return false;
     }
 
     nlohmann::json original;
     nlohmann::json* ptr;
     std::stack<nlohmann::json*> stack;
 };
-} // namespace Snowglobe::Core
+} // namespace Snowglobe::Core::Serialization
