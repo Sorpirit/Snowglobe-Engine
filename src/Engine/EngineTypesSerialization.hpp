@@ -42,6 +42,7 @@ public:
                 api->Property("Velocity", value.Velocity);
                 api->Property("AngularVelocity", value.AngularVelocity);
                 api->Property("Mass", value.Mass);
+                api->Property("Drag", value.Drag);
                 api->Property("AngularDrag", value.AngularDrag);
                 api->Property("GravityScale", value.GravityScale);
                 api->Property("Bounciness", value.Bounciness);

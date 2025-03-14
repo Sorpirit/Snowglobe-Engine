@@ -26,6 +26,7 @@ class CommonVisualizers
                 ui.Drag("AngularVelocity", &component.AngularVelocity, 0.1f);
                 ui.Drag("Mass", &component.Mass, 0.1f, 0.001f, 100.0f);
                 ui.Drag("Drag", &component.Drag, 0.01f, 0.0f, 1.0f);
+                ui.Slider("GravityScale", &component.GravityScale, 0.0f, 1.0f);
                 ui.Slider("Bounciness", &component.Bounciness, 0.01f, 1.0f);
             });
 

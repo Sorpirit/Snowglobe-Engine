@@ -129,6 +129,7 @@ void PhysicsEngine2DSystem::Update()
         transform->Position += glm::vec3(physics->Velocity * physicsDeltaTime, 0.0f);
         transform->Rotation.z += physics->AngularVelocity * physicsDeltaTime;
 
+        physics->Velocity -= glm::vec2(0, 9.81f) * physicsDeltaTime * physics->GravityScale;
         physics->Velocity -= physics->Velocity * physics->Drag * physicsDeltaTime;
         physics->AngularVelocity = physics->AngularVelocity * (1 - physics->AngularDrag);
     }
