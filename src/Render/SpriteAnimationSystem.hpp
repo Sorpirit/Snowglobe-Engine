@@ -22,6 +22,22 @@ class SpriteAnimationSystem : public Core::ECS::ISystem
 
             auto& spriteData = sprite->SpriteAsset.GetData();
 
+            //Animation State machine
+            auto it = animation->AnimationStateMachine.find(animation->GetAnimationIndex());
+            if (it != animation->AnimationStateMachine.end())
+            {
+                for (auto& [toState, condition] : it->second)
+                {
+                    bool transition = condition();
+                    if (transition)
+                    {
+                        animation->SetAnimationIndex(toState);
+                        break;
+                    }
+                }
+            }
+
+
             if (animation->AnimationIndexChanged())
             {
                 animation->ResetAnimationChangedFlag();

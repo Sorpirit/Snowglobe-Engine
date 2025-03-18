@@ -27,6 +27,7 @@ class SpriteAnimationComponent : public Core::ECS::Component
     SpriteAnimationComponent() = default;
 
     std::unordered_map<uint32_t, AnimationClip> AnimationClips;
+    std::unordered_map<uint32_t, std::vector<std::pair<uint32_t, std::function<bool()>>>> AnimationStateMachine;
     AnimationClip Clip;
     float AnimationSpeed = 1.0f;
     float AnimationTickTimer = 0.0f;
@@ -40,6 +41,16 @@ class SpriteAnimationComponent : public Core::ECS::Component
 
     bool AnimationIndexChanged() const { return _animationIndexDirty; }
     void ResetAnimationChangedFlag() { _animationIndexDirty = false; }
+
+    void AddStateTransition(uint32_t fromState, uint32_t toState, std::function<bool()> condition)
+    {
+        AnimationStateMachine[fromState].emplace_back(toState, condition);
+    }
+
+    void AddOnFinishTransition(uint32_t fromState, uint32_t toState)
+    {
+        AnimationStateMachine[fromState].emplace_back(toState, [&]() { return Clip.Finished; });
+    }
 
   private:
     bool _animationIndexDirty = false;

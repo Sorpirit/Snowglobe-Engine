@@ -6,7 +6,8 @@
 #include "SpriteRenderComponent.hpp"
 #include "TransformComponent.hpp"
 
-namespace Snowglobe {
+namespace Snowglobe
+{
 
 enum class AnimationStates
 {
@@ -16,7 +17,6 @@ enum class AnimationStates
     Jumping,
     Falling,
 };
-
 
 void InputActionsTest::Init()
 {
@@ -29,7 +29,7 @@ void InputActionsTest::Init()
     Player->AddComponent<Core::TransformComponent>();
     Player->AddComponent<Engine::Collider2DComponent>(Engine::CollisionShapeType::AABB, false);
     auto physics = Player->AddOrGetComponent<Engine::Physics2DComponent>();
-    physics->Bounciness = .2f;
+    physics->Bounciness = .0f;
 
     auto sprite = Player->AddOrGetComponent<Render::SpriteRenderComponent>();
     sprite->SpriteAsset.Set(*assets->Get<Render::SpriteAssetData>("runner.sprite"));
@@ -50,12 +50,10 @@ void InputActionsTest::Init()
         if (isStarted)
         {
             sprite->flipX = true;
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Runing));
             physics->Velocity.x = -1;
         }
         else
         {
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Idle));
             physics->Velocity.x = 0;
         }
     });
@@ -63,27 +61,56 @@ void InputActionsTest::Init()
         if (isStarted)
         {
             sprite->flipX = false;
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Runing));
             physics->Velocity.x = 1;
         }
         else
         {
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Idle));
             physics->Velocity.x = 0;
         }
     });
     inputConfig->Jump.RegisterCallback([=](bool isStarted) {
         if (isStarted)
         {
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Jumping));
             physics->Velocity.y = 5;
         }
         else
         {
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Falling));
             physics->Velocity.y = 0;
         }
     });
+
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Idle),
+                                  static_cast<uint32_t>(AnimationStates::Runing),
+                                  [=]() { return std::abs(physics->Velocity.x) > 0.05f; });
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Idle),
+                                  static_cast<uint32_t>(AnimationStates::Jumping),
+                                  [=]() { return physics->Velocity.y > 0.05f; });
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Idle),
+                                  static_cast<uint32_t>(AnimationStates::Falling),
+                                  [=]() { return physics->Velocity.y < -0.05f; });
+
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Runing),
+                                  static_cast<uint32_t>(AnimationStates::Jumping),
+                                  [=]() { return physics->Velocity.y > 0.05f; });
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Runing),
+                                  static_cast<uint32_t>(AnimationStates::Falling),
+                                  [=]() { return physics->Velocity.y < -0.05f; });
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Runing),
+                                  static_cast<uint32_t>(AnimationStates::Idle),
+                                  [=]() { return std::abs(physics->Velocity.x) < 0.05f; });
+
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Jumping),
+                                  static_cast<uint32_t>(AnimationStates::Falling),
+                                  [=]() { return physics->Velocity.y < -0.05f; });
+
+    animation->AddStateTransition(
+        static_cast<uint32_t>(AnimationStates::Falling), static_cast<uint32_t>(AnimationStates::Runing), [=]() {
+            return std::abs(physics->Velocity.y) < 0.05f && std::abs(physics->Velocity.x) > 0.05f;
+            ;
+        });
+    animation->AddStateTransition(static_cast<uint32_t>(AnimationStates::Falling),
+                                  static_cast<uint32_t>(AnimationStates::Idle),
+                                  [=]() { return std::abs(physics->Velocity.y) < 0.05f; });
 
     input.SetMapping(Core::Key::A, inputConfig->WalkLeft);
     input.SetMapping(Core::Key::D, inputConfig->WalkRight);
@@ -102,8 +129,6 @@ void InputActionsTest::Init()
     entity->AddComponent<Engine::Collider2DComponent>(Engine::CollisionShapeType::AABB, false);
 }
 
-void InputActionsTest::Run()
-{
-}
+void InputActionsTest::Run() {}
 
-} // Snowglobe
+} // namespace Snowglobe
