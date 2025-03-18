@@ -21,7 +21,7 @@ public:
     void Bind(uint32_t pipelineID) override;
 
 private:
-    CachedUniformLocations<4> _uniformLocations;
+    CachedUniformLocations<5> _uniformLocations;
 };
 
 } // namespace Snowglobe::RenderOpenGL::Materials

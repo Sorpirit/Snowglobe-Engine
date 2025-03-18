@@ -27,6 +27,7 @@ void InputActionsTest::Init()
     auto assets = DI->Resolve<Core::AssetManager>();
     sprite->SpriteAsset.Set(*assets->Get<Render::SpriteAssetData>("runner.sprite"));
     sprite->Color = glm::vec3(1.0f, 1.0f, 1.0f);
+
     auto animation = Player->AddOrGetComponent<Render::SpriteAnimationComponent>();
 
     animation->AnimationClips[static_cast<int>(AnimationStates::Idle)] = {{0, 0}, {4, 0}, true, 1 / 8.0};
@@ -41,21 +42,27 @@ void InputActionsTest::Init()
     auto inputConfig = input.GetInputMapping<TestInputConfig>();
     inputConfig->WalkLeft.RegisterCallback([=](bool isStarted) {
         if (isStarted)
-            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Walking));
+        {
+            sprite->flipX = true;
+            animation->SetAnimationIndex(static_cast<int>(AnimationStates::Runing));
+        }
         else
             animation->SetAnimationIndex(static_cast<int>(AnimationStates::Idle));
     });
     inputConfig->WalkRight.RegisterCallback([=](bool isStarted) {
         if (isStarted)
+        {
+            sprite->flipX = false;
             animation->SetAnimationIndex(static_cast<int>(AnimationStates::Runing));
+        }
         else
             animation->SetAnimationIndex(static_cast<int>(AnimationStates::Idle));
     });
 
-    input.SetMapping(Core::Key::D, inputConfig->WalkLeft);
     input.SetMapping(Core::Key::A, inputConfig->WalkLeft);
+    input.SetMapping(Core::Key::D, inputConfig->WalkRight);
     input.SetMapping(Core::Key::Left, inputConfig->WalkLeft);
-    input.SetMapping(Core::Key::Right, inputConfig->WalkLeft);
+    input.SetMapping(Core::Key::Right, inputConfig->WalkRight);
 }
 
 void InputActionsTest::Run()

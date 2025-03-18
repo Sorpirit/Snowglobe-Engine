@@ -11,6 +11,7 @@ struct Material {
     vec4 color;
     vec2 textureOffset;
     vec2 textureScale;
+    int flipXY;
 };
 
 out vec4 FragColor;

@@ -44,10 +44,22 @@ void SpriteRenderer::Update()
 
         _material.GetMaterialData().texture = sprite->SpriteAsset.HasData() ? sprite->SpriteAsset.GetData().GetTexture() : Render::Texture2DPtr{};
         _material.GetMaterialData().color = glm::vec4(sprite->Color, 1);
-        _material.GetMaterialData().textureOffset = sprite->SpriteAsset.HasData() ? sprite->SpriteAsset.GetData().CurrentSpriteCoord : glm::ivec2{};
-        _material.GetMaterialData().textureScale = sprite->SpriteAsset.HasData() ? sprite->SpriteAsset.GetData().SpriteScale: glm::vec2{1};
-        _material.Bind(_shaderProgram);
+        _material.GetMaterialData().flipXY = (Render::MaterialsData::FLIP_X && sprite->flipX ) || (Render::MaterialsData::FLIP_Y && sprite->flipY);
 
+        if (sprite->SpriteAsset.HasData())
+        {
+            auto& spriteData = sprite->SpriteAsset.GetData();
+
+            _material.GetMaterialData().textureOffset = sprite->SpriteAsset.GetData().CurrentSpriteCoord;
+            _material.GetMaterialData().textureScale = sprite->SpriteAsset.GetData().SpriteScale;
+        }
+        else
+        {
+            _material.GetMaterialData().textureOffset = glm::vec2(0);
+            _material.GetMaterialData().textureScale = glm::vec2(1);
+        }
+        
+        _material.Bind(_shaderProgram);
         _quadMesh->Draw();
     }
 }

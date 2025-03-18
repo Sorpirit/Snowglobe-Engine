@@ -57,5 +57,7 @@ public:
 
     glm::vec3 Color = glm::vec3(1.0f);
     Core::AssetOptional<SpriteAssetData> SpriteAsset;
+    bool flipX = false;
+    bool flipY = false;
 };
 }

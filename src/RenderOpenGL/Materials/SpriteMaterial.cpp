@@ -13,6 +13,7 @@ void RenderOpenGL::Materials::SpriteMaterial::Bind(uint32_t pipelineID)
     uniformSetter.Set("material.color", _data.color);
     uniformSetter.Set("material.textureOffset", _data.textureOffset);
     uniformSetter.Set("material.textureScale", _data.textureScale);
+    uniformSetter.Set("material.flipXY", _data.flipXY);
 }
 
 } // Snowglobe
