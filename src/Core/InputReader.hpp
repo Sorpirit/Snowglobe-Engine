@@ -4,6 +4,7 @@
 
 #include "InputConstants.hpp"
 
+#include <functional>
 #include <optional>
 
 namespace Snowglobe::Core
