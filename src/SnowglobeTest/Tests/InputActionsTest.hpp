@@ -10,7 +10,7 @@ class TestInputConfig
 public:
     Engine::InputAction WalkLeft;
     Engine::InputAction WalkRight;
-    Engine::InputAction JumpLeft;
+    Engine::InputAction Jump;
 };
 
 class InputActionsTest : public RuntimeTest
