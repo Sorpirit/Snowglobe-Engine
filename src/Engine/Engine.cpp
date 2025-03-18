@@ -9,6 +9,7 @@
 #include "Editor/WorldGridDebugDraw.hpp"
 #include "EngineTime.hpp"
 #include "Imgui/ImguiSystem.hpp"
+#include "InputActionSystem.hpp"
 #include "LifetimeSystem.hpp"
 #include "PhysicsEngine2DSystem.hpp"
 #include "RenderEngineSyncSystem.hpp"
@@ -71,6 +72,8 @@ void Engine::Setup(const Core::EngineProfile& profile, const Render::WindowParam
                                                         &renderSystem->GetMainWindow()->GetInput(), this);
     _systemManager->TryAddSystem<SpectatorCameraSystem>(Core::ECS::DefaultLifetime, &renderSystem->GetCamera(),
                                                         &renderSystem->GetMainWindow()->GetInput());
+
+    _inputActionSystem.Init(renderSystem->GetMainWindow()->GetInput());
 
     EngineInspectorSystem* componentEditorSystem = nullptr;
     if (!_systemManager->QuerySystem<EngineInspectorSystem>(componentEditorSystem))

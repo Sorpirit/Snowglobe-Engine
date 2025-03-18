@@ -71,6 +71,32 @@ namespace Snowglobe::Render::GLFW
 
     void InputGLFW::Update()
     {
+        if (_externalKeyInputCallback.has_value())
+        {
+            auto& callback = _externalKeyInputCallback.value();
+            for (int i = 0; i < (GLFW_KEY_LAST + 1); ++i)
+            {
+                Core::KeyStatus status = _keys[i];
+                if (status == Core::KeyStatus::Pressed || status == Core::KeyStatus::Released)
+                {
+                    callback(static_cast<Core::Key>(i), status);
+                }
+            }
+        }
+
+        if (_externalMouseInputCallback.has_value())
+        {
+            auto& callback = _externalMouseInputCallback.value();
+            for (int i = 0; i < (GLFW_MOUSE_BUTTON_LAST + 1); ++i)
+            {
+                Core::KeyStatus status = _mouseButtons[i];
+                if (status == Core::KeyStatus::Pressed || status == Core::KeyStatus::Released)
+                {
+                    callback(static_cast<Core::CursorButton>(i), status);
+                }
+            }
+        }
+
         for (auto& _key : _keys)
         {
             if (_key == Core::KeyStatus::Pressed)

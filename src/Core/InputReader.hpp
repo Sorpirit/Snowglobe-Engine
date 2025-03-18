@@ -4,6 +4,8 @@
 
 #include "InputConstants.hpp"
 
+#include <optional>
+
 namespace Snowglobe::Core
 {
 
@@ -30,6 +32,20 @@ class InputReader
 
     virtual void SetCursorScreenPosition(glm::vec2 pos) = 0;
     virtual void SetCursorMode(CursorMode mode) = 0;
+
+    void SetExternalKeyInputCallBack(std::function<void(Key, KeyStatus)> callback)
+    {
+        _externalKeyInputCallback = callback;
+    }
+    void SetExternalMouseInputCallBack(std::function<void(CursorButton, KeyStatus)> callback)
+    {
+        _externalMouseInputCallback = callback;
+    }
+
+  protected:
+    std::optional<std::function<void(Key, KeyStatus)>> _externalKeyInputCallback;
+    std::optional<std::function<void(CursorButton, KeyStatus)>> _externalMouseInputCallback;
+
 };
 
 } // namespace Snowglobe::Core

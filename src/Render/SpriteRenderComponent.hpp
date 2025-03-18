@@ -1,6 +1,8 @@
 #pragma once
 #include <nlohmann/json.hpp>
 
+#include "ECS/Component.hpp"
+
 #include "Assets/AssetManager.hpp"
 #include "TextureAssetData.hpp"
 namespace Snowglobe::Render
