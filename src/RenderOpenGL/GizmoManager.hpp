@@ -7,7 +7,10 @@
 #include "glm/glm.hpp"
 
 #include "SceneParameters.hpp"
+#include "ShaderCompiler.hpp"
 #include "VertexLayoutDescriptor.hpp"
+
+#include <complex.h>
 
 namespace Snowglobe::RenderOpenGL {
 
@@ -54,7 +57,7 @@ private:
     uint32_t _vbo = 0;
     uint32_t _vao = 0;
     uint32_t _bufferByteSize = 0;
-    uint32_t _programID = 0;
+    std::shared_ptr<PipelineProgram> _program = 0;
     SceneParameters _sceneParameters;
 
     static constexpr size_t BATCH_SIZE = 512;

@@ -27,7 +27,7 @@ std::vector<Render::MeshProxy*> AssimpImporter::LoadModel(const Core::SnowFileHa
     std::string path = modelPath.GetFullPath().string();
     std::vector<Render::MeshProxy*> model;
 
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipWindingOrder);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;

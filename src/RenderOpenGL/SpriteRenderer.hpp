@@ -5,7 +5,9 @@
 #include "Materials/SpriteMaterial.hpp"
 #include "MeshOpenGL.hpp"
 #include "SceneParameters.hpp"
+#include "ShaderCompiler.hpp"
 
+#include <complex.h>
 #include <memory>
 
 namespace Snowglobe::RenderOpenGL
@@ -23,7 +25,7 @@ private:
     MeshOpenGL* _quadMesh;
     Materials::SpriteMaterial _material = {"SpriteMaterial"};
     SceneParameters _sceneParameters;
-    uint32_t _shaderProgram;
+    std::shared_ptr<PipelineProgram> _shaderProgram;
 };
 
 } // namespace Snowglobe::RenderOpenGL

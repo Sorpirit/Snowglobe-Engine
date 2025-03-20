@@ -9,16 +9,15 @@
 #include <unordered_set>
 
 #include "FileTexture.hpp"
-#include "Serialization/SerializationAPI.hpp"
 
 namespace Snowglobe::Core
 {
 struct SnowFileHandle
 {
   public:
-    bool IsValid() const { return _isValid; }
-    std::filesystem::path GetFullPath() const { return _fullPath; }
-    std::filesystem::path GetPath() const { return _initialPath; }
+    [[nodiscard]] bool IsValid() const { return _isValid; }
+    [[nodiscard]] std::filesystem::path GetFullPath() const { return _fullPath; }
+    [[nodiscard]] std::filesystem::path GetPath() const { return _initialPath; }
 
     SnowFileHandle() = default;
     SnowFileHandle(const std::filesystem::path& path) : _initialPath(path) { Initialize(path); }
@@ -26,10 +25,11 @@ struct SnowFileHandle
     SnowFileHandle(const char* path) : _initialPath(path) { Initialize(path); }
 
     void Initialize(const std::filesystem::path& path);
+
   private:
     std::filesystem::path _initialPath;
     std::filesystem::path _fullPath;
-    bool _isValid;
+    bool _isValid = false;
 };
 
 class FileSystem
@@ -49,7 +49,6 @@ class FileSystem
     static std::shared_ptr<FileTexture> LoadTexture(const SnowFileHandle& handle);
 
   private:
-
     std::unordered_set<std::filesystem::path> _mounts;
 };
 
@@ -76,3 +75,13 @@ inline bool FileSystem::TryResolvePath(const std::filesystem::path& path, std::f
 
 } // namespace Snowglobe::Core
 
+namespace std
+{
+template <> struct hash<Snowglobe::Core::SnowFileHandle>
+{
+    size_t operator()(const Snowglobe::Core::SnowFileHandle& s) const
+    {
+        return s.IsValid() ? hash<std::filesystem::path>{}(s.GetFullPath()) : 0;
+    }
+};
+} // namespace std

@@ -19,11 +19,15 @@ namespace Snowglobe::RenderOpenGL
             _rotation = rotation; 
             _dirty = true;
         }
-        void SetScale(const glm::vec3& scale) 
-        { 
+        void SetScale(const glm::vec3& scale)
+        {
             _scale = scale;
             _dirty = true;
         }
+
+        [[nodiscard]] glm::vec3 Position() const { return _position; }
+        [[nodiscard]] glm::vec3 Rotation() const { return _rotation; }
+        [[nodiscard]] glm::vec3 Scale() const { return _scale; }
 
         void Bind(uint32_t pipelineId);
         

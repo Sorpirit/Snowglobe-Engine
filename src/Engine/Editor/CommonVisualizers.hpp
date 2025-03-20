@@ -61,6 +61,8 @@ class CommonVisualizers
             [](Render::UISystem& ui, RenderOpenGL::DirectionalLightComponent& component) {
                 ui.Color("Color", &component.Light.LightColor);
                 ui.Slider("AmbientIntensity", &component.Light.AmbientIntensity, 0.0f, 1.0f);
+                ui.Slider("UseEnvMapping", &component.Light.UseEnvMapping, 0, 1);
+                ui.Slider("EnvIntensity", &component.Light.EnvIntensity, 0, 1);
             });
 
         inspector->RegisterComponentVisualiser<RenderOpenGL::PointLightComponent>(

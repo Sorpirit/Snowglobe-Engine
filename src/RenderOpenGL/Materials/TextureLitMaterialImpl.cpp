@@ -1,5 +1,7 @@
 #include "TextureLitMaterialImpl.hpp"
 
+#include "OpenGLRenderSystem.hpp"
+
 #include <glad/gl.h>
 
 namespace Snowglobe::RenderOpenGL::Materials
@@ -7,6 +9,8 @@ namespace Snowglobe::RenderOpenGL::Materials
 
 void TextureLitMaterialImpl::Bind(uint32_t pipelineID)
 {
+    OpenGLRenderSystem::GetInstance()->GetSkybox().BindSkybox(pipelineID, 4);
+
     auto uniformSetter = _uniformLocations.GetSetter(pipelineID);
     uniformSetter.Set("material.diffuseTexture", _data.diffuseTexture);
     uniformSetter.Set("material.specularTexture", _data.specularTexture);

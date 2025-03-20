@@ -27,6 +27,7 @@
 #include "GizmoManager.hpp"
 #include "LightsManager.hpp"
 #include "Shape2DSystem.hpp"
+#include "SkyboxRenderPass.hpp"
 #include "SpriteRenderer.hpp"
 
 #include "Texture2DPtr.hpp"
@@ -67,6 +68,7 @@ namespace Snowglobe::RenderOpenGL {
         LightsManager& GetLightParameters() { return _lightParameters; }
 
         Render::GizmosAPI* GetGizmos() override { return &_gizmos; }
+        SkyboxRenderPass& GetSkybox() { return _skybox; }
 
       protected:
         Render::VertexBufferPtr *AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount,
@@ -95,10 +97,17 @@ namespace Snowglobe::RenderOpenGL {
         Shape2DSystem _shape2DSystem;
         SpriteRenderer _spriteRenderer;
         GizmoManager _gizmos;
+        SkyboxRenderPass _skybox;
 
-        std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass> > _renderPasses;
+        uint32_t _frameBuffer = 0;
 
-        template<class MaterialImpl, class MaterialData>
+        std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass>> _renderPasses;
+
+        std::shared_ptr<PipelineProgram> _quadProgram;
+        uint32_t _colorTexture;
+        uint32_t _quadVAO;
+
+        template <class MaterialImpl, class MaterialData>
         void RegisterMaterialManager();
 
         template<class MaterialImpl, class InstanceVertexLayoutDescriptor>

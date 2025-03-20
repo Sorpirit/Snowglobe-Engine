@@ -28,6 +28,7 @@
 #include "SpriteAnimationSystem.hpp"
 #include "SpriteRenderComponent.hpp"
 #include "Tests/AnimationTest.hpp"
+#include "Tests/Basic3DTest.hpp"
 #include "Tests/InputActionsTest.hpp"
 #include "Tests/ModelLoading.hpp"
 #include "Tests/Physics2DTest.hpp"
@@ -105,6 +106,7 @@ void RegisterTests()
     RuntimeTest::RegisterTest<Snowglobe::AnimationTest>();
     RuntimeTest::RegisterTest<Snowglobe::Physics2DTest>();
     RuntimeTest::RegisterTest<Snowglobe::InputActionsTest>();
+    RuntimeTest::RegisterTest<Snowglobe::Basic3DTest>();
 }
 
 int main(int argc, char* argv[])

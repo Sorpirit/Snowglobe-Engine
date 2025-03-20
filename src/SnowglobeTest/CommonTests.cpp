@@ -608,7 +608,6 @@ void LightTests::Init()
 
 void LightTests::Run()
 {
-    _spectator.Update();
 }
 
 

@@ -56,6 +56,11 @@ namespace Snowglobe::Render
             return _projectionMatrix * GetViewMatrix();
         }
 
+        glm::mat4 GetInvViewProjectionMatrix3() const
+        {
+            return glm::inverse(_projectionMatrix * GetViewMatrix());
+        }
+
         void SetMode(CameraMode mode)
         {
             _mode = mode;

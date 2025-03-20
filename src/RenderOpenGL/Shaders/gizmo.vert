@@ -1,5 +1,3 @@
-#version 330 core
-
 struct SceneParameters
 {
     mat4 viewProjection;

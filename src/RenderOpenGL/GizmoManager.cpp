@@ -20,11 +20,10 @@ void GizmoVertexLayoutDescriptor::SetupAtributePointers() const
 void GizmoManager::Init()
 {
     auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
-    auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("gizmo.vert"));
-    auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("gizmo.frag"));
-
-    PipelineSetupParams params = {vertexShader, fragmentShader};
-    _programID = shaderCompiler->GetOrCratePipeline(params);
+    GraphicsPipelineCreateInfo params;
+    params.VertexShader = Core::SnowFileHandle("gizmo.vert");
+    params.FragmentShader = Core::SnowFileHandle("gizmo.frag");
+    _program = shaderCompiler->GetOrCratePipeline(params);
 
     glGenBuffers(1, &_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
@@ -52,11 +51,11 @@ void GizmoManager::Draw()
 
     Flush();
 
-    glUseProgram(_programID);
-    glDisable(GL_DEPTH_TEST);
+    _program->Bind();
+    glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _programID);
+    _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _program->GetProgramID());
     glBindVertexArray(_vao);
     glBindBuffer(GL_ARRAY_BUFFER, _vbo);
     if (_vertexCount > 0)
@@ -64,7 +63,7 @@ void GizmoManager::Draw()
     if (_vertexWireCount > 0)
         glDrawArrays(GL_LINES, BATCH_SIZE, _vertexWireCount);
 
-    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
     //End
     _vertexCount = 0;
     _vertexWireCount = 0;

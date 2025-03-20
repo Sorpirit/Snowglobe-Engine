@@ -14,10 +14,10 @@ void SpriteRenderer::Init(std::shared_ptr<Core::ECS::EntityManagerBase> entityMa
     ISystem::Init(entityManager);
 
     auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
-    auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("sprite.vert"));
-    auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("sprite.frag"));
 
-    PipelineSetupParams params = {vertexShader, fragmentShader};
+    GraphicsPipelineCreateInfo params;
+    params.VertexShader = Core::SnowFileHandle("sprite.vert");
+    params.FragmentShader = Core::SnowFileHandle("sprite.frag");
     _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
 
     GenerateVertexBuffers();
@@ -25,9 +25,9 @@ void SpriteRenderer::Init(std::shared_ptr<Core::ECS::EntityManagerBase> entityMa
 
 void SpriteRenderer::Update()
 {
-    glUseProgram(_shaderProgram);
-    _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
-    _quadMesh->Bind(_shaderProgram);
+    _shaderProgram->Bind();
+    _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram->GetProgramID());
+    _quadMesh->Bind(_shaderProgram->GetProgramID());
 
     auto& entities = _entityManager->GetAllEntities();
     for (auto& entity : entities)
@@ -40,7 +40,7 @@ void SpriteRenderer::Update()
         _quadMesh->SetPosition(transform->Position);
         _quadMesh->SetRotation(transform->Rotation);
         _quadMesh->SetScale(transform->Scale);
-        _quadMesh->BindEntity(_shaderProgram);
+        _quadMesh->BindEntity(_shaderProgram->GetProgramID());
 
         _material.GetMaterialData().texture = sprite->SpriteAsset.HasData() ? sprite->SpriteAsset.GetData().GetTexture() : Render::Texture2DPtr{};
         _material.GetMaterialData().color = glm::vec4(sprite->Color, 1);
@@ -59,7 +59,7 @@ void SpriteRenderer::Update()
             _material.GetMaterialData().textureScale = glm::vec2(1);
         }
         
-        _material.Bind(_shaderProgram);
+        _material.Bind(_shaderProgram->GetProgramID());
         _quadMesh->Draw();
     }
 }

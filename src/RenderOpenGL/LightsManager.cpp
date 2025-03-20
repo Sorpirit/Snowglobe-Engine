@@ -16,6 +16,8 @@ void LightsManager::Bind(uint32_t pipelineId)
     uniformSetter.Set("directionalLight.direction", _directional.LightDirection);
     uniformSetter.Set("directionalLight.color", _directional.LightColor);
     uniformSetter.Set("directionalLight.ambientIntensity", _directional.AmbientIntensity);
+    uniformSetter.Set("directionalLight.useEnvMapping", _directional.UseEnvMapping);
+    uniformSetter.Set("directionalLight.envIntensity", _directional.EnvIntensity);
 
     //PointLight
     for (uint32_t i = 0; i < POINT_LIGHTS_COUNT; ++i)

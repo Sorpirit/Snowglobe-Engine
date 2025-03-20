@@ -27,6 +27,8 @@ struct DirectionalLight
     glm::vec3 LightDirection = glm::vec3(0.0f, -1.0f, 0.0f);
     glm::vec3 LightColor = glm::vec3(1.0f);
     float AmbientIntensity = 0.1f;
+    float EnvIntensity = 0.65f;
+    int UseEnvMapping = 1;
 };
 
 struct PointLight
@@ -74,7 +76,7 @@ private:
     uint32_t _pointLightCount;
     uint32_t _spotLightCount;
     
-    CachedUniformLocations<5 + POINT_LIGHTS_COUNT * 5 + SPOT_LIGHTS_COUNT * 8> _uniformLocations;
+    CachedUniformLocations<7 + POINT_LIGHTS_COUNT * 5 + SPOT_LIGHTS_COUNT * 8> _uniformLocations;
 };
     
 class DirectionalLightComponent : public Core::ECS::Component
