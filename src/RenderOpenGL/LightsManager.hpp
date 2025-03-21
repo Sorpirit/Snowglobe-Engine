@@ -1,9 +1,10 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <array>
+
 #include "Camera.hpp"
-#include "CachedUniformLocations.hpp"
 #include "ECS/Tag.hpp"
+#include <glm/glm.hpp>
 
 #include "ECS/Component.hpp"
 
@@ -75,8 +76,6 @@ private:
 
     uint32_t _pointLightCount;
     uint32_t _spotLightCount;
-    
-    CachedUniformLocations<7 + POINT_LIGHTS_COUNT * 5 + SPOT_LIGHTS_COUNT * 8> _uniformLocations;
 };
     
 class DirectionalLightComponent : public Core::ECS::Component

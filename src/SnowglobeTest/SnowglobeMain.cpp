@@ -152,3 +152,8 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
+extern "C" {
+    _declspec(dllexport) int NvOptimusEnablement = 1;
+    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
+}

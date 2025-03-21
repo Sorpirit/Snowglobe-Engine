@@ -76,7 +76,7 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
 
     if (directionalLight.useEnvMapping == 1)
     {
-        float cubemapBias = (1.0 - pow(specularColor.x, 8)) * 11.0;
+        float cubemapBias = (1.0 - pow(specularColor.x, 8)) * 9.0;
 
         vec3 skyColor = texture(skybox, reflect(-viewDir, normal), cubemapBias).rgb;
         fragColor += skyColor * specularColor * directionalLight.envIntensity + directionalLight.envIntensity * skyColor * diffuseColor * (1 - specularColor);

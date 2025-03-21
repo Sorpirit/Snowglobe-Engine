@@ -1,6 +1,7 @@
 #include "TextureLitMaterialImpl.hpp"
 
 #include "OpenGLRenderSystem.hpp"
+#include "UniformLocationSetter.hpp"
 
 #include <glad/gl.h>
 
@@ -11,7 +12,7 @@ void TextureLitMaterialImpl::Bind(uint32_t pipelineID)
 {
     OpenGLRenderSystem::GetInstance()->GetSkybox().BindSkybox(pipelineID, 4);
 
-    auto uniformSetter = _uniformLocations.GetSetter(pipelineID);
+    UniformLocationSetter uniformSetter{pipelineID};
     uniformSetter.Set("material.diffuseTexture", _data.diffuseTexture);
     uniformSetter.Set("material.specularTexture", _data.specularTexture);
     uniformSetter.Set("material.aoTexture", _data.aoTexture);

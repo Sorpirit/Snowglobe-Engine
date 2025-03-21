@@ -4,10 +4,7 @@
 #include <memory>
 
 #include "MaterialsData/TextureColorMaterialData.hpp"
-
 #include "TemplateMaterialManager.hpp"
-#include "CachedUniformLocations.hpp"
-
 #include "Texture.hpp"
 
 namespace Snowglobe::RenderOpenGL::Materials
@@ -19,8 +16,5 @@ namespace Snowglobe::RenderOpenGL::Materials
         TextureShapeMaterialImpl(const std::string& debugName) : TemplateMaterialImpl(debugName) {}
 
         void Bind(uint32_t pipelineID) override;
-
-    private:
-        CachedUniformLocations<2> _uniformLocations;
     };
 }

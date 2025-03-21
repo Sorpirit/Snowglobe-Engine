@@ -1,5 +1,7 @@
 #include "OutlineTextureLitMaterialImpl.hpp"
 
+#include "UniformLocationSetter.hpp"
+
 #include <glad/gl.h>
 
 namespace Snowglobe::RenderOpenGL::Materials
@@ -7,7 +9,7 @@ namespace Snowglobe::RenderOpenGL::Materials
 
 void OutlineTextureLitMaterialImpl::Bind(uint32_t pipelineID)
 {
-    auto uniformSetter = _uniformLocations.GetSetter(pipelineID);
+    UniformLocationSetter uniformSetter{pipelineID};
     uniformSetter.Set("material.diffuseTexture", _data.Material.diffuseTexture);
     uniformSetter.Set("material.specularTexture", _data.Material.specularTexture);
     uniformSetter.Set("material.aoTexture", _data.Material.aoTexture);

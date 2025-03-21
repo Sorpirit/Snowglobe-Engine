@@ -1,4 +1,5 @@
 #include "LightsManager.hpp"
+#include "UniformLocationSetter.hpp"
 
 #include <glad/gl.h>
 namespace Snowglobe::RenderOpenGL
@@ -6,7 +7,7 @@ namespace Snowglobe::RenderOpenGL
 
 void LightsManager::Bind(uint32_t pipelineId)
 {
-    auto uniformSetter = _uniformLocations.GetSetter(pipelineId);
+    UniformLocationSetter uniformSetter{pipelineId};
 
     //LightParameters
     uniformSetter.Set("lightParameters.pointLightsCount", _pointLightCount);

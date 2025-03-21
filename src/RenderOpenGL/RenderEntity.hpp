@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "CachedUniformLocations.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -39,8 +38,6 @@ namespace Snowglobe::RenderOpenGL
         
         glm::mat4 _modelMatrix = glm::mat4(1.0f);
         glm::mat3 _normalMatrix = glm::mat3(1.0f);
-
-        CachedUniformLocations<2> _uniformLocations;
 
         glm::mat4 GetModelMatrix();
     };

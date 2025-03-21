@@ -4,11 +4,13 @@
 
 #include "SpriteMaterial.hpp"
 
+#include "UniformLocationSetter.hpp"
+
 namespace Snowglobe {
 
 void RenderOpenGL::Materials::SpriteMaterial::Bind(uint32_t pipelineID)
 {
-    auto uniformSetter = _uniformLocations.GetSetter(pipelineID);
+    UniformLocationSetter uniformSetter{pipelineID};
     uniformSetter.Set("material.mainTexture", _data.texture);
     uniformSetter.Set("material.color", _data.color);
     uniformSetter.Set("material.textureOffset", _data.textureOffset);

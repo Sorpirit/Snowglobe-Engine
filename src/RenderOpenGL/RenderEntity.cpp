@@ -1,5 +1,7 @@
 #include "RenderEntity.hpp"
 
+#include "UniformLocationSetter.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -10,7 +12,7 @@ namespace Snowglobe::RenderOpenGL
 
 void RenderEntity::Bind(uint32_t pipelineId)
 {
-    auto uniformSetter = _uniformLocations.GetSetter(pipelineId);
+    UniformLocationSetter uniformSetter{pipelineId};
     uniformSetter.Set("rentity.model", GetModelMatrix());
     uniformSetter.Set("rentity.normalMatrix", _normalMatrix);
 }

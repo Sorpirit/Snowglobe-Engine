@@ -5,6 +5,7 @@
 #include "OpenGLRenderSystem.hpp"
 #include "ShaderCompiler.hpp"
 #include "TextureAssetData.hpp"
+#include "UniformLocationSetter.hpp"
 #include "glad/gl.h"
 
 #include <array>
@@ -98,7 +99,7 @@ void SkyboxRenderPass::Draw()
     glBindVertexArray(_quadVAO);
     BindSkybox(_quadProgram->GetProgramID(), 0);
 
-    auto uniformSetter = _uniformLocations.GetSetter(_quadProgram->GetProgramID());
+    UniformLocationSetter uniformSetter{_quadProgram->GetProgramID()};
     uniformSetter.Set("invViewProjection",
                       OpenGLRenderSystem::GetInstance()->GetCamera().GetInvViewProjectionMatrix3());
 
@@ -106,6 +107,7 @@ void SkyboxRenderPass::Draw()
 }
 void SkyboxRenderPass::BindSkybox(uint32_t pipelineId, uint32_t textureIndex)
 {
+
     glActiveTexture(GL_TEXTURE0 + textureIndex);
     glBindTexture(GL_TEXTURE_CUBE_MAP, _cubeMapTexture);
     glUniform1i(glGetUniformLocation(pipelineId, "skybox"), textureIndex);
