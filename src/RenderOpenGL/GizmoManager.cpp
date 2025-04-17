@@ -11,7 +11,7 @@ namespace Snowglobe::RenderOpenGL {
 
 void GizmoVertexLayoutDescriptor::SetupAtributePointers() const
 {
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GizmoVertex), static_cast<void*>(offsetof(GizmoVertex, position)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GizmoVertex), reinterpret_cast<void*>(offsetof(GizmoVertex, position)));
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(GizmoVertex), reinterpret_cast<void*>(offsetof(GizmoVertex, color)));
     glEnableVertexAttribArray(1);
