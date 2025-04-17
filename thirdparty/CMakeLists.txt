@@ -1,25 +1,42 @@
-option(BUILD_STATIC_LIBS "Build using static libraries" ON)
-option(BUILD_SHARED_LIBS  "Build using shared libraries" OFF)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 add_subdirectory(glad)
 set_property(TARGET glad PROPERTY FOLDER "thirdparty")
 
 add_subdirectory(glfw)
-#Has ist own folder
+#set_property - Has ist own folder
 
 add_subdirectory(glm)
-set_property(TARGET glm_static PROPERTY FOLDER "thirdparty")
+set_property(TARGET glm PROPERTY FOLDER "thirdparty")
 
 add_subdirectory(stb)
 set_property(TARGET stb PROPERTY FOLDER "thirdparty")
-
-add_subdirectory(imgui)
-set_property(TARGET imgui PROPERTY FOLDER "thirdparty")
 
 add_subdirectory(tracy)
 set_property(TARGET TracyClient PROPERTY FOLDER "thirdparty")
 
 add_subdirectory(fastgltf)
 set_property(TARGET fastgltf PROPERTY FOLDER "thirdparty")
+
+# Setup libraries that does not have a CMakeLists.txt file
+
+# ImGui
+find_package(Vulkan REQUIRED)
+
+add_library(imgui 
+    imgui/imgui.cpp imgui/imgui_demo.cpp imgui/imgui_draw.cpp imgui/imgui_tables.cpp imgui/imgui_widgets.cpp
+    imgui/backends/imgui_impl_glfw.cpp imgui/backends/imgui_impl_opengl3.cpp imgui/backends/imgui_impl_vulkan.cpp
+)
+
+target_include_directories(imgui 
+    PUBLIC 
+    imgui
+    PRIVATE
+    imgui/backends
+)
+
+target_link_libraries(imgui 
+    PRIVATE  
+    glfw
+    Vulkan::Vulkan
+)
+
+set_property(TARGET imgui PROPERTY FOLDER "thirdparty")
