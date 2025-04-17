@@ -2,7 +2,6 @@
 
 #include "AssimpImporter.hpp"
 #include "CommonVertexLayouts.hpp"
-#include "ECS/ECSTest/ECSTest.hpp"
 #include "MaterialsData/TextureColorMaterialData.hpp"
 #include "MaterialsData/TextureLitOutlineMaterialData.hpp"
 #include "MeshComponent.hpp"
