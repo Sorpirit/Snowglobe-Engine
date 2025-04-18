@@ -1,3 +1,6 @@
+add_subdirectory(fastgltf)
+set_property(TARGET fastgltf PROPERTY FOLDER "thirdparty")
+
 add_subdirectory(glad)
 set_property(TARGET glad PROPERTY FOLDER "thirdparty")
 
@@ -7,14 +10,18 @@ add_subdirectory(glfw)
 add_subdirectory(glm)
 set_property(TARGET glm PROPERTY FOLDER "thirdparty")
 
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(json)
+set_property(TARGET nlohmann_json PROPERTY FOLDER "thirdparty")
+
+add_subdirectory(spdlog)
+set_property(TARGET spdlog PROPERTY FOLDER "thirdparty")
+
 add_subdirectory(stb)
 set_property(TARGET stb PROPERTY FOLDER "thirdparty")
 
 add_subdirectory(tracy)
 set_property(TARGET TracyClient PROPERTY FOLDER "thirdparty")
-
-add_subdirectory(fastgltf)
-set_property(TARGET fastgltf PROPERTY FOLDER "thirdparty")
 
 # Setup libraries that does not have a CMakeLists.txt file
 
