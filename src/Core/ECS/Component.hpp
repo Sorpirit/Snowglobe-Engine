@@ -2,6 +2,9 @@
 
 namespace Snowglobe::Core::ECS
 {
+class Component;
+template<class T>
+concept ComponentBased = std::is_base_of<Component, T>::value;
 
 /// @brief Base class for all components. Naming convention is NameComponent.
 /// Component should contain only data and no logic(apart from described here: OnAttach, OnDetach, OnActivate,
@@ -30,6 +33,8 @@ class Component
     void OnActivate() { _isActive = true; }
     /// @brief Called when component is deactivated. Every time entity is deactivated OnDeactivate will be called.
     void OnDeactivate() { _isActive = false; }
+
+    void SetActive(bool isActive) { _isActive = isActive; }
 
     /// @brief Activates delayed removal process. Component will be removed only on the next EntityManager Update.
     /// Should be called only from the Entity.

@@ -38,6 +38,7 @@ class TagManager
         const uint32_t id = _tagsSet.size();
         _tagsSet.insert(name);
         _tags[id] = name;
+        _nameTags[name] = id;
         return {id};
     }
 
@@ -48,6 +49,13 @@ class TagManager
         return it->second;
     }
 
+    Tag GetTag(const std::string& tagName) const
+    {
+        auto it = _nameTags.find(tagName);
+        assert(it != _nameTags.end() && "Tag does not exist");
+        return it->second;
+    }
+
     std::unordered_map<uint32_t, std::string>& GetAllTags() { return _tags; }
 
   private:
@@ -55,6 +63,7 @@ class TagManager
 
     std::unordered_set<std::string> _tagsSet;
     std::unordered_map<uint32_t, std::string> _tags;
+    std::unordered_map<std::string, uint32_t> _nameTags;
 };
 
 inline std::string Tag::GetName() const { return TagManager::GetInstance().GetName(*this); }

@@ -5,6 +5,12 @@ out/coverage/*
 cmake-build-*/
 conan-cache/
 
+# Big Assets
+/assets/
+
+# Large binraries
+libraries/bin/
+
 # User spesific settings
 CMakeUserPresets.json
 

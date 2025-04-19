@@ -1,5 +1,3 @@
-#version 330 core
-
 struct SceneParameters
 {
     mat4 viewProjection;
@@ -16,6 +14,8 @@ struct DirectionalLight {
     vec3 direction;
     vec3 color;
     float ambientIntensity;
+    int useEnvMapping;
+    float envIntensity;
 };
 
 struct PointLight {
@@ -52,6 +52,7 @@ out vec4 FragColor;
 
 uniform SceneParameters sceneParameters;
 uniform Material material;
+uniform samplerCube skybox;
 
 //Lighting
 uniform LightParameters lightParameters;
@@ -72,6 +73,15 @@ vec3 LightingPass(vec3 normal, vec3 viewDir)
     vec3 diffuseColor = (material.baseColor * texture(material.diffuseTexture, TexCoord)).rgb;
     vec3 specularColor = texture(material.specularTexture, TexCoord).rgb;
     vec3 ambientIntensity = texture(material.aoTexture, TexCoord).rgb;
+
+    if (directionalLight.useEnvMapping == 1)
+    {
+        float cubemapBias = (1.0 - pow(specularColor.x, 8)) * 9.0;
+
+        vec3 skyColor = texture(skybox, reflect(-viewDir, normal), cubemapBias).rgb;
+        fragColor += skyColor * specularColor * directionalLight.envIntensity + directionalLight.envIntensity * skyColor * diffuseColor * (1 - specularColor);
+    }
+
 
     // Directional
     {

@@ -1,9 +1,11 @@
 #pragma once
-#include "MeshOpenGL.hpp"
-#include "SceneParameters.hpp"
 #include "ECS/ISystem.hpp"
 #include "Materials/BasicShapeMaterialImpl.hpp"
+#include "MeshOpenGL.hpp"
+#include "SceneParameters.hpp"
+#include "ShaderCompiler.hpp"
 
+#include <complex.h>
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -21,7 +23,7 @@ private:
     std::vector<MeshOpenGL*> _mesh;
     Materials::BasicShapeMaterialImpl _material = {"Shape2DMaterial"};
     SceneParameters _sceneParameters;
-    uint32_t _shaderProgram;
+    std::shared_ptr<PipelineProgram> _shaderProgram;
 };
     
 } // namespace Snowglobe::RenderOpenGL

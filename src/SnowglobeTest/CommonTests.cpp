@@ -10,7 +10,7 @@
 #include <BasicShapeFactory.hpp>
 
 #include "CommonVertexLayouts.hpp"
-#include "ComponentEditor.hpp"
+#include "Physics2DComponent.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
 #include "../RenderOpenGL/LightsManager.hpp"
@@ -608,7 +608,6 @@ void LightTests::Init()
 
 void LightTests::Run()
 {
-    _spectator.Update();
 }
 
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Serialization/SerializationAPI.hpp"
+
 #include <glm/glm.hpp>
 
 #include "ECS/Component.hpp"
@@ -20,7 +22,6 @@ public:
     float Drag = 0.0f;
     float AngularDrag = 0.0f;
     float GravityScale = 1.0f;
-    float Bouncines = 1.0f;
+    float Bounciness = 1.0f;
 };
-
 }

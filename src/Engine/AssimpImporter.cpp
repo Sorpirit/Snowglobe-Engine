@@ -10,13 +10,24 @@
 #include <queue>
 
 namespace Snowglobe::Engine {
+
+AssimpImporter::AssimpImporter()
+{
+    auto engine = DI->Resolve<Engine>();
+    engine->GetSystemManager()->QuerySystem<Render::RenderSystem>(_renderSystem);
+
+    auto renderMaterial = _renderSystem->CreateMaterialInstance<Render::MaterialsData::TextureColorMaterialData>("AssimpImporter::CreateMesh");
+    renderMaterial.Properties()->color = glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
+    _defaultMaterial = &renderMaterial.GetMaterialBase();
+}
+
 std::vector<Render::MeshProxy*> AssimpImporter::LoadModel(const Core::SnowFileHandle& modelPath)
 {
     Assimp::Importer import;
     std::string path = modelPath.GetFullPath().string();
     std::vector<Render::MeshProxy*> model;
 
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals);
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipWindingOrder);
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;

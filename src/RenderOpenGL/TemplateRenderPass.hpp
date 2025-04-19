@@ -23,28 +23,26 @@ public:
         _useLighting(useLighting)
     {
         auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
-        auto vertexShader = shaderCompiler->GetOrCompileShader(vertex);
-        auto fragmentShader = shaderCompiler->GetOrCompileShader(fragment);
-
-        PipelineSetupParams params = {vertexShader, fragmentShader};
-        _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
+        auto createInfo = GraphicsPipelineCreateInfo();
+        createInfo.VertexShader = vertex;
+        createInfo.FragmentShader = fragment;
+        _shaderProgram = shaderCompiler->GetOrCratePipeline(createInfo);
     }
 
     virtual void Execute(MeshOpenGL& mesh) override
     {
-        
-        glUseProgram(_shaderProgram);
-        _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
+        _shaderProgram->Bind();
+        _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram->GetProgramID());
         if (_useLighting)
-            OpenGLRenderSystem::GetInstance()->GetLightParameters().Bind(_shaderProgram);
-        mesh.Bind(_shaderProgram);
+            OpenGLRenderSystem::GetInstance()->GetLightParameters().Bind(_shaderProgram->GetProgramID());
+        mesh.Bind(_shaderProgram->GetProgramID());
         mesh.Draw();
         mesh.Unbind();
     }
 
     
 protected:
-    uint32_t _shaderProgram;
+    std::shared_ptr<PipelineProgram> _shaderProgram;
     SceneParameters _sceneParameters;
 
     bool _useLighting;

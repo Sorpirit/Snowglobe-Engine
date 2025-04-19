@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Serialization/SerializationAPI.hpp"
+
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtx/quaternion.hpp>
 

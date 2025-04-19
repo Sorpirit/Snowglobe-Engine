@@ -15,7 +15,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         std::string text;
         glm::vec3 position;
         glm::vec3 color;
-        int alignment;
+        Render::Alignment alignment;
     };
     
     class ImguiSystem : public Render::UISystem
@@ -30,7 +30,7 @@ namespace Snowglobe::RenderOpenGL::Imgui
         Render::UIPanel OpenUIPanel(const std::string& title) override;
         void Close(Render::UIPanel* panel) override;
         
-        void AddWorldText(const glm::vec3& position, const std::string& text, const glm::vec3& color = {1.0f, 1.0f, 0.0f}, int alignment = 0) override
+        void AddWorldText(const glm::vec3& position, const std::string& text, const glm::vec3& color = {1.0f, 1.0f, 0.0f}, Render::Alignment alignment = Render::Alignment::Default) override
         {
             if (!_drawWorldText)
                 return;
@@ -63,15 +63,15 @@ namespace Snowglobe::RenderOpenGL::Imgui
         bool Drag(const std::string& label, glm::ivec3* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) override;
         bool Drag(const std::string& label, glm::ivec4* value, float speed = 0, int min = 0, int max = 0, const std::string& format = "%d", int flags = 0) override;
         
-        void Slider(const std::string& label, float* value, float min, float max, const std::string& format = "%.3f", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::vec2* value, float min, float max, const std::string& format = "%.3f", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::vec3* value, float min, float max, const std::string& format = "%.3f", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::vec4* value, float min, float max, const std::string& format = "%.3f", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, int* value, int min, int max, const std::string& format = "%d", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::ivec2* value, int min, int max, const std::string& format = "%d", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::ivec3* value, int min, int max, const std::string& format = "%d", int flags = Render::Slider::None) override;
-        void Slider(const std::string& label, glm::ivec4* value, int min, int max, const std::string& format = "%d", int flags = Render::Slider::None) override;
-        void SliderAngle(const std::string& label, float* value, float min, float max, const std::string& format = "%.3f", int flags = Render::Slider::None) override;
+        void Slider(const std::string& label, float* value, float min, float max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::vec2* value, float min, float max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::vec3* value, float min, float max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::vec4* value, float min, float max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, int* value, int min, int max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::ivec2* value, int min, int max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::ivec3* value, int min, int max, const std::string& format, int flags) override;
+        void Slider(const std::string& label, glm::ivec4* value, int min, int max, const std::string& format, int flags) override;
+        void SliderAngle(const std::string& label, float* value, float min, float max, const std::string& format, int flags) override;
 
         void Color(const std::string& label, glm::vec3* value, int flags = 0) override;
         void Color(const std::string& label, glm::vec4* value, int flags = 0) override;

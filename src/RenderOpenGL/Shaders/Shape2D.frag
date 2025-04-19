@@ -1,5 +1,4 @@
-#version 330 core
-struct Material {  
+struct Material {
     vec4 color;
 };
 

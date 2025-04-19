@@ -20,3 +20,5 @@ target_link_libraries(SnowglobeTest
     Snowglobe::Render
     Snowglobe::Engine
 )
+
+add_subdirectory(Tests)

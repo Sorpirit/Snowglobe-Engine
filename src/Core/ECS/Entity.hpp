@@ -45,6 +45,26 @@ class Entity
         return true;
     }
 
+    /// @brief Adds a component to the entity. Component mast inherit from Component, and must be defined in the
+    /// EntityData template
+    /// @return True if component is added, false if component is already attached
+    template <class TComponent, typename... TArgs> TComponent* AddOrGetComponent(TArgs&&... args)
+    {
+        static_assert(std::is_base_of_v<Component, TComponent>, "TComponent must inherit from Component");
+        auto& component = _components->GetComponent<TComponent>();
+
+        if (component.IsAttached())
+            return &component;
+
+        component = TComponent(std::forward<TArgs>(args)...);
+        component.OnAttach();
+
+        if (_isActive)
+            component.OnActivate();
+
+        return &component;
+    }
+
     /// @brief Removes a component from the entity
     /// @return True if component is removed, false if component is not attached
     template <class TComponent> bool RemoveComponent()
@@ -173,6 +193,7 @@ class Entity
     /// @brief Gets entity's debug name
     const std::string& GetName() const { return _name; }
 
+    const EntityData& GetData() const { return *_components;}
   private:
     bool _isActive = true;
     bool _isDestroyed = false;

@@ -16,14 +16,27 @@
 #include "ECS/EntityManager.hpp"
 
 #include "../RenderOpenGL/OpenGLRenderSystem.hpp"
+#include "Assets/PrefabAssetData.hpp"
+#include "Assets/SceneAssetData.hpp"
 #include "Collider2DComponent.hpp"
 #include "DependencyManager.hpp"
-#include "LifeLinkComponent.hpp"
 #include "LifetimeComponent.hpp"
 #include "MeshComponent.hpp"
 #include "NEdgeShape2DComponent.hpp"
 #include "Physics2DComponent.hpp"
 #include "ShapesShooter2DTest.hpp"
+#include "SpriteAnimationSystem.hpp"
+#include "SpriteRenderComponent.hpp"
+#include "Tests/AnimationTest.hpp"
+#include "Tests/Basic3DTest.hpp"
+#include "Tests/InputActionsTest.hpp"
+#include "Tests/ModelLoading.hpp"
+#include "Tests/Physics2DTest.hpp"
+#include "Tests/PrefabTest.hpp"
+#include "Tests/SceneSerializationTest.hpp"
+#include "Tests/Sprite2DTest.hpp"
+#include "TextureAssetData.hpp"
+#include "TextureAssetDataReader.hpp"
 #include "TransformComponent.hpp"
 
 typedef Snowglobe::Core::ECS::MappedTupleEntityData<
@@ -31,6 +44,7 @@ typedef Snowglobe::Core::ECS::MappedTupleEntityData<
     Snowglobe::Engine::MeshComponent, Snowglobe::Engine::ModelComponent, Snowglobe::Engine::BaseComponentMaterial,
     Snowglobe::RenderOpenGL::DirectionalLightComponent, Snowglobe::RenderOpenGL::PointLightComponent,
     Snowglobe::RenderOpenGL::SpotLightComponent, Snowglobe::Render::NEdgeShape2DComponent,
+    Snowglobe::Render::SpriteRenderComponent, Snowglobe::Render::SpriteAnimationComponent,
     Snowglobe::Engine::LifetimeComponent, Snowglobe::PawnInputComponent, Snowglobe::FadeOutLifetime,
     Snowglobe::ExplodeOnDeath, Snowglobe::DestroyOnCollision, Snowglobe::MouseControllerComponent,
     Snowglobe::RotationAnimationComponent, Snowglobe::ScoreComponent>
@@ -65,8 +79,19 @@ void SetupFileSystem()
         project_path = std::filesystem::current_path();
     }
 
+    fileSystem->AddMount(project_path / "assets");
     fileSystem->AddMount(project_path / "src/RenderOpenGL/Shaders");
-    fileSystem->AddMount(project_path / "src/SnowglobeTest/Assets");
+}
+
+void SetupAssetManager()
+{
+    auto assetManager = DI->RegisterSingle<Snowglobe::Core::AssetManager>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Render::TextureAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Render::SpriteAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Core::SceneAssetData>();
+    assetManager->RegisterAssetProcessor<Snowglobe::Core::PrefabAssetData>();
+
+    assetManager->ProcessAll("");
 }
 
 void RegisterTests()
@@ -74,6 +99,14 @@ void RegisterTests()
     RuntimeTest::RegisterTest<Snowglobe::ShapesShooter2DTest>();
     RuntimeTest::RegisterTest<LightTests>();
     RuntimeTest::RegisterTest<Phyiscs2DTests>();
+    RuntimeTest::RegisterTest<Snowglobe::SceneSerializationTest>();
+    RuntimeTest::RegisterTest<Snowglobe::Sprite2DTest>();
+    RuntimeTest::RegisterTest<Snowglobe::ModelLoading>();
+    RuntimeTest::RegisterTest<Snowglobe::PrefabTest>();
+    RuntimeTest::RegisterTest<Snowglobe::AnimationTest>();
+    RuntimeTest::RegisterTest<Snowglobe::Physics2DTest>();
+    RuntimeTest::RegisterTest<Snowglobe::InputActionsTest>();
+    RuntimeTest::RegisterTest<Snowglobe::Basic3DTest>();
 }
 
 int main(int argc, char* argv[])
@@ -93,6 +126,8 @@ int main(int argc, char* argv[])
         std::cout << "Failed to get render system" << std::endl;
         return -1;
     }
+
+    SetupAssetManager();
 
     RegisterTests();
     std::string testName = "SpaceShooter2DTest";
@@ -116,4 +151,9 @@ int main(int argc, char* argv[])
     }
 
     return 0;
+}
+
+extern "C" {
+    _declspec(dllexport) int NvOptimusEnablement = 1;
+    _declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }

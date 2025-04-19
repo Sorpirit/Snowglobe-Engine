@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Serialization/SerializationAPI.hpp"
 #include "ECS/Component.hpp"
 
 namespace Snowglobe::Engine
@@ -29,13 +30,16 @@ struct EntityCollisionData
 
 class Collider2DComponent : public Core::ECS::Component
 {
-public:
+  public:
     Collider2DComponent() = default;
-    Collider2DComponent(CollisionShapeType shapeType, bool isTrigger = false) : ShapeType(shapeType), IsTrigger(isTrigger) {}
-    
+    Collider2DComponent(CollisionShapeType shapeType, bool isTrigger = false)
+        : ShapeType(shapeType), IsTrigger(isTrigger)
+    {
+    }
+
     CollisionShapeType ShapeType;
     bool IsTrigger = false;
     EntityCollisionData CollisionData;
 };
 
-}
+} // namespace Snowglobe::Engine

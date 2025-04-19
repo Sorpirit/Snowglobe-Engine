@@ -40,7 +40,6 @@ class DependencyManager
     std::unordered_map<std::type_index, std::shared_ptr<void>> _single;
     std::unordered_map<std::type_index, std::shared_ptr<void>> _relation;
 };
+} // namespace Snowglobe::Core
 
 #define DI Snowglobe::Core::DependencyManager::Instance()
-
-} // namespace Snowglobe::Core

@@ -39,7 +39,7 @@ void MeshOpenGL::Bind(uint32_t pipelineId)
 
     if(_material)
         _material->Bind(pipelineId);
-    
+
     glBindVertexArray(_vao);
     _vertexBuffer->Bind();
 }

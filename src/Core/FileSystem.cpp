@@ -22,6 +22,19 @@ bool FileSystem::TryReadTextFile(const SnowFileHandle& handle, std::stringstream
     return true;
 }
 
+bool FileSystem::TryWriteTextFile(const SnowFileHandle& handle, const std::stringstream& buffer)
+{
+    if (!handle.IsValid())
+        return false;
+
+    std::ofstream file(handle.GetFullPath(), std::ios::out);
+    if (!file.is_open())
+        return false;
+
+    file << buffer.rdbuf();
+    return true;
+}
+
 bool FileSystem::TryReadTextFile(const SnowFileHandle& handle, std::function<void(std::ifstream&)> read)
 {
     if (!handle.IsValid())

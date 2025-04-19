@@ -6,7 +6,7 @@
 
 namespace Snowglobe::Render
 {
-    enum CameraMode : uint8_t
+    enum class CameraMode : uint8_t
     {
         Orthographic,
         Perspective
@@ -54,6 +54,11 @@ namespace Snowglobe::Render
         glm::mat4 GetViewProjectionMatrix() const
         {
             return _projectionMatrix * GetViewMatrix();
+        }
+
+        glm::mat4 GetInvViewProjectionMatrix3() const
+        {
+            return glm::inverse(_projectionMatrix * GetViewMatrix());
         }
 
         void SetMode(CameraMode mode)

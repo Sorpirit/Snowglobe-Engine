@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include "CachedUniformLocations.hpp"
 
 namespace Snowglobe::RenderOpenGL
 {
@@ -19,11 +18,15 @@ namespace Snowglobe::RenderOpenGL
             _rotation = rotation; 
             _dirty = true;
         }
-        void SetScale(const glm::vec3& scale) 
-        { 
+        void SetScale(const glm::vec3& scale)
+        {
             _scale = scale;
             _dirty = true;
         }
+
+        [[nodiscard]] glm::vec3 Position() const { return _position; }
+        [[nodiscard]] glm::vec3 Rotation() const { return _rotation; }
+        [[nodiscard]] glm::vec3 Scale() const { return _scale; }
 
         void Bind(uint32_t pipelineId);
         
@@ -35,8 +38,6 @@ namespace Snowglobe::RenderOpenGL
         
         glm::mat4 _modelMatrix = glm::mat4(1.0f);
         glm::mat3 _normalMatrix = glm::mat3(1.0f);
-
-        CachedUniformLocations<2> _uniformLocations;
 
         glm::mat4 GetModelMatrix();
     };

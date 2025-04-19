@@ -16,10 +16,12 @@
 #include "CommonVertexLayoutDescriptor.hpp"
 
 #include "BasicShapeFactory.hpp"
+#include "ObjectOutlineRenderPass.hpp"
 
 #include "Materials/BasicShapeMaterialImpl.hpp"
-#include "Materials/TextureShapeMaterialImpl.hpp"
+#include "Materials/OutlineTextureLitMaterialImpl.hpp"
 #include "Materials/TextureLitMaterialImpl.hpp"
+#include "Materials/TextureShapeMaterialImpl.hpp"
 
 #include "TextureManager.hpp"
 #include "TransformComponent.hpp"
@@ -57,6 +59,7 @@ namespace Snowglobe::RenderOpenGL
 
     OpenGLRenderSystem::~OpenGLRenderSystem()
     {
+        glDeleteFramebuffers(1, &_frameBuffer);
         glfwTerminate();
     }
 
@@ -64,9 +67,11 @@ namespace Snowglobe::RenderOpenGL
     {
         Core::EngineTime::GetInstance()->RenderTick();
 
+        glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glEnable(GL_DEPTH_TEST);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_STENCIL_TEST);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         _camera.Update();
         _lightParameters.Reset();
@@ -119,6 +124,23 @@ namespace Snowglobe::RenderOpenGL
         }
 
         _shape2DSystem.Update();
+        _spriteRenderer.Update();
+        _skybox.Draw();
+        _gizmos.Draw();
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        _quadProgram->Bind();
+        glBindVertexArray(_quadVAO);
+        glDisable(GL_DEPTH_TEST);
+        glBindTexture(GL_TEXTURE_2D, _colorTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        if (_mainWindow->GetInput().IsKeyPressed(Core::Key::F5))
+        {
+            _shaderCompiler->RecompileAll();
+        }
 
         _uiSystem->EndRendering();
     }
@@ -146,6 +168,62 @@ namespace Snowglobe::RenderOpenGL
         {
             std::cout << "Failed to initialize GLAD" << std::endl;
         }
+
+        glGenFramebuffers(1, &_frameBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffer);
+
+        glGenTextures(1, &_colorTexture);
+        glBindTexture(GL_TEXTURE_2D, _colorTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, params.Width, params.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        uint32_t depthTexture;
+        glGenTextures(1, &depthTexture);
+        glBindTexture(GL_TEXTURE_2D, depthTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, params.Width, params.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _colorTexture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        {
+            std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+        std::array positionsUV {
+            glm::vec2(-1, -1), glm::vec2(0, 0),
+            glm::vec2(-1, 1), glm::vec2(0, 1),
+            glm::vec2(1, 1), glm::vec2(1, 1),
+            glm::vec2(-1, -1), glm::vec2(0, 0),
+            glm::vec2(1, 1), glm::vec2(1, 1),
+            glm::vec2(1, -1), glm::vec2(1, 0),
+        };
+        uint32_t quadVBO;
+        glGenBuffers(1, &quadVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, 2 * sizeof(float) * positionsUV.size(), positionsUV.data(), GL_STATIC_DRAW);
+
+        glGenVertexArrays(1, &_quadVAO);
+        glBindVertexArray(_quadVAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(0 * sizeof(float)));
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glBindVertexArray(0);
+
+
+        GraphicsPipelineCreateInfo quadProgramParams;
+        quadProgramParams.VertexShader = Core::SnowFileHandle("screenQuad.vert");
+        quadProgramParams.FragmentShader = Core::SnowFileHandle("screenQuad.frag");
+        _quadProgram = _shaderCompiler->GetOrCratePipeline(quadProgramParams);
     }
     
     void OpenGLRenderSystem::InitializeRenderScene()
@@ -156,10 +234,14 @@ namespace Snowglobe::RenderOpenGL
         _vertexLayoutDescriptors.insert({typeid(Render::PositionNormalTangentUVVertex), PositionNormalTangentUVVertexLayoutDescriptor::GetInstance()});
 
         _shape2DSystem.Init(_entityManager);
+        _spriteRenderer.Init(_entityManager);
+        _skybox.Init();
+        _gizmos.Init();
         
         RegisterMaterialManager<Materials::BasicShapeMaterialImpl, Render::BasicShapeMaterial>();
         RegisterMaterialManager<Materials::TextureShapeMaterialImpl, Render::MaterialsData::TextureColorMaterialData>();
         RegisterMaterialManager<Materials::TextureLitMaterialImpl, Render::MaterialsData::TextureLitMaterialData>();
+        RegisterMaterialManager<Materials::OutlineTextureLitMaterialImpl, Render::MaterialsData::TextureLitOutlineMaterialData>();
 
         RegisterTemplateRenderPass<Materials::BasicShapeMaterialImpl, PositionVertexLayoutDescriptor>(
             Core::SnowFileHandle("color.vert"), Core::SnowFileHandle("color.frag"));
@@ -170,6 +252,13 @@ namespace Snowglobe::RenderOpenGL
         RegisterTemplateRenderPass<Materials::TextureLitMaterialImpl, PositionNormalUVVertexLayoutDescriptor>(
             Core::SnowFileHandle("textureLit.vert"), Core::SnowFileHandle("textureLit.frag"), true);
 
+        auto litPass = _renderPasses.at({typeid(Materials::TextureLitMaterialImpl), typeid(PositionNormalUVVertexLayoutDescriptor)}).get();
+        auto outlinePass = std::make_unique<ObjectOutlineRenderPass>(litPass);
+        _renderPasses.insert({outlinePass->GetSignature(), std::move(outlinePass)});
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CW);
     }
 
     Render::MeshProxy* OpenGLRenderSystem::CreateMeshProxy(const Render::VertexBufferPtr& vertexBuffer,

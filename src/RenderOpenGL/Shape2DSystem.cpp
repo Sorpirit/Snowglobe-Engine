@@ -15,12 +15,11 @@ namespace Snowglobe::RenderOpenGL
         ISystem::Init(entityManager);
         
         auto shaderCompiler = OpenGLRenderSystem::GetInstance()->GetShaderCompiler();
-        auto vertexShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Shape2D.vert"));
-        auto fragmentShader = shaderCompiler->GetOrCompileShader(Core::SnowFileHandle("Shape2D.frag"));
 
-        PipelineSetupParams params = {vertexShader, fragmentShader};
+        GraphicsPipelineCreateInfo params;
+        params.VertexShader = Core::SnowFileHandle("Shape2D.vert");
+        params.FragmentShader = Core::SnowFileHandle("Shape2D.frag");
         _shaderProgram = shaderCompiler->GetOrCratePipeline(params);
-        
         GenerateVertexBuffers();
 
         glEnable(GL_BLEND);
@@ -29,9 +28,9 @@ namespace Snowglobe::RenderOpenGL
 
     void Shape2DSystem::Update()
     {
-        glUseProgram(_shaderProgram);
+        _shaderProgram->Bind();
 
-        _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram);
+        _sceneParameters.Bind(OpenGLRenderSystem::GetInstance()->GetCamera(), _shaderProgram->GetProgramID());
 
         auto& entities = _entityManager->GetAllEntities();
         for (auto& entity : entities)
@@ -51,18 +50,18 @@ namespace Snowglobe::RenderOpenGL
             if (shape2DComponent->UseOutline)
             {
                 mesh->SetPosition(transform->Position - glm::vec3(0, 0, 0.1f));
-                mesh->Bind(_shaderProgram);
+                mesh->Bind(_shaderProgram->GetProgramID());
                 _material.GetMaterialData().color = glm::vec4(shape2DComponent->Outline, shape2DComponent->Alpha);
-                _material.Bind(_shaderProgram);
+                _material.Bind(_shaderProgram->GetProgramID());
                 mesh->Draw();
 
                 mesh->SetPosition(transform->Position);
                 mesh->SetScale(transform->Scale - glm::vec3(shape2DComponent->OutlineWidth));
             }
             
-            mesh->Bind(_shaderProgram);
+            mesh->Bind(_shaderProgram->GetProgramID());
             _material.GetMaterialData().color = glm::vec4(shape2DComponent->Color, shape2DComponent->Alpha);
-            _material.Bind(_shaderProgram);
+            _material.Bind(_shaderProgram->GetProgramID());
             mesh->Draw();
         }
     }

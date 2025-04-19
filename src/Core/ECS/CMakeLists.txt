@@ -6,5 +6,3 @@ target_sources(Core
     ${SNOW_CORE_ESC_SOURCE}
     ${SNOW_CORE_ESC_HEADER}
 )
-
-add_subdirectory(ECSTest)

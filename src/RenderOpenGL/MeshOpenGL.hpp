@@ -23,6 +23,7 @@ namespace Snowglobe::RenderOpenGL
         void SetPosition(const glm::vec3& position) override { _entity.SetPosition(position);}
         void SetRotation(const glm::vec3& rotation) override { _entity.SetRotation(rotation); }
         void SetScale(const glm::vec3& scale) override { _entity.SetScale(scale); }
+        RenderEntity& GetEntity() { return _entity; }
         
         void SetMaterial(Render::MaterialBase& material) override
         {
@@ -38,6 +39,7 @@ namespace Snowglobe::RenderOpenGL
         std::type_index GetVertexBufferType() const { return _vertexType; }
 
         void Bind(uint32_t pipelineId);
+        void BindEntity(uint32_t pipelineId) { _entity.Bind(pipelineId); }
         void Draw() const;
         void Unbind() const;
 

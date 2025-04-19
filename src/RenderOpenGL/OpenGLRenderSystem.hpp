@@ -24,8 +24,11 @@
 #include "RenderPass.hpp"
 
 #include "FileTexture.hpp"
+#include "GizmoManager.hpp"
 #include "LightsManager.hpp"
 #include "Shape2DSystem.hpp"
+#include "SkyboxRenderPass.hpp"
+#include "SpriteRenderer.hpp"
 
 #include "Texture2DPtr.hpp"
 
@@ -62,9 +65,12 @@ namespace Snowglobe::RenderOpenGL {
         Render::Texture2DPtr CreateTexture2D(const Core::FileTexture &texture, const Render::Texture2DDescriptor &desc,
                                              const std::string &debugName = "Texture2D") override;
 
-        LightsManager &GetLightParameters() { return _lightParameters; }
+        LightsManager& GetLightParameters() { return _lightParameters; }
 
-    protected:
+        Render::GizmosAPI* GetGizmos() override { return &_gizmos; }
+        SkyboxRenderPass& GetSkybox() { return _skybox; }
+
+      protected:
         Render::VertexBufferPtr *AllocateVertexBufferPtrImpl(std::type_index vertexType, size_t vertexCount,
                                                              const void *bufferPtr,
                                                              const std::string &debugName) override;
@@ -89,10 +95,19 @@ namespace Snowglobe::RenderOpenGL {
         LightsManager _lightParameters;
 
         Shape2DSystem _shape2DSystem;
+        SpriteRenderer _spriteRenderer;
+        GizmoManager _gizmos;
+        SkyboxRenderPass _skybox;
 
-        std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass> > _renderPasses;
+        uint32_t _frameBuffer = 0;
 
-        template<class MaterialImpl, class MaterialData>
+        std::unordered_map<RenderPassSignature, std::unique_ptr<RenderPass>> _renderPasses;
+
+        std::shared_ptr<PipelineProgram> _quadProgram;
+        uint32_t _colorTexture;
+        uint32_t _quadVAO;
+
+        template <class MaterialImpl, class MaterialData>
         void RegisterMaterialManager();
 
         template<class MaterialImpl, class InstanceVertexLayoutDescriptor>
