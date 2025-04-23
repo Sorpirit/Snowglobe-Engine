@@ -7,8 +7,6 @@ add_library(Snowglobe::RenderVulkan ALIAS RenderVulkan)
 find_package(Vulkan REQUIRED)
 
 target_include_directories(RenderVulkan
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/libraries/include
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

@@ -1,5 +1,6 @@
 #include "Shape2DSystem.hpp"
 
+#include <glad/gl.h>
 #include <numbers>
 
 #include "CommonVertexLayouts.hpp"

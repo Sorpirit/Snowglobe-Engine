@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ShaderCompiler.hpp"
-#include "glad/gl.h"
 
 #include <complex.h>
 #include <glm/glm.hpp>

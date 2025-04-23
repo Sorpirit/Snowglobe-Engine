@@ -5,8 +5,6 @@ add_library(RenderOpenGL)
 add_library(Snowglobe::RenderOpenGL ALIAS RenderOpenGL)
 
 target_include_directories(RenderOpenGL
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/libraries/include
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )

@@ -9,20 +9,6 @@
 namespace Snowglobe::Core::Serialization
 {
 
-class SAXHandler : public nlohmann::detail::json_sax_dom_parser<nlohmann::json>
-{
-  public:
-    SAXHandler(nlohmann::json& j) : json_sax_dom_parser(j, false) {}
-
-    bool parse_error(std::size_t position, const std::string& last_token, const nlohmann::json::exception& ex)
-    {
-        std::cerr << "parse error at input byte " << position << "\n"
-                  << ex.what() << "\n"
-                  << "last read: \"" << last_token << "\"" << std::endl;
-        return false;
-    }
-};
-
 class JsonReader : public Deserializer
 {
   public:

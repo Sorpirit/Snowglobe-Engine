@@ -596,8 +596,8 @@ void LightTests::Init()
     _isOrthographic = false;
 
     Snowglobe::Engine::AssimpImporter importer;
-    // auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/backpack/backpack.obj"));
-    auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/sponza/sponza.obj"));
+    auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/backpack/backpack.obj"));
+    // auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/sponza/sponza.obj"));
     //auto meshList = importer.LoadModel(Snowglobe::Core::SnowFileHandle("Models/San_Miguel/san-miguel-low-poly.obj"));
 
     auto backpack = manager->CreateEntity();

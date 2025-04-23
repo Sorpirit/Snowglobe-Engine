@@ -2,8 +2,6 @@ add_library(Render)
 add_library(Snowglobe::Render ALIAS Render)
 
 target_include_directories(Render
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/libraries/include
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
@@ -14,6 +12,8 @@ target_link_libraries(Render
     stb
     glfw
     Snowglobe::Core
+    nlohmann_json
+    assimp
 )
 
 file(GLOB RENDER_SOURCE *.cpp)

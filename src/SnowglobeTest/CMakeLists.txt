@@ -9,13 +9,15 @@ add_executable(SnowglobeTest ${SNOW_TEST_SOURCE} ${SNOW_TEST_HEADER})
 #target_link_options(SnowglobeTest PRIVATE /wholearchive:clang_rt.asan_dynamic_runtime_thunk-x86_64.lib)
 
 target_include_directories(SnowglobeTest
-    PRIVATE
-    ${CMAKE_SOURCE_DIR}/libraries/include
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(SnowglobeTest
     PRIVATE
     glm
+    nlohmann_json
+    assimp
     Snowglobe::Core
     Snowglobe::Render
     Snowglobe::Engine

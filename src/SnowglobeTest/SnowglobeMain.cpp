@@ -65,7 +65,7 @@ void SetupFileSystem()
     bool foundProjectPath = false;
     while (project_path.has_parent_path() && project_path != project_path.root_path())
     {
-        if (project_path.has_filename() && project_path.filename() == "snowglobe")
+        if (project_path.has_filename() && project_path.filename() == "Snowglobe-Engine")
         {
             foundProjectPath = true;
             break;

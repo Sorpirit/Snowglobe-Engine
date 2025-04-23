@@ -6,7 +6,7 @@
 #include "ShaderCompiler.hpp"
 #include "TextureAssetData.hpp"
 #include "UniformLocationSetter.hpp"
-#include "glad/gl.h"
+#include <glad/gl.h>
 
 #include <array>
 
