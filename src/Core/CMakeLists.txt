@@ -10,10 +10,12 @@ target_include_directories(Core
 )
 
 target_link_libraries(Core
+    PUBLIC
+        cxx_setup
     PRIVATE
-    glm
-    stb
-    nlohmann_json
+        glm
+        stb
+        nlohmann_json
 )
 
 add_subdirectory(ECS)
