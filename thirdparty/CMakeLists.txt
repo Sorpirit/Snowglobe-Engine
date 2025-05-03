@@ -32,6 +32,11 @@ set_property(TARGET stb PROPERTY FOLDER "thirdparty")
 add_subdirectory(tracy)
 set_property(TARGET TracyClient PROPERTY FOLDER "thirdparty")
 
+set(BUILD_GMOCK OFF CACHE INTERNAL "")
+set(INSTALL_GTEST OFF CACHE INTERNAL "")
+add_subdirectory(googletest)
+set_property(TARGET gtest PROPERTY FOLDER "thirdparty")
+
 # Setup libraries that does not have a CMakeLists.txt file
 
 # ImGui
