@@ -3,10 +3,6 @@ project(Snowglobe VERSION 1.0
         DESCRIPTION "Snowglobe. Toy game engine!"
         LANGUAGES CXX)
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
-endif()
-
 add_library(cxx_setup INTERFACE)
 target_compile_options(cxx_setup INTERFACE
         $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>: -Wall -Wpedantic -Wextra>

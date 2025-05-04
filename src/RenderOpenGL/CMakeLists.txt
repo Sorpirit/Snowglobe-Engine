@@ -16,6 +16,8 @@ target_link_libraries(RenderOpenGL
     glm
     stb
     imgui
+    glslang
+    glslang-default-resource-limits
     Snowglobe::Core
     Snowglobe::Render
 )
