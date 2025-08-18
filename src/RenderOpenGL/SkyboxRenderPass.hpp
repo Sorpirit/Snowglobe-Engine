@@ -2,7 +2,7 @@
 
 #include "ShaderCompiler.hpp"
 
-#include <complex.h>
+// #include <complex.h>
 #include <glm/glm.hpp>
 
 namespace Snowglobe::RenderOpenGL

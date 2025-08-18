@@ -10,7 +10,7 @@
 #include "ShaderCompiler.hpp"
 #include "VertexLayoutDescriptor.hpp"
 
-#include <complex.h>
+// #include <complex.h>
 
 namespace Snowglobe::RenderOpenGL {
 

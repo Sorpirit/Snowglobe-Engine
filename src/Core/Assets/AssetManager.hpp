@@ -67,7 +67,7 @@ class AssetManager
         auto it = _assetsMap.find(tag);
         if (it == _assetsMap.end())
         {
-            assert(assetRef->Optional() && "Cannot find asset with tag");
+            // assert(assetRef->Optional() && "Cannot find asset with tag");
             return;
         }
 

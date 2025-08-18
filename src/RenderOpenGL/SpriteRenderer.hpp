@@ -7,7 +7,7 @@
 #include "SceneParameters.hpp"
 #include "ShaderCompiler.hpp"
 
-#include <complex.h>
+// #include <complex.h>
 #include <memory>
 
 namespace Snowglobe::RenderOpenGL

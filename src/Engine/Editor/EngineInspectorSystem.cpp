@@ -147,7 +147,8 @@ void EngineInspectorSystem::DrawInspectorUI()
     auto selectedEntity = entities[_selectedEntity];
 
     char buffer[128];
-    strncpy_s(buffer, selectedEntity->GetName().c_str(), _TRUNCATE);
+    strcpy(buffer, selectedEntity->GetName().c_str());
+    // strncpy_s(buffer, selectedEntity->GetName().c_str(), _TRUNCATE);
     if (_uiSystem->Input("Name", buffer, 128))
     {
         selectedEntity->SetName(buffer);

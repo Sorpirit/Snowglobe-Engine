@@ -5,7 +5,7 @@
 #include "SceneParameters.hpp"
 #include "ShaderCompiler.hpp"
 
-#include <complex.h>
+// #include <complex.h>
 
 namespace Snowglobe::RenderOpenGL
 {
