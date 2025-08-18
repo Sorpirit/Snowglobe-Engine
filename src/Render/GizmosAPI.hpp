@@ -88,7 +88,7 @@ public:
 
     void AddDisk(glm::vec3 center, float radius, glm::vec4 color)
     {
-        for (int i = 0; i < _diskVertices.size(); ++i)
+        for (size_t i = 0; i < _diskVertices.size(); ++i)
         {
             PushVertex(_diskVertices[i] * radius + center, color);
         }
@@ -96,7 +96,7 @@ public:
 
     void AddDiskWire(glm::vec3 center, float radius, glm::vec4 color)
     {
-        for (int i = 0; i < _diskVerticesWire.size(); ++i)
+        for (size_t i = 0; i < _diskVerticesWire.size(); ++i)
         {
             PushVertex(_diskVerticesWire[i] * radius + center, color, false);
         }

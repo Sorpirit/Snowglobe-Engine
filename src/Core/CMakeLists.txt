@@ -24,3 +24,7 @@ target_link_libraries(Core
         spdlog
         TracyClient
 )
+
+target_compile_options(Core PRIVATE
+        $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>: -Wall -Wpedantic -Wextra -Werror>
+        $<$<CXX_COMPILER_ID:MSVC>: /WX /W3 /wd4267 /EHsc>)

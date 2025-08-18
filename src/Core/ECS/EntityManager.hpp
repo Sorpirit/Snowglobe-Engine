@@ -78,7 +78,7 @@ template <class TEntityData> class EntityManager final : public EntityManagerBas
         return entity;
     }
 
-    std::shared_ptr<Entity> CreateEntity(Entity& baseEntity, Lifetime lifetime) override
+    std::shared_ptr<Entity> CreateEntity(Entity& baseEntity, [[maybe_unused]] Lifetime lifetime) override
     {
         auto entityData = std::make_unique<TEntityData>();
         entityData->CopyFrom(baseEntity.GetData());
