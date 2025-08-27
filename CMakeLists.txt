@@ -12,3 +12,5 @@ target_compile_features(cxx_setup INTERFACE cxx_std_23)
 add_subdirectory(thirdparty)
 add_subdirectory(src)
 
+enable_testing()
+add_subdirectory(tests)
